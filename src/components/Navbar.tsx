@@ -31,11 +31,17 @@ function Navbar({ showDropdown }: { showDropdown: (bool: boolean) => void }) {
               <Link target="blank" to="https://spiral-stake.gitbook.io/spiral-stake-docs">
                 <div className="cursor-pointer text-center ">Learn</div>
               </Link>
+              <Link to={"/markets"}>
+                <div className="cursor-pointer text-center ">Markets</div>
+              </Link>
               <Link to={"/borrow"}>
                 <div className="cursor-pointer text-center ">Borrow</div>
               </Link>
+              <Link to={"/loop"}>
+                <div className="cursor-pointer text-center ">Loop</div>
+              </Link>
               <Link to={"/my-positions"}>
-                <div className="cursor-pointer text-center ">My Positions</div>
+                <div className="cursor-pointer text-center ">Portfolio</div>
               </Link>
             </div>
           </div>

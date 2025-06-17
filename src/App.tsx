@@ -6,15 +6,18 @@ import Navbar from "./components/Navbar";
 import DropdownMenu from "./components/DropdownMenu";
 // Pages
 import Borrow from "./pages/Borrow";
-import MyPositions from "./pages/MyPosition";
+import Portfolio from "./pages/Portfolio";
 import { Token } from "./types";
 import { useChainId } from "wagmi";
 import { readCollateralTokens } from "./config/contractsData";
+import Loop from "./pages/Loop";
+import Markets from "./pages/Markets";
+import PositionManager from "./contract-hooks/PositionManager";
 
 
 function App() {
   const [dropdown, setDropDown] = useState(false);
-  const [collateralTokens, setCollateralTokens] = useState<Token[]>([]);
+  const [positionManager, setPositionManager] = useState<PositionManager>()
 
   const appChainId = useChainId();
 
@@ -23,16 +26,16 @@ function App() {
      * @dev on appChainId change, reset the collateralTokens and positionManager according to the chain
      */
     async function handleChainChange() {
-      console.log("hey")
-      const [_collateralTokens] = await Promise.all([readCollateralTokens(appChainId)]);
+      const _positionManager = await PositionManager.createInstance(appChainId);
 
-      setCollateralTokens(_collateralTokens);
+
+      setPositionManager(_positionManager);
     }
 
     handleChainChange();
   }, [appChainId]);
 
-  console.log(collateralTokens);
+
 
   const showDropdown = (bool: boolean) => setDropDown(bool);
 
@@ -47,8 +50,10 @@ function App() {
 
       <main className="px-4 lg:px-16">
         <Routes>
-          <Route path="/borrow" element={<Borrow collateralTokens={collateralTokens} />} />
-          <Route path="/my-positions" element={<MyPositions collateralTokens={collateralTokens} />} />
+          <Route path="/markets" element={<Markets positionManager={positionManager} />} />
+          <Route path="/loop" element={<Loop positionManager={positionManager} />} />
+          <Route path="/borrow" element={<Borrow positionManager={positionManager} />} />
+          <Route path="/my-positions" element={<Portfolio positionManager={positionManager} />} />
           <Route path="*" element={<Navigate to={"/borrow"} />} />
         </Routes>
       </main>

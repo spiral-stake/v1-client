@@ -9,9 +9,11 @@ export interface Token {
 }
 
 export interface Position {
+  id: number;
+  owner: string;
   collateralToken: Token;
   collateralDeposited: BigNumber;
-  collateralValueInUsd: BigNumber;
   spiUsdMinted: BigNumber;
+  collateralValueInUsd: BigNumber;
   ltv?: BigNumber;
 }

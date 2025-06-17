@@ -4,8 +4,9 @@ import PageTitle from "../components/low-level/PageTitle";
 import PositionCard from "../components/low-level/PositionCard";
 import { Position, Token } from "../types";
 import { useAccount } from "wagmi";
+import PositionManager from "../contract-hooks/PositionManager";
 
-const MyPositions = ({ collateralTokens }: { collateralTokens: Token[] }) => {
+const Portfolio = ({ positionManager }: { positionManager: PositionManager | undefined }) => {
     const [positions, setPositions] = useState([]);
 
     const { address } = useAccount();
@@ -20,8 +21,8 @@ const MyPositions = ({ collateralTokens }: { collateralTokens: Token[] }) => {
         <div className="pb-16">
             <div className="py-16">
                 <PageTitle
-                    title={"Your Positions"}
-                    subheading={`Manage all your borrow positions in one place`}
+                    title={"Your Portfolio"}
+                    subheading={`Manage all your borrowing and looping positions in one place`}
                 />
             </div>
             {
@@ -64,4 +65,4 @@ const MyPositions = ({ collateralTokens }: { collateralTokens: Token[] }) => {
     );
 }
 
-export default MyPositions;
+export default Portfolio;

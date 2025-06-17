@@ -5,14 +5,18 @@ import { useAccount } from "wagmi";
 import SpiralStakeLogo from "../assets/logo.svg"
 import { Token } from "../types";
 import Input from "../components/low-level/Input";
+import PositionManager from "../contract-hooks/PositionManager";
+import { displayTokenAmount } from "../utils/displayTokenAmounts";
+import BigNumber from "bignumber.js";
+import ERC20 from "../contract-hooks/ERC20";
 
-const Borrow = ({ collateralTokens }: { collateralTokens: Token[] }) => {
+const Borrow = ({ positionManager }: { positionManager: PositionManager | undefined }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [collateralToken, setCollateralToken] = useState<Token>()
-    const [inputValue, setInputValue] = useState<{
-        amountSpiUsd: String,
-        amountCollateral: String
-    }>()
+    const [amountCollateral, setAmountCollateral] = useState("");
+    const [amountSpiUsd, setAmountSpiUsd] = useState("");
+    const [amountCollateralInUsd, setAmountCollateralInUsd] = useState<BigNumber>(BigNumber(0));
+
 
     const [actionBtn, setActionBtn] = useState({
         text: "Borrow",
@@ -24,9 +28,16 @@ const Borrow = ({ collateralTokens }: { collateralTokens: Token[] }) => {
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (!collateralTokens.length) return;
-        setCollateralToken(collateralTokens[0])
-    }, [collateralTokens]);
+        if (!positionManager) return;
+        setCollateralToken(positionManager.collateralTokens[0])
+
+        setActionBtn({
+            text: "Borrow",
+            onClick: () => handleBorrow(positionManager.collateralTokens[0]),
+            disabled: false,
+        });
+    }, [positionManager]);
+
 
     useEffect(() => {
         const handleClick = (e: MouseEvent) => {
@@ -38,22 +49,40 @@ const Borrow = ({ collateralTokens }: { collateralTokens: Token[] }) => {
         return () => document.removeEventListener('mousedown', handleClick);
     }, []);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+    useEffect(() => {
+        async function updateCollateralValueInUsd() {
+            if (positionManager && collateralToken && amountCollateral) {
+                setAmountCollateralInUsd(await positionManager.getTokenUsdValue(collateralToken, amountCollateral))
+            } else {
+                setAmountCollateralInUsd(BigNumber(0));
+            }
+        }
 
-        setInputValue((prevInput: any) => ({
-            ...prevInput,
-            [name]: value,
-        }));
-    };
+        updateCollateralValueInUsd();
+
+    }, [positionManager, collateralToken, amountCollateral])
+
 
     const handleCollateralTokenChange = (token: Token) => {
         setCollateralToken(token);
+        setAmountCollateral("");
         setIsOpen(false);
     }
 
+    const handleLtvSlider = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const ltv = e.target.value;
+        const _adjustedSpiUsd = BigNumber(amountCollateralInUsd).multipliedBy(BigNumber(ltv).div(100));
+        setAmountSpiUsd(String(_adjustedSpiUsd));
+    }
 
-    return collateralTokens.length && collateralToken && (
+    async function handleBorrow(collateralToken: Token) {
+        if (!positionManager) return;
+
+        await new ERC20(collateralToken).approve(positionManager.address, amountCollateral);
+        await positionManager?.openPosition(collateralToken, amountCollateral, amountSpiUsd);
+    }
+
+    return positionManager && collateralToken && (
         <div className="pb-16">
             <div className="py-16">
                 <PageTitle
@@ -102,7 +131,7 @@ const Borrow = ({ collateralTokens }: { collateralTokens: Token[] }) => {
 
                                                             {isOpen && (
                                                                 <div className="absolute top-full left-0 right-0 mt-1 bg-[#011B37] border border-[#142435] rounded-sm shadow-lg z-50">
-                                                                    {collateralTokens.map((token, index) => (
+                                                                    {positionManager.collateralTokens.map((token, index) => (
                                                                         <button
                                                                             key={index}
                                                                             className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-[#142435] flex items-center gap-2"
@@ -118,8 +147,8 @@ const Borrow = ({ collateralTokens }: { collateralTokens: Token[] }) => {
                                                             )}
                                                         </div>
                                                         <div className="flex min-w-0 flex-col gap-0.5">
-                                                            <Input name="amountCollateral" placeholder="0" onChange={handleInputChange} value={inputValue?.amountCollateral} />
-                                                            <div data-testid="component-AssetInput-inputUsdValue" className="text-xs truncate text-gray-500">{ }</div>
+                                                            <Input name="amountCollateral" placeholder="0" onChange={(e: any) => setAmountCollateral(e.target.value)} value={amountCollateral} />
+                                                            <div data-testid="component-AssetInput-inputUsdValue" className="text-xs truncate text-gray-400">${displayTokenAmount(amountCollateralInUsd, undefined, 2)}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -136,7 +165,7 @@ const Borrow = ({ collateralTokens }: { collateralTokens: Token[] }) => {
                                         <div className="flex flex-col gap-2">
                                             <div className="grid items-center gap-3 p-2 pr-4 rounded-sm border border-[#142435] to-gray-950 focus-within:border-[#084FAA] grid-cols-[auto_1fr]">
                                                 <div className="min-w-[120px]">
-                                                    <button type="button" role="combobox" aria-controls="radix-:r1l:" aria-expanded="false" aria-autocomplete="none" dir="ltr" data-state="closed" className="group flex w-full items-center justify-between rounded-sm border border-[#142435] bg-[#011B37] text-white p-3 placeholder:text-gray-500 hover:border-gray-400 hover:shadow-sm disabled:cursor-not-allowed disabled:border-gray-200 disabled:opacity-50 disabled:shadow-sm focus-visible:outline-none focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-offset-0 data-[state=open]:border-gray-200 data-[state=open]:shadow-sm" data-testid="component-AssetSelector-trigger">
+                                                    <button type="button" role="combobox" aria-controls="radix-:r1l:" aria-expanded="false" aria-autocomplete="none" dir="ltr" data-state="closed" className="group flex w-full items-center justify-between rounded-sm border border-[#142435] bg-[#011B37] text-white p-3 placeholder:text-gray-400 hover:border-gray-400 hover:shadow-sm disabled:cursor-not-allowed disabled:border-gray-200 disabled:opacity-50 disabled:shadow-sm focus-visible:outline-none focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-offset-0 data-[state=open]:border-gray-200 data-[state=open]:shadow-sm" data-testid="component-AssetSelector-trigger">
                                                         <div className="flex flex-row items-center gap-2">
                                                             <img className="h-6 w-6" src={SpiralStakeLogo} alt="" />
                                                             <div className="text-sm font-medium">SPIUSD</div>
@@ -144,8 +173,8 @@ const Borrow = ({ collateralTokens }: { collateralTokens: Token[] }) => {
                                                     </button>
                                                 </div>
                                                 <div className="flex min-w-0 flex-col gap-0.5">
-                                                    <Input name="amountSpiUsd" placeholder="0" onChange={handleInputChange} value={inputValue?.amountSpiUsd} />
-                                                    <div data-testid="component-AssetInput-inputUsdValue" className="text-xs truncate text-gray-500">${inputValue?.amountSpiUsd || "0.00"}</div>
+                                                    <Input name="amountSpiUsd" placeholder="0" onChange={(e: any) => setAmountSpiUsd(e.target.value)} value={amountSpiUsd} />
+                                                    <div data-testid="component-AssetInput-inputUsdValue" className="text-xs truncate text-gray-400">${amountSpiUsd || "0"}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -155,47 +184,37 @@ const Borrow = ({ collateralTokens }: { collateralTokens: Token[] }) => {
 
                             <section className="rounded-sm text-white p-4 sm:p-5 md:p-8">
                                 <div className="flex flex-col gap-6">
+                                    {/* Header */}
                                     <div className="flex flex-col gap-1">
-                                        <div className="text-xl font-semibold flex flex-row justify-between text-white">
+                                        <div className="text-xl font-semibold flex justify-between">
                                             <h4>Loan to Value (LTV)</h4>
-                                            <h4 data-testid="easyBorrow-form-ltv">79.00%</h4>
+                                            <h4>{positionManager.calcLtv(BigNumber(amountSpiUsd), amountCollateralInUsd)}%</h4>
                                         </div>
-                                        <div className="text-sm mt-2 flex flex-row justify-between text-gray-500">
+                                        <div className="text-sm mt-2 flex justify-between text-gray-400">
                                             <div>Ratio of the collateral value to the borrowed value</div>
-                                            <div className="text-right">max. 79.00%</div>
+                                            <div className="text-right flex flex-col">
+                                                <span>max. {positionManager.maxLtv}%</span>
+                                                <span>liquidation. {positionManager.liqLtv}%</span>
+                                            </div>
                                         </div>
                                     </div>
+
+                                    {/* Slider */}
                                     <div className="px-2.5">
-                                        <span dir="ltr" data-orientation="horizontal" aria-disabled="false" className="relative my-8 flex w-full touch-none select-none items-center" style={{ "--radix-slider-thumb-transform": "translateX(-50%)" }}>
-                                            <span data-orientation="horizontal" className="relative grid h-5 w-full gap-0.5" style={{ gridTemplateColumns: "26.67% 13.33% 40% 20%" }}>
-                                                <div className="flex h-full items-center justify-center bg-gray-200 transition-colors duration-300 -ml-2.5 rounded-l-full">
-                                                    <div className="-bottom-6 text-xs absolute text-gray-500">Conservative</div>
-                                                </div>
-                                                <div className="flex h-full items-center justify-center bg-gray-200 transition-colors duration-300">
-                                                    <div className="-bottom-6 text-xs absolute text-gray-500">Moderate</div>
-                                                </div>
-                                                <div className="flex h-full items-center justify-center bg-gray-200 transition-colors duration-300">
-                                                    <div className="-bottom-6 text-xs absolute text-white">Aggressive</div>
-                                                </div>
-                                                <div className="flex h-full items-center justify-center bg-gray-200 transition-colors duration-300 -ml-0.5 -mr-1 rounded-r-full">
-                                                    <div className="-bottom-6 text-xs absolute text-gray-500">Liquidation</div>
-                                                </div>
-                                                <div className="absolute top-0.5 bottom-0.5 w-0.5 bg-gradient-to-r from-blue-500 to-purple-500" style={{ left: "79%" }}></div>
-                                                <div className="absolute flex h-full w-0.5 justify-center" style={{ left: "80%" }}>
-                                                    <div className="absolute top-0.5 bottom-0.5 w-0.5 bg-gradient-to-r from-red-500 to-red-600" style={{ left: "79%" }}></div>
-                                                    <div className="text-xs absolute bottom-7 bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">80.00%</div>
-                                                </div>
-                                                <span data-orientation="horizontal" className="-mr-2.5 -ml-2.5 absolute h-full rounded-full bg-gradient-to-r from-red-500 to-red-600" style={{ left: "0%", right: "21.0002%" }}></span>
-                                            </span>
-                                            <span style={{ transform: "var(--radix-slider-thumb-transform)", position: "absolute", left: "calc(78.9998% + 0px)" }}>
-                                                <span role="slider" aria-valuemin="0" aria-valuemax="10000" aria-orientation="horizontal" data-orientation="horizontal" tabIndex={0} className="transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50" data-radix-collection-item="" aria-valuenow="7899.980471833878">
-                                                    <div className="flex transform items-center justify-center rounded-full bg-white p-0.5 transition-transform hover:scale-125 border border-[#142435]">
-                                                        <img className="h-3 w-3" src="data:image/svg+xml,%3csvg%20width='10'%20height='10'%20viewBox='0%200%2010%2010'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20d='M6.19416%205.61765H9.73349C9.87121%205.61765%209.91205%205.43009%209.78681%205.37281L6.19352%203.72939L6.19352%200.128422C6.19352%20-0.00576997%206.0135%20-0.0498007%205.95158%200.0692454L4.46004%202.93674L2.79457%202.17796C2.68398%202.12758%202.57189%202.24502%202.62735%202.35317L3.66797%204.38235L0.128503%204.38235C-0.00920611%204.38235%20-0.0500559%204.56989%200.0751746%204.62718L3.66862%206.2711L3.66862%209.87158C3.66862%2010.0058%203.84863%2010.0498%203.91055%209.93075L5.40196%207.0635L7.06478%207.82364C7.1753%207.87416%207.28754%207.75688%207.23223%207.64866L6.19416%205.61765Z'%20fill='url(%23paint0_linear_6022_1414)'/%3e%3cdefs%3e%3clinearGradient%20id='paint0_linear_6022_1414'%20x1='10.5289'%20y1='4.40741'%20x2='-0.332136'%20y2='4.22359'%20gradientUnits='userSpaceOnUse'%3e%3cstop%20stop-color='%23FFCD4D'/%3e%3cstop%20offset='1'%20stop-color='%23FA43BD'/%3e%3c/linearGradient%3e%3c/defs%3e%3c/svg%3e" />
-                                                    </div>
-                                                </span>
-                                            </span>
-                                        </span>
-                                        <input defaultValue="7899.980471833878" style={{ display: "none" }} />
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max={positionManager.maxLtv}
+                                            step="0.01"
+                                            value={positionManager.calcLtv(BigNumber(amountSpiUsd), amountCollateralInUsd)}
+                                            onChange={handleLtvSlider}
+                                            className="w-full"
+                                        />
+                                        <div className="flex justify-between mt-2 text-xs text-gray-400">
+                                            <span>Conservative</span>
+                                            <span className="text-white">Moderate</span>
+                                            <span className="text-red-500">Aggressive</span>
+                                        </div>
                                     </div>
                                 </div>
                             </section>
@@ -214,7 +233,7 @@ const Borrow = ({ collateralTokens }: { collateralTokens: Token[] }) => {
                             </section>
                         </div>
                     </section >
-                    <div>
+                    <div className="px-7">
                         <ActionBtn
                             text={actionBtn.text}
                             disabled={actionBtn.disabled}
@@ -238,8 +257,55 @@ const Borrow = ({ collateralTokens }: { collateralTokens: Token[] }) => {
                                 </div>
                             </div>
                         </section>
+
+
+                        <section className="rounded-sm text-white p-4 sm:p-5 md:p-8">
+                            <section className="flex flex-col gap-2">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-xl font-semibold text-white">Actions</h3>
+
+                                </div>
+                                <div className="rounded-sm border border-[#142435]">
+                                    <div className="grid grid-cols-[auto_1fr_auto] gap-x-3 sm:gap-x-8 md:grid-cols-[auto_auto_auto_1fr_auto]">
+                                        <div className="col-span-full grid grid-cols-subgrid items-center gap-y-3 border-b border-[#142435] p-4 last:border-none sm:p-5" data-testid="actions-row-2">
+                                            <div className="overflow-x-auto overflow-y-hidden whitespace-nowrap text-xs font-medium col-span-2 flex items-center gap-1.5 sm:overflow-visible md:col-span-1" data-chromatic="ignore">
+                                                Approve
+                                            </div>
+                                            <div className="text-xs font-medium col-span-full col-start-2 md:col-span-1">{amountCollateral} <span className="text-gray-400">{collateralToken.symbol}</span></div>
+                                            <div >
+                                                <button className="relative isolate inline-flex select-none items-center justify-center overflow-hidden whitespace-nowrap rounded-sm transition-colors focus-visible:bg-blue-600 focus-visible:text-gray-950 focus-visible:outline-none focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-offset-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 active:from-gray-800 active:to-gray-900 disabled:cursor-not-allowed disabled:text-gray-500 disabled:from-gray-50 disabled:to-gray-50 text-sm font-medium h-10 px-3.5 py-2.5 gap-2 w-full" type="button">Borrow</button>
+                                            </div>
+                                        </div>
+
+
+                                        <div className="col-span-full grid grid-cols-subgrid items-center gap-y-3 border-b border-[#142435] p-4 last:border-none sm:p-5" data-testid="actions-row-2">
+                                            <div className="overflow-x-auto overflow-y-hidden whitespace-nowrap text-xs font-medium col-span-2 flex items-center gap-1.5 sm:overflow-visible md:col-span-1" data-chromatic="ignore">
+                                                Deposit
+                                            </div>
+                                            <div className="text-xs font-medium col-span-full col-start-2 md:col-span-1">2,000.00 <span className="text-gray-400">DAI</span></div>
+                                            <div >
+                                                <button className="relative isolate inline-flex select-none items-center justify-center overflow-hidden whitespace-nowrap rounded-sm transition-colors focus-visible:bg-blue-600 focus-visible:text-gray-950 focus-visible:outline-none focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-offset-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 active:from-gray-800 active:to-gray-900 disabled:cursor-not-allowed disabled:text-gray-500 disabled:from-gray-50 disabled:to-gray-50 text-sm font-medium h-10 px-3.5 py-2.5 gap-2 w-full" type="button">Borrow</button>
+                                            </div>
+                                        </div>
+
+
+                                        <div className="col-span-full grid grid-cols-subgrid items-center gap-y-3 border-b border-[#142435] p-4 last:border-none sm:p-5" data-testid="actions-row-2">
+                                            <div className="overflow-x-auto overflow-y-hidden whitespace-nowrap text-xs font-medium col-span-2 flex items-center gap-1.5 sm:overflow-visible md:col-span-1" data-chromatic="ignore">
+                                                Borrow
+                                            </div>
+                                            <div className="text-xs font-medium col-span-full col-start-2 md:col-span-1">2,000.00 <span className="text-gray-400">DAI</span></div>
+                                            <div >
+                                                <button className="relative isolate inline-flex select-none items-center justify-center overflow-hidden whitespace-nowrap rounded-sm transition-colors focus-visible:bg-blue-600 focus-visible:text-gray-950 focus-visible:outline-none focus-visible:ring focus-visible:ring-blue-200 focus-visible:ring-offset-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 active:from-gray-800 active:to-gray-900 disabled:cursor-not-allowed disabled:text-gray-500 disabled:from-gray-50 disabled:to-gray-50 text-sm font-medium h-10 px-3.5 py-2.5 gap-2 w-full" type="button">Borrow</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </section>
                     </section>
                 </div >
+
+
             </div >
 
         </div >

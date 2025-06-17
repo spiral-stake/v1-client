@@ -1,19 +1,19 @@
 import { Base } from "./Base";
 import { abi as TOKEN_ABI } from "../abi/ERC20.sol/ERC20.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
+import { Token } from "../types/index.ts";
 
 export default class ERC20 extends Base {
   name: string;
   symbol: string;
   decimals: number;
 
+  constructor(token: Token, ...extendedAbis: any[]) {
+    super(token.address, [...TOKEN_ABI, ...extendedAbis]);
 
-  constructor(address: string, name: string, symbol: string, decimals: number, ...extendedAbis: any[]) {
-    super(address, [...TOKEN_ABI, ...extendedAbis]);
-
-    this.name = name;
-    this.symbol = symbol;
-    this.decimals = decimals;
+    this.name = token.name;
+    this.symbol = token.symbol;
+    this.decimals = token.decimals;
   }
 
   ///////////////////////////
