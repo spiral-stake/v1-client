@@ -8,18 +8,44 @@ import DropdownMenu from "./components/DropdownMenu";
 import Borrow from "./pages/Borrow";
 import Portfolio from "./pages/Portfolio";
 import { Token } from "./types";
-import { useChainId } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import { readCollateralTokens } from "./config/contractsData";
 import Loop from "./pages/Loop";
 import Markets from "./pages/Markets";
 import PositionManager from "./contract-hooks/PositionManager";
+import ERC20 from "./contract-hooks/ERC20";
+import OnboardingOverlay from "./components/OnboardingOverlay";
+import Overlay from "./components/low-level/Overlay";
 
 
 function App() {
   const [dropdown, setDropDown] = useState(false);
-  const [positionManager, setPositionManager] = useState<PositionManager>()
+  const [positionManager, setPositionManager] = useState<PositionManager>();
+  const [onboarding, setOnboarding] = useState(false);
+  const [overlay, setOverlay] = useState<React.ReactNode>();
 
+  const { address, chainId } = useAccount();
   const appChainId = useChainId();
+
+  useEffect(() => {
+    /**
+     * @dev Checks if the user's ybt balance is 0, and airdrop ybt and baseTokens for testnet onboarding
+     */
+    const onboardUser = async () => {
+      if (!address || chainId !== appChainId || !positionManager) return setOnboarding(false);
+
+      const collateralToken = new ERC20(positionManager.collateralTokens[0]);
+      const collateralTokenBalance = await collateralToken.balanceOf(address);
+
+      if (collateralTokenBalance.isZero()) {
+        setOnboarding(true);
+      } else {
+        setOnboarding(false);
+      }
+    };
+
+    onboardUser();
+  }, [address, chainId, appChainId, positionManager]);
 
   useEffect(() => {
     /**
@@ -28,13 +54,11 @@ function App() {
     async function handleChainChange() {
       const _positionManager = await PositionManager.createInstance(appChainId);
 
-
       setPositionManager(_positionManager);
     }
 
     handleChainChange();
   }, [appChainId]);
-
 
 
   const showDropdown = (bool: boolean) => setDropDown(bool);
@@ -56,6 +80,9 @@ function App() {
           <Route path="/my-positions" element={<Portfolio positionManager={positionManager} />} />
           <Route path="*" element={<Navigate to={"/borrow"} />} />
         </Routes>
+
+        <Overlay overlay={overlay} />
+        <OnboardingOverlay onboarding={onboarding} setOnboarding={setOnboarding} />
       </main>
     </div>
   );

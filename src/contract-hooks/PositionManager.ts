@@ -2,10 +2,11 @@ import { Position, Token } from "./../types/index";
 import { Base } from "./Base";
 import { abi as POSITION_MANAGER_ABI } from "../abi/PositionManager.sol/PositionManager.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
-import { readCollateralTokens } from "../config/contractsData.ts";
+import { readCollateralTokens, readCollateralToken } from "../config/contractsData.ts";
 import BigNumber from "bignumber.js";
 
 export default class PositionManager extends Base {
+  public chainId: number;
   public maxLtv: string;
   public liqLtv: string;
   public collateralTokens: Token[]; // Supported Collateral Tokens to borrow against
@@ -26,6 +27,7 @@ export default class PositionManager extends Base {
       readCollateralTokens(chainId),
     ]);
 
+    instance.chainId = chainId;
     instance.maxLtv = formatUnits(_maxLtv as bigint, instance.DEFAULT_DECIMALS)
       .multipliedBy(100)
       .toFixed(2);
@@ -107,9 +109,9 @@ export default class PositionManager extends Base {
   // Read Functions
 
   async getUserPositions(user: string) {
-    const positionIds = await this.read("getUserPositions", [user]);
+    const positionIds = await this.read("getUserPositionIds", [user]);
 
-    if (!positionIds || !Array.isArray(positionIds)) {
+    if (!Array.isArray(positionIds)) {
       throw new Error("Invalid positionInfo data received");
     }
 
@@ -122,26 +124,20 @@ export default class PositionManager extends Base {
       this.read("getPositionCollateralValue", [positionId]),
     ]);
 
-    if (!positionInfo || !Array.isArray(positionInfo)) {
-      throw new Error("Invalid positionInfo data received");
-    }
-
-    const owner = positionInfo[0];
-    const collateralToken = positionInfo[1];
-    const collateralDeposited = formatUnits(positionInfo[2] as bigint, collateralToken.decimals);
-    const spiUsdMinted = formatUnits(positionInfo[3] as bigint, this.DEFAULT_DECIMALS);
-    const collateralUsdValue = formatUnits(
-      collateralValueInUsd as bigint,
-      this.DEFAULT_DECIMALS // Needs to change
-    );
+    const collateralToken = await readCollateralToken(this.chainId, positionInfo.collateralToken);
+    const spiUsdMinted = formatUnits(positionInfo.SPIUSDMinted as bigint, this.DEFAULT_DECIMALS);
+    const collateralUsdValue = formatUnits(collateralValueInUsd as bigint, this.DEFAULT_DECIMALS);
 
     const ltv = spiUsdMinted.dividedBy(collateralUsdValue);
 
     return {
       id: positionId,
-      owner,
+      owner: positionInfo.owner,
       collateralToken,
-      collateralDeposited,
+      collateralDeposited: formatUnits(
+        positionInfo.collateralDeposited as bigint,
+        collateralToken.decimals
+      ),
       collateralValueInUsd: collateralUsdValue,
       spiUsdMinted,
       ltv,
@@ -155,14 +151,6 @@ export default class PositionManager extends Base {
     ]);
 
     return formatUnits(tokenUsdValue as bigint, token.decimals);
-  }
-
-  /////////////////////////
-  // Calc Functions
-
-  calcLtv(amountSpiUsd: BigNumber, amountCollateralInUsd: BigNumber) {
-    const ltv = amountSpiUsd.div(amountCollateralInUsd).multipliedBy(100);
-    return ltv.isNaN() || !ltv.isFinite() ? "0.00" : ltv.toFixed(2);
   }
 
   // UNUSED FUNCTIONS

@@ -3,19 +3,23 @@ import Loader from "../components/low-level/Loader";
 import PageTitle from "../components/low-level/PageTitle";
 import PositionCard from "../components/low-level/PositionCard";
 import { Position, Token } from "../types";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import PositionManager from "../contract-hooks/PositionManager";
 
 const Portfolio = ({ positionManager }: { positionManager: PositionManager | undefined }) => {
-    const [positions, setPositions] = useState([]);
+    const [positions, setPositions] = useState<Position[]>([]);
 
     const { address } = useAccount();
+    const chainId = useChainId();
 
     useEffect(() => {
-        async function getPositions() {
-
+        async function getUserPositions() {
+            if (!chainId || !address || !positionManager) return;
+            setPositions([...await positionManager.getUserPositions(address)]);
         }
-    }, [address])
+
+        getUserPositions();
+    }, [address, positionManager])
 
     return (
         <div className="pb-16">
@@ -48,13 +52,13 @@ const Portfolio = ({ positionManager }: { positionManager: PositionManager | und
                                 <span>LTV</span>
                             </div>
                             <div className="col-span-1 flex justify-end items-center">
-                                <span>Liq Risk</span>
+                                <span>Liq. LTV</span>
                             </div>
                         </div>
                         {/* <div className="h-0 w-full px-5 outline-[10px] outline-gray-600"/> */}
                         <div>
                             {positions.map((position: Position, index: number) => (
-                                <PositionCard key={index} position={position} />
+                                <PositionCard key={index} position={position} liqLtv={positionManager?.liqLtv} />
                             ))}
                         </div>
                     </div>

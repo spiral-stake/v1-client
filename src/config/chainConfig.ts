@@ -17,7 +17,7 @@ const fraxtalLocal: any = defineChain({
   logo: "/logo/reya-logo.webp",
   api: "http://localhost:5000",
   onboard: {
-    amountNative: "100",
+    amountNative: "1",
   },
 });
 
