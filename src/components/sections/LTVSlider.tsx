@@ -1,6 +1,6 @@
 import PositionManager from "../../contract-hooks/PositionManager";
 
-const LTVSlider = ({ positionManager, ltv, handleLtvSlider }: { positionManager: PositionManager, ltv: string, handleLtvSlider: (e: any) => void }) => {
+const LTVSlider = ({ maxLtv, ltv, handleLtvSlider }: { maxLtv: string, ltv: string, handleLtvSlider: (e: any) => void }) => {
     return (<section className="rounded-sm text-white p-4 sm:p-5 md:p-8">
         <div className="flex flex-col gap-6">
             {/* Header */}
@@ -12,7 +12,7 @@ const LTVSlider = ({ positionManager, ltv, handleLtvSlider }: { positionManager:
                 <div className="text-sm mt-2 flex justify-between text-gray-400">
                     <div>Ratio of the collateral value to the borrowed value</div>
                     <div className="text-right flex flex-col">
-                        <span>max. <span className="text-gray-300">{positionManager.maxLtv}%</span></span>
+                        <span>max. <span className="text-gray-300">{maxLtv}%</span></span>
                         {/* <span>liquidation. <span className="text-gray-300">{positionManager.liqLtv}%</span></span> */}
                     </div>
                 </div>
@@ -24,7 +24,7 @@ const LTVSlider = ({ positionManager, ltv, handleLtvSlider }: { positionManager:
                     type="range"
 
                     min="0"
-                    max={positionManager.maxLtv}
+                    max={maxLtv}
                     step="0.01"
                     value={ltv || "0.00"}
                     onChange={handleLtvSlider}

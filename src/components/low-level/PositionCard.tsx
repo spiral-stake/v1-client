@@ -6,7 +6,7 @@ import { Position } from "../../types";
 import PositionManager from "../../contract-hooks/PositionManager";
 import { calcLtv } from "../../utils";
 
-const PositionCard = ({ position, liqLtv }: { position: Position, liqLtv: string | undefined }) => {
+const PositionCard = ({ position, liqLtv, borrowApy }: { position: Position, liqLtv: string | undefined, borrowApy: string }) => {
   return (
     <Link to="">
       <div className="w-full mt-4 bg-gradient-to-l from-slate-900 to-gray-950 hover:bg-slate-800 rounded-md py-5 lg:py-2 border-y border-y-slate-800 lg:border-y-0 grid grid-cols-[1.3fr_1.8fr_2.2fr_2.2fr] grid-rows-[1fr_1fr_2fr] lg:grid-cols-8 lg:grid-rows-1 items-center lg:pr-5 transition-all ease-out duration-150">
@@ -17,7 +17,7 @@ const PositionCard = ({ position, liqLtv }: { position: Position, liqLtv: string
           <div className="w-full h-16 p-3 inline-flex justify-start items-center gap-4">
             <div className="inline-flex flex-col justify-center items-start">
               <div className="inline-flex justify-center items-center gap-2">
-                <div className="text-lg font-bold">
+                <div className="text-lg font-semibold">
                   {position.collateralToken.symbol}
                 </div>
               </div>
@@ -40,7 +40,7 @@ const PositionCard = ({ position, liqLtv }: { position: Position, liqLtv: string
         </div>
 
         <div className="col-span-1 h-16 flex flex-col items-end justify-center">
-          5.02%
+          {borrowApy}%
         </div>
 
         <div className="col-span-1 h-16 flex flex-col items-end justify-center">

@@ -16,11 +16,13 @@ import PositionManager from "./contract-hooks/PositionManager";
 import ERC20 from "./contract-hooks/ERC20";
 import OnboardingOverlay from "./components/OnboardingOverlay";
 import Overlay from "./components/low-level/Overlay";
+import FlashLeverage from "./contract-hooks/FlashLeverage";
 
 
 function App() {
   const [dropdown, setDropDown] = useState(false);
   const [positionManager, setPositionManager] = useState<PositionManager>();
+  const [flashLeverage, setFlashLeverage] = useState<FlashLeverage>();
   const [onboarding, setOnboarding] = useState(false);
   const [overlay, setOverlay] = useState<React.ReactNode>();
 
@@ -53,8 +55,10 @@ function App() {
      */
     async function handleChainChange() {
       const _positionManager = await PositionManager.createInstance(appChainId);
+      const _flashLeverage = await FlashLeverage.createInstance(appChainId);
 
       setPositionManager(_positionManager);
+      setFlashLeverage(_flashLeverage);
     }
 
     handleChainChange();
@@ -75,9 +79,9 @@ function App() {
       <main className="px-4 lg:px-16">
         <Routes>
           <Route path="/markets" element={<Markets positionManager={positionManager} />} />
-          <Route path="/loop" element={<Loop positionManager={positionManager} />} />
+          <Route path="/loop" element={<Loop positionManager={positionManager} flashLeverage={flashLeverage} />} />
           <Route path="/borrow" element={<Borrow positionManager={positionManager} />} />
-          <Route path="/my-positions" element={<Portfolio positionManager={positionManager} />} />
+          <Route path="/my-positions" element={<Portfolio positionManager={positionManager} flashLeverage={flashLeverage} />} />
           <Route path="*" element={<Navigate to={"/borrow"} />} />
         </Routes>
 

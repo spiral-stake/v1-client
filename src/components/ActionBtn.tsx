@@ -8,18 +8,20 @@ const ActionBtn = ({
   onClick,
   disabled,
   text,
+  btnLoading
 }: {
   expectedChainId: number;
   onClick: () => void;
   disabled: boolean;
   text: string;
+  btnLoading: boolean
 }) => {
   const { address, chainId } = useAccount();
   const { switchChain } = useSwitchChain();
 
   return address ? (
     chainId === expectedChainId ? (
-      <BtnFull text={text} onClick={onClick} disabled={disabled} />
+      <BtnFull text={text} onClick={onClick} disabled={disabled} btnLoading={btnLoading} />
     ) : (
       <BtnFull
         text={`Switch to ${chainConfig[expectedChainId].name}`}

@@ -17,3 +17,11 @@ export interface Position {
   collateralValueInUsd: BigNumber;
   ltv?: BigNumber;
 }
+
+export interface LeveragePosition {
+  owner: string;
+  id: number; // user => LeveragePosition[index]
+  debtPosition: Position;
+  userCollateralDeposited: BigNumber;
+  userCollateralDepositedValueInUsd: BigNumber;
+}

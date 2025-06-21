@@ -1,0 +1,26 @@
+{
+  "0x26b8fAb1a8179822a3D8df35A063f38913904614": {
+    "isPT": false,
+    "apy": "4.11"
+  },
+  "0x3d3aF2eCfaa71343B15aCf5D64d6fbBC2B22AD26": {
+    "isPT": true,
+    "apy": "8.73"
+  },
+  "0x1b922B45fd00D1d1E524538B45c963bC0C325189": {
+    "isPT": true,
+    "apy": "7.47"
+  },
+  "0xb97e2Eaff562b702cB744352Da05646b6e9DD65F": {
+    "isPT": true,
+    "apy": "9.51"
+  },
+  "0xE4408cECD1eC5D8336b16998f010cf4f8497AB23": {
+    "isPT": false,
+    "apy": "4.6"
+  },
+  "0xb4ccD7d85bC96E6F260671E5f218B615a5cC62D9": {
+    "isPT": false,
+    "apy": "10.03"
+  }
+}

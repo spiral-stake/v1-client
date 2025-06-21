@@ -11,8 +11,9 @@ import BigNumber from "bignumber.js";
 import ERC20 from "../contract-hooks/ERC20";
 import { calcLtv } from "../utils";
 import LTVSlider from "../components/sections/LTVSlider";
+import { handleAsync } from "../utils/handleAsyncFunction";
 
-const Borrow = ({ positionManager }: { positionManager: PositionManager | undefined }) => {
+const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [collateralToken, setCollateralToken] = useState<Token>();
     const [amountCollateral, setAmountCollateral] = useState("");
@@ -20,13 +21,19 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager | undefi
     const [amountCollateralInUsd, setAmountCollateralInUsd] = useState<BigNumber>(BigNumber(0));
     const [showActions, setShowActions] = useState(false);
 
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const [userCollateralBalance, setUserCollateralBalance] = useState<BigNumber>();
+    const [userCollateralAllowance, setUserCollateralAllowance] = useState<BigNumber>();
+
+
     const [actionBtn, setActionBtn] = useState({
         text: "Borrow: Summary",
         onClick: () => { },
         disabled: false,
     });
 
-    const { chainId } = useAccount();
+    const { chainId, address } = useAccount();
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -38,6 +45,27 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager | undefi
         document.addEventListener("mousedown", handleClick);
         return () => document.removeEventListener("mousedown", handleClick);
     }, []);
+
+    useEffect(() => {
+        updateUserCollateralBalance();
+        updateUserCollateralAllowance();
+    }, [address, collateralToken]);
+
+    const updateUserCollateralBalance = async () => {
+        if (!address || !collateralToken) return;
+
+        const balance = await new ERC20(collateralToken).balanceOf(address);
+        setUserCollateralAllowance(balance);
+    }
+
+    const updateUserCollateralAllowance = async () => {
+        if (!address || !collateralToken) return;
+
+        const allowance = await new ERC20(collateralToken).allowance(address, positionManager.address);
+        setUserCollateralAllowance(allowance);
+    }
+
+
 
     useEffect(() => {
         if (!positionManager) return;
@@ -79,11 +107,13 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager | undefi
     async function handleApprove(collateralToken: Token) {
         if (!positionManager) return;
         await new ERC20(collateralToken).approve(positionManager.address, amountCollateral);
+        setUserCollateralAllowance(BigNumber(amountCollateral));
     }
 
     async function handleBorrow(collateralToken: Token) {
         if (!positionManager) return;
         await positionManager?.openPosition(collateralToken, amountCollateral, amountSpiUsd);
+        updateUserCollateralBalance();
     }
 
     return (
@@ -255,7 +285,7 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager | undefi
                                 </div>
 
                                 <LTVSlider
-                                    positionManager={positionManager}
+                                    maxLtv={positionManager.maxLtv}
                                     ltv={calcLtv(BigNumber(amountSpiUsd), amountCollateralInUsd)}
                                     handleLtvSlider={handleLtvSlider}
                                 />
@@ -281,7 +311,7 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager | undefi
                                         className="text-4xl font-bold bg-gradient-to-r from-orange-100 to-orange-600 bg-clip-text text-transparent"
                                         data-testid="easyBorrow-form-borrowRate"
                                     >
-                                        5.02%
+                                        {positionManager.borrowApy}%
                                     </h3>
                                     <div className="text-sm text-gray-300">
                                         Borrow SPIUSD directly from your Staked Stablecoins
@@ -314,10 +344,11 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager | undefi
                                                     </div>
                                                     <div>
                                                         <ActionBtn
-                                                            text={"Approve"}
+                                                            btnLoading={loading}
+                                                            text={userCollateralAllowance?.gte(amountCollateral) ? "" : "Approve"} // "" means tick
                                                             disabled={false}
                                                             expectedChainId={Number(chainId)}
-                                                            onClick={() => handleApprove(collateralToken)}
+                                                            onClick={handleAsync(() => handleApprove(collateralToken), setLoading)}
                                                         />
                                                     </div>
                                                 </div>

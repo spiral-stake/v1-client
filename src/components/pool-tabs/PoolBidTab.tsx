@@ -9,7 +9,7 @@ import ActionBtn from "../ActionBtn.tsx";
 import { HoverInfo } from "../low-level/HoverInfo.tsx";
 import Loading from "../low-level/Loading.tsx";
 import UserMessage from "../low-level/SuccessMsg.tsx";
-import checkIconBig from "../../assets/icons/checkIconBig.svg";
+import checkIconBlue from "../../assets/icons/checkIconBlue.svg";
 import errorIconBig from "../../assets/icons/errorIconBig.svg";
 import BidInfoRow from "../low-level/BidInfoRow.tsx";
 import BigNumber from "bignumber.js";
@@ -39,7 +39,7 @@ const PoolBidTab = ({
   const [loading, setLoading] = useState(false);
   const [actionBtn, setActionBtn] = useState({
     text: "",
-    onClick: () => {},
+    onClick: () => { },
     disabled: false,
   });
 
@@ -153,7 +153,7 @@ const PoolBidTab = ({
       // For Winners
       return (
         <UserMessage
-          icon={checkIconBig}
+          icon={checkIconBlue}
           title="You won the Bid"
           message="You will receive the cycle amount when the cycle finalizes"
         />
@@ -164,7 +164,7 @@ const PoolBidTab = ({
     if (lowestBid.amount.isGreaterThan(0) && lowestBid.positionId === position.id) {
       return (
         <UserMessage
-          icon={checkIconBig}
+          icon={checkIconBlue}
           title="Your Bid is Currently Winning"
           message={`Your bid of ${displayTokenAmount(
             lowestBid.amount,

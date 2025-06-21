@@ -1,4 +1,4 @@
-import checkIconBig from "../../assets/icons/checkIconBig.svg";
+import checkIconBlue from "../../assets/icons/checkIconBlue.svg";
 import completedIcon from "../../assets/icons/completed.svg";
 
 const Loading = ({
@@ -26,7 +26,7 @@ const Loading = ({
           <div className="flex-1 inline-flex flex-col justify-start items-center gap-1">
             <div className="self-stretch inline-flex justify-start items-center">
               <div className="flex-1 self-stretch" />
-              <img src={checkIconBig} alt="" />
+              <img src={checkIconBlue} alt="" />
               <div className="flex-1 inline-flex flex-col justify-start items-start gap-2">
                 <div className="self-stretch h-0 outline outline-2 outline-offset-[-1px] outline-blue-800" />
               </div>

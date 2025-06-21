@@ -10,12 +10,13 @@ import { displayTokenAmount } from "../utils/displayTokenAmounts";
 import { calcMaxLeverage, } from "../utils";
 import ActionBtn from "../components/ActionBtn";
 import ERC20 from "../contract-hooks/ERC20";
+import FlashLeverage from "../contract-hooks/FlashLeverage";
 
-const Loop = ({ positionManager }: { positionManager: PositionManager | undefined }) => {
+const Loop = ({ positionManager, flashLeverage }: { positionManager: PositionManager, flashLeverage: FlashLeverage }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [collateralToken, setCollateralToken] = useState<Token>()
     const [amountCollateral, setAmountCollateral] = useState("");
-    const [ltv, setLtv] = useState("");
+    const [desiredLtv, setLtv] = useState("");
     const [actionBtn, setActionBtn] = useState({
         text: "Borrow: Summary",
         onClick: () => { },
@@ -39,15 +40,15 @@ const Loop = ({ positionManager }: { positionManager: PositionManager | undefine
     }, []);
 
     useEffect(() => {
-        if (!positionManager) return;
-        setCollateralToken(positionManager.collateralTokens[0]);
+        if (!positionManager || !flashLeverage) return;
+        setCollateralToken(flashLeverage.collateralTokens[0]);
 
         setActionBtn({
             text: "Loop",
             onClick: () => setShowActions(true),
             disabled: false,
         });
-    }, [positionManager]);
+    }, [positionManager, flashLeverage]);
 
     useEffect(() => {
         async function updateCollateralValueInUsd() {
@@ -74,11 +75,16 @@ const Loop = ({ positionManager }: { positionManager: PositionManager | undefine
     }
 
     async function handleApprove(collateralToken: Token) {
-        if (!positionManager) return;
-        await new ERC20(collateralToken).approve(positionManager.address, amountCollateral);
+        if (!flashLeverage) return;
+        await new ERC20(collateralToken).approve(flashLeverage.address, amountCollateral);
     }
 
-    return positionManager && collateralToken && (
+    async function handleLeverage(collateralToken: Token,) {
+        if (!flashLeverage) return;
+        await flashLeverage.leverage(collateralToken, amountCollateral, desiredLtv);
+    }
+
+    return flashLeverage && collateralToken && (
         <div className="pb-16">
             <div className="py-16">
                 <PageTitle
@@ -129,7 +135,7 @@ const Loop = ({ positionManager }: { positionManager: PositionManager | undefine
 
                                                             {isOpen && (
                                                                 <div className="absolute top-full left-0 right-0 mt-1 bg-[#011B37] border border-[#142435] rounded-sm shadow-lg z-50">
-                                                                    {positionManager.collateralTokens.map((token, index) => (
+                                                                    {flashLeverage.collateralTokens.map((token, index) => (
                                                                         <button
                                                                             key={index}
                                                                             className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-[#142435] flex items-center gap-2"
@@ -157,12 +163,12 @@ const Loop = ({ positionManager }: { positionManager: PositionManager | undefine
 
 
                                 <section className="rounded-sm p-4 sm:p-5 md:p-8 flex flex-1 justify-center items-center flex-col gap-4 bg-gradient-to-l from-slate-950 via-gray-900 to-slate-950">
-                                    <div className="text-4xl font-semibold">{calcMaxLeverage(BigNumber(ltv))}x Leverage</div>
+                                    <div className="text-4xl font-semibold">{calcMaxLeverage(BigNumber(desiredLtv))}x Leverage</div>
                                 </section>
 
 
                             </div>
-                            <LTVSlider positionManager={positionManager} ltv={ltv} handleLtvSlider={handleLtvSlider} />
+                            <LTVSlider maxLtv={flashLeverage?.maxLeverageLtv} ltv={desiredLtv} handleLtvSlider={handleLtvSlider} />
                         </div>
                         <div className="px-7">
                             <ActionBtn
@@ -237,14 +243,14 @@ const Loop = ({ positionManager }: { positionManager: PositionManager | undefine
                                                     Leverage
                                                 </div>
                                                 <div className="text-xs font-medium col-span-1 col-start-2 md:col-span-3">
-                                                    {calcMaxLeverage((BigNumber(ltv)))} <span className="text-gray-400">x</span>
+                                                    {calcMaxLeverage((BigNumber(desiredLtv)))} <span className="text-gray-400">x</span>
                                                 </div>
                                                 <div>
                                                     <ActionBtn
                                                         text={"Loop"}
                                                         disabled={false}
                                                         expectedChainId={Number(chainId)}
-                                                        onClick={() => { }}
+                                                        onClick={() => handleLeverage(collateralToken)}
                                                     />
                                                 </div>
                                             </div>

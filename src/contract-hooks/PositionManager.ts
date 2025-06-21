@@ -10,6 +10,7 @@ export default class PositionManager extends Base {
   public maxLtv: string;
   public liqLtv: string;
   public collateralTokens: Token[]; // Supported Collateral Tokens to borrow against
+  public borrowApy: "3.6";
 
   constructor(positionManagerAddress: string) {
     super(positionManagerAddress, POSITION_MANAGER_ABI);

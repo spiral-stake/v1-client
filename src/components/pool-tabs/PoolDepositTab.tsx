@@ -14,7 +14,7 @@ import { displayTokenAmount } from "../../utils/displayTokenAmounts.ts";
 import Loading from "../low-level/Loading.tsx";
 import { HoverInfo } from "../low-level/HoverInfo.tsx";
 import UserMessage from "../low-level/SuccessMsg.tsx";
-import checkIconBig from "../../assets/icons/checkIconBig.svg";
+import checkIconBlue from "../../assets/icons/checkIconBlue.svg";
 import errorIconBig from "../../assets/icons/errorIconBig.svg";
 import Countdown from "react-countdown";
 import { renderCountdown } from "../low-level/CountdownRenderer.tsx";
@@ -39,7 +39,7 @@ const PoolDepositTab = ({
   const [loading, setLoading] = useState(false);
   const [actionBtn, setActionBtn] = useState({
     text: "",
-    onClick: () => {},
+    onClick: () => { },
     disabled: false,
   });
 
@@ -148,7 +148,7 @@ const PoolDepositTab = ({
       return (
         <div>
           <UserMessage
-            icon={checkIconBig}
+            icon={checkIconBlue}
             title={`${displayTokenAmount(
               pool.amountCycle,
               pool.baseToken
@@ -166,9 +166,8 @@ const PoolDepositTab = ({
           <UserMessage
             icon={errorIconBig}
             title={`Cycle Deposit window is closed.`}
-            message={`Your ${displayTokenAmount(pool.amountCycle, pool.baseToken)} worth of ${
-              pool.ybt.symbol
-            } collateral has been liquidated for your missed cycle deposit`}
+            message={`Your ${displayTokenAmount(pool.amountCycle, pool.baseToken)} worth of ${pool.ybt.symbol
+              } collateral has been liquidated for your missed cycle deposit`}
           />
         );
       }
@@ -184,7 +183,7 @@ const PoolDepositTab = ({
               value={displayTokenAmount(pool.amountCycle)}
               inputTokenSymbol={pool.baseToken.symbol}
               name={""}
-              onChange={() => {}}
+              onChange={() => { }}
             />
           </div>
           <div>
@@ -221,7 +220,7 @@ const PoolDepositTab = ({
             <Countdown
               date={currentCycle.depositAndBidEndTime * 1000}
               renderer={renderCountdown}
-              onComplete={() => {}} // closeCycleDepositAndBidWindow would be closed by PoolBidTab
+              onComplete={() => { }} // closeCycleDepositAndBidWindow would be closed by PoolBidTab
             />
           </div>
         </div>
