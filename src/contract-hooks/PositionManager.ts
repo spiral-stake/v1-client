@@ -2,7 +2,7 @@ import { Position, Token } from "./../types/index";
 import { Base } from "./Base";
 import { abi as POSITION_MANAGER_ABI } from "../abi/PositionManager.sol/PositionManager.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
-import { readCollateralTokens, readCollateralToken } from "../config/contractsData.ts";
+import { readCollateralTokens, readCollateralToken, readSpiUsd } from "../config/contractsData.ts";
 import BigNumber from "bignumber.js";
 
 export default class PositionManager extends Base {
@@ -10,7 +10,8 @@ export default class PositionManager extends Base {
   public maxLtv: string;
   public liqLtv: string;
   public collateralTokens: Token[]; // Supported Collateral Tokens to borrow against
-  public borrowApy: "3.6";
+  public spiUsd: Token;
+  public borrowApy: string;
 
   constructor(positionManagerAddress: string) {
     super(positionManagerAddress, POSITION_MANAGER_ABI);
@@ -19,13 +20,13 @@ export default class PositionManager extends Base {
   static async createInstance(chainId: number) {
     const { positionManagerAddress } = await import(`../addresses/${chainId}.json`);
 
-    console.log(positionManagerAddress);
     const instance = new PositionManager(positionManagerAddress);
 
-    const [_maxLtv, _liqLtv, _collateralTokens] = await Promise.all([
+    const [_maxLtv, _liqLtv, _collateralTokens, spiUsd] = await Promise.all([
       instance.read("MAX_LTV"),
       instance.read("LIQ_LTV"),
       readCollateralTokens(chainId),
+      readSpiUsd(chainId),
     ]);
 
     instance.chainId = chainId;
@@ -36,7 +37,8 @@ export default class PositionManager extends Base {
       .multipliedBy(100)
       .toFixed(2);
     instance.collateralTokens = _collateralTokens;
-
+    instance.borrowApy = "3.6";
+    instance.spiUsd = spiUsd;
     return instance;
   }
 
@@ -126,6 +128,7 @@ export default class PositionManager extends Base {
     ]);
 
     const collateralToken = await readCollateralToken(this.chainId, positionInfo.collateralToken);
+
     const spiUsdMinted = formatUnits(positionInfo.SPIUSDMinted as bigint, this.DEFAULT_DECIMALS);
     const collateralUsdValue = formatUnits(collateralValueInUsd as bigint, this.DEFAULT_DECIMALS);
 
@@ -142,6 +145,7 @@ export default class PositionManager extends Base {
       collateralValueInUsd: collateralUsdValue,
       spiUsdMinted,
       ltv,
+      borrowApy: BigNumber(this.borrowApy), // Needs to change
     };
   }
 

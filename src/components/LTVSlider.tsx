@@ -22,7 +22,6 @@ const LTVSlider = ({ maxLtv, ltv, handleLtvSlider }: { maxLtv: string, ltv: stri
             <div className="px-2.5">
                 <input
                     type="range"
-
                     min="0"
                     max={maxLtv}
                     step="0.01"

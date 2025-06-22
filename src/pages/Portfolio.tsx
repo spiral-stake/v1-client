@@ -64,7 +64,7 @@ const Portfolio = ({ positionManager, flashLeverage }: { positionManager: Positi
                     {/* <div className="h-0 w-full px-5 outline-[10px] outline-gray-600"/> */}
                     <div>
                         {positions.map((position: Position, index: number) => (
-                            <PositionCard key={index} position={position} liqLtv={positionManager?.liqLtv} />
+                            <PositionCard key={index} position={position} liqLtv={positionManager?.liqLtv} borrowApy={positionManager.borrowApy} />
                         ))}
                     </div>
                 </div>
@@ -73,7 +73,7 @@ const Portfolio = ({ positionManager, flashLeverage }: { positionManager: Positi
             )}
 
 
-            {leveragePositions.length && (
+            {leveragePositions.length ? (
                 <>
                     <div className="py-10">
                         <h2 className="text-xl font-semibold">Looping Positions</h2>
@@ -108,7 +108,7 @@ const Portfolio = ({ positionManager, flashLeverage }: { positionManager: Positi
                                 <LeveragePositionCard key={index} leveragePosition={leveragePosition} liqLtv={positionManager?.liqLtv} />
                             ))}
                         </div>
-                    </div></>)}
+                    </div></>) : ""}
         </div>
     );
 };

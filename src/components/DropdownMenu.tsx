@@ -1,7 +1,4 @@
-import BtnFull from "./low-level/BtnFull";
-import bellIcon from "../assets/bell.svg";
 import fraxIcon from "../assets/icons/frax.svg";
-import arrowIcon from "../assets/icons/arrowDown.svg";
 import close from "../assets/icons/close.svg";
 import ConnectWalletBtn from "./ConnectWalletButton";
 import { Link } from "react-router-dom";

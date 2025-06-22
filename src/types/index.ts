@@ -6,6 +6,8 @@ export interface Token {
   symbol: string;
   decimals: number;
   valueInUsd: BigNumber;
+  apy: string;
+  isPT: boolean;
 }
 
 export interface Position {
@@ -16,6 +18,7 @@ export interface Position {
   spiUsdMinted: BigNumber;
   collateralValueInUsd: BigNumber;
   ltv?: BigNumber;
+  borrowApy: BigNumber;
 }
 
 export interface LeveragePosition {
