@@ -30,18 +30,18 @@ export const readCollateralTokens = async (chainId: number): Promise<Token[]> =>
   });
 };
 
-export const readSpiUsd = async (chainId: number): Promise<Token> => {
+export const readStblUSD = async (chainId: number): Promise<Token> => {
   const [addressesModule] = await Promise.all([
     import(`../addresses/${chainId}.json`) as Promise<{
-      default: { SPIUSD: Token };
+      default: { stblUSD: Token };
     }>,
     import(`../token-data/${chainId}.json`) as Promise<{ default: TokenData }>,
   ]);
 
-  const { SPIUSD } = addressesModule.default;
+  const { stblUSD } = addressesModule.default;
 
   return {
-    ...SPIUSD,
+    ...stblUSD,
     isPT: false,
     apy: "0",
   };

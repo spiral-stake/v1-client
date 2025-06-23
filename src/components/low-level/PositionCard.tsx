@@ -35,8 +35,8 @@ const PositionCard = ({ position, liqLtv, borrowApy }: { position: Position, liq
         </div>
 
         <div className="col-span-1 lg:col-span-1 h-16  flex flex-col items-end justify-center">
-          {displayTokenAmount(position.spiUsdMinted)}{" SPIUSD"}
-          <div className="text-xs">${displayTokenAmount(position.spiUsdMinted)}</div>
+          {displayTokenAmount(position.stblUSDMinted)}{" stblUSD"}
+          <div className="text-xs">${displayTokenAmount(position.stblUSDMinted)}</div>
         </div>
 
         <div className="col-span-1 h-16 flex flex-col items-end justify-center">
@@ -44,7 +44,7 @@ const PositionCard = ({ position, liqLtv, borrowApy }: { position: Position, liq
         </div>
 
         <div className="col-span-1 h-16 flex flex-col items-end justify-center">
-          {calcLtv(position.spiUsdMinted, position.collateralValueInUsd)}%
+          {calcLtv(position.stblUSDMinted, position.collateralValueInUsd)}%
         </div>
 
         <div className="hidden lg:inline-flex col-span-1 justify-end">

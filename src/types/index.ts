@@ -15,7 +15,7 @@ export interface Position {
   owner: string;
   collateralToken: Token;
   collateralDeposited: BigNumber;
-  spiUsdMinted: BigNumber;
+  stblUSDMinted: BigNumber;
   collateralValueInUsd: BigNumber;
   ltv?: BigNumber;
   borrowApy: BigNumber;

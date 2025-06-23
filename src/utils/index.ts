@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 
-export function calcLtv(amountSpiUsd: BigNumber, amountCollateralInUsd: BigNumber) {
-  const ltv = amountSpiUsd.div(amountCollateralInUsd).multipliedBy(100);
+export function calcLtv(amountStblUSD: BigNumber, amountCollateralInUsd: BigNumber) {
+  const ltv = amountStblUSD.div(amountCollateralInUsd).multipliedBy(100);
   return ltv.isNaN() || !ltv.isFinite() ? "0.00" : ltv.toFixed(2);
 }
 

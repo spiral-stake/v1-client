@@ -15,7 +15,7 @@ import Action from "../components/Action";
 const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
     const [collateralToken, setCollateralToken] = useState<Token>();
     const [amountCollateral, setAmountCollateral] = useState("");
-    const [amountSpiUsd, setAmountSpiUsd] = useState("");
+    const [amountStblUSD, setAmountStblUSD] = useState("");
     const [amountCollateralInUsd, setAmountCollateralInUsd] = useState<BigNumber>(BigNumber(0));
     const [showSummary, setShowSummary] = useState(false);
 
@@ -75,8 +75,8 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
 
     const handleLtvSlider = (e: React.ChangeEvent<HTMLInputElement>) => {
         const ltv = e.target.value;
-        const _adjustedSpiUsd = BigNumber(amountCollateralInUsd).multipliedBy(BigNumber(ltv).div(100));
-        setAmountSpiUsd(String(_adjustedSpiUsd));
+        const _adjustedStblUSD = BigNumber(amountCollateralInUsd).multipliedBy(BigNumber(ltv).div(100));
+        setAmountStblUSD(String(_adjustedStblUSD));
     };
 
     async function handleApprove() {
@@ -87,7 +87,7 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
 
     async function handleBorrow() {
         if (!positionManager || !collateralToken) return;
-        await positionManager?.openPosition(collateralToken, amountCollateral, amountSpiUsd);
+        await positionManager?.openPosition(collateralToken, amountCollateral, amountStblUSD);
         updateUserCollateralBalance();
     }
 
@@ -121,17 +121,17 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
 
                                     <TokenAmount
                                         title="Borrow"
-                                        selectedToken={positionManager.spiUsd}
-                                        amount={amountSpiUsd}
-                                        handleAmountChange={setAmountSpiUsd}
-                                        amountInUsd={BigNumber(amountSpiUsd || "0.00")}
+                                        selectedToken={positionManager.stblUSD}
+                                        amount={amountStblUSD}
+                                        handleAmountChange={setAmountStblUSD}
+                                        amountInUsd={BigNumber(amountStblUSD || "0.00")}
                                         bgStyle={"bg-gradient-to-r from-slate-900 to-gray-950"}
                                     />
                                 </div>
 
                                 <LTVSlider
                                     maxLtv={positionManager.maxLtv}
-                                    ltv={calcLtv(BigNumber(amountSpiUsd), amountCollateralInUsd)}
+                                    ltv={calcLtv(BigNumber(amountStblUSD), amountCollateralInUsd)}
                                     handleLtvSlider={handleLtvSlider}
                                 />
                             </div>
@@ -153,7 +153,7 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
                             <APYInfo
                                 title="Fixed Borrow Rate"
                                 apy={positionManager.borrowApy}
-                                description="Borrow SPIUSD directly from your PT's or Staked Stablecoins"
+                                description="Borrow stblUSD directly from your PT's or Staked Stablecoins"
                             />
 
                             {/* Actions */}
@@ -174,8 +174,8 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
                                                 />
                                                 <Action
                                                     text="Borrow"
-                                                    token={positionManager.spiUsd}
-                                                    amountToken={amountSpiUsd}
+                                                    token={positionManager.stblUSD}
+                                                    amountToken={amountStblUSD}
                                                     actionHandler={handleBorrow}
                                                 />
                                             </div>

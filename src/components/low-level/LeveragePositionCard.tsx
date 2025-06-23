@@ -36,7 +36,7 @@ const LeveragePositionCard = ({ leveragePosition, liqLtv }: { leveragePosition: 
                 </div>
 
                 <div className="col-span-1 lg:col-span-1 h-16  flex flex-col items-end justify-center">
-                    {calcMaxLeverage(calcLtv(leveragePosition.debtPosition.spiUsdMinted, leveragePosition.debtPosition.collateralValueInUsd))}x
+                    {calcMaxLeverage(calcLtv(leveragePosition.debtPosition.stblUSDMinted, leveragePosition.debtPosition.collateralValueInUsd))}x
                 </div>
 
                 <div className="col-span-1 h-16 flex flex-col items-end justify-center">
@@ -45,13 +45,13 @@ const LeveragePositionCard = ({ leveragePosition, liqLtv }: { leveragePosition: 
                 </div>
 
                 <div className="col-span-1 h-16 flex flex-col items-end justify-center">
-                    {calcLtv(leveragePosition.debtPosition.spiUsdMinted, leveragePosition.debtPosition.collateralValueInUsd)}%
+                    {calcLtv(leveragePosition.debtPosition.stblUSDMinted, leveragePosition.debtPosition.collateralValueInUsd)}%
                     <div className="text-xs">liq. {liqLtv}%</div>
                 </div>
 
                 <div className="hidden lg:inline-flex col-span-1 justify-end">
                     {/* Needs to change, this is obsolete, need to calc for the apy and borrow apy of his positions */}
-                    {calcLeverageApy(leveragePosition.debtPosition.collateralToken.apy, leveragePosition.debtPosition.borrowApy.toFixed(2), calcLtv(leveragePosition.debtPosition.spiUsdMinted, leveragePosition.debtPosition.collateralValueInUsd))}%
+                    {calcLeverageApy(leveragePosition.debtPosition.collateralToken.apy, leveragePosition.debtPosition.borrowApy.toFixed(2), calcLtv(leveragePosition.debtPosition.stblUSDMinted, leveragePosition.debtPosition.collateralValueInUsd))}%
                 </div>
             </div>
         </Link >

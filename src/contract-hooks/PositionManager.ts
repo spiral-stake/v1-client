@@ -2,7 +2,7 @@ import { Position, Token } from "./../types/index";
 import { Base } from "./Base";
 import { abi as POSITION_MANAGER_ABI } from "../abi/PositionManager.sol/PositionManager.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
-import { readCollateralTokens, readCollateralToken, readSpiUsd } from "../config/contractsData.ts";
+import { readCollateralTokens, readCollateralToken, readStblUSD } from "../config/contractsData.ts";
 import BigNumber from "bignumber.js";
 
 export default class PositionManager extends Base {
@@ -10,7 +10,7 @@ export default class PositionManager extends Base {
   public maxLtv: string;
   public liqLtv: string;
   public collateralTokens: Token[]; // Supported Collateral Tokens to borrow against
-  public spiUsd: Token;
+  public stblUSD: Token;
   public borrowApy: string;
 
   constructor(positionManagerAddress: string) {
@@ -22,11 +22,11 @@ export default class PositionManager extends Base {
 
     const instance = new PositionManager(positionManagerAddress);
 
-    const [_maxLtv, _liqLtv, _collateralTokens, spiUsd] = await Promise.all([
+    const [_maxLtv, _liqLtv, _collateralTokens, stblUSD] = await Promise.all([
       instance.read("MAX_LTV"),
       instance.read("LIQ_LTV"),
       readCollateralTokens(chainId),
-      readSpiUsd(chainId),
+      readStblUSD(chainId),
     ]);
 
     instance.chainId = chainId;
@@ -38,7 +38,7 @@ export default class PositionManager extends Base {
       .toFixed(2);
     instance.collateralTokens = _collateralTokens;
     instance.borrowApy = "3.6";
-    instance.spiUsd = spiUsd;
+    instance.stblUSD = stblUSD;
     return instance;
   }
 
@@ -55,12 +55,12 @@ export default class PositionManager extends Base {
     ]);
   }
 
-  async depositCollateralAndMintSPIUSD(
+  async depositCollateralAndMintStblUSD(
     position: Position,
     amountCollateral: string,
     amountToMint: string
   ) {
-    return this.write("depositCollateralAndMintSPIUSD", [
+    return this.write("depositCollateralAndMintStblUSD", [
       position.id,
       parseUnits(amountCollateral, position.collateralToken.decimals),
       parseUnits(amountToMint, this.DEFAULT_DECIMALS),
@@ -74,16 +74,19 @@ export default class PositionManager extends Base {
     ]);
   }
 
-  async mintSPIUSD(position: Position, amountToMint: string) {
-    return this.write("mintSPIUSD", [position.id, parseUnits(amountToMint, this.DEFAULT_DECIMALS)]);
+  async mintStblUSD(position: Position, amountToMint: string) {
+    return this.write("mintStblUSD", [
+      position.id,
+      parseUnits(amountToMint, this.DEFAULT_DECIMALS),
+    ]);
   }
 
-  async redeemCollateralAndBurnSPIUSD(
+  async redeemCollateralAndBurnStblUSD(
     position: Position,
     amountCollateral: string,
     amountToBurn: string
   ) {
-    return this.write("redeemCollateralAndBurnSPIUSD", [
+    return this.write("redeemCollateralAndBurnStblUSD", [
       position.id,
       parseUnits(amountCollateral, position.collateralToken.decimals),
       parseUnits(amountToBurn, this.DEFAULT_DECIMALS),
@@ -97,8 +100,8 @@ export default class PositionManager extends Base {
     ]);
   }
 
-  async burnSPIUSD(position: Position, amountToBurn: string) {
-    return this.write("redeemCollateralAndBurnSPIUSD", [
+  async burnStblUSD(position: Position, amountToBurn: string) {
+    return this.write("redeemCollateralAndBurnStblUSD", [
       position.id,
       parseUnits(amountToBurn, this.DEFAULT_DECIMALS),
     ]);
@@ -129,10 +132,10 @@ export default class PositionManager extends Base {
 
     const collateralToken = await readCollateralToken(this.chainId, positionInfo.collateralToken);
 
-    const spiUsdMinted = formatUnits(positionInfo.SPIUSDMinted as bigint, this.DEFAULT_DECIMALS);
+    const stblUSDMinted = formatUnits(positionInfo.stblUSDMinted as bigint, this.DEFAULT_DECIMALS);
     const collateralUsdValue = formatUnits(collateralValueInUsd as bigint, this.DEFAULT_DECIMALS);
 
-    const ltv = spiUsdMinted.dividedBy(collateralUsdValue);
+    const ltv = stblUSDMinted.dividedBy(collateralUsdValue);
 
     return {
       id: positionId,
@@ -143,7 +146,7 @@ export default class PositionManager extends Base {
         collateralToken.decimals
       ),
       collateralValueInUsd: collateralUsdValue,
-      spiUsdMinted,
+      stblUSDMinted,
       ltv,
       borrowApy: BigNumber(this.borrowApy), // Needs to change
     };

@@ -111,7 +111,7 @@ const Loop = ({
                 <div className="py-16">
                     <PageTitle
                         title={"Auto Loop"}
-                        subheading={`Seamlessly Leverage in one click, with our cost-efficient Auto-looping powered by SPIUSD's Flashmint`}
+                        subheading={`Seamlessly Leverage in one click, with our cost-efficient Auto-looping powered by stblUSD's Flashmint`}
                     />
                 </div>{" "}
                 <div className="xl:grid xl:grid-cols-[67%_calc(33%-18px)] xl:gap-[18px]">
