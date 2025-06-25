@@ -2,7 +2,7 @@ import { Position, Token, LeveragePosition } from "./../types/index";
 import { Base } from "./Base";
 import { abi as FLASH_LEVERAGE_ABI } from "../abi/FlashLeverage.sol/FlashLeverage.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
-import { readCollateralTokens, readCollateralToken } from "../config/contractsData.ts";
+import { readCollateralTokens } from "../config/contractsData.ts";
 import BigNumber from "bignumber.js";
 import PositionManager from "./PositionManager.ts";
 
@@ -39,8 +39,14 @@ export default class FlashLeverage extends Base {
   /////////////////////////
   // Write Functions
 
-  async leverage(collateralToken: Token, userCollateralAmount: string, desiredLtv: string) {
+  async leverage(
+    userAddress: string,
+    collateralToken: Token,
+    userCollateralAmount: string,
+    desiredLtv: string
+  ) {
     await this.write("leverage", [
+      userAddress,
       collateralToken.address,
       parseUnits(userCollateralAmount, collateralToken.decimals),
       parseUnits(BigNumber(desiredLtv).dividedBy(100).toFixed(2), this.DEFAULT_DECIMALS),

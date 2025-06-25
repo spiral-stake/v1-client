@@ -8,6 +8,7 @@ export interface Token {
   valueInUsd: BigNumber;
   apy: string;
   isPT: boolean;
+  image: string;
 }
 
 export interface Position {

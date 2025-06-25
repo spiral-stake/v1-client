@@ -4,7 +4,7 @@ import LTVSlider from "../components/LTVSlider";
 import PositionManager from "../contract-hooks/PositionManager";
 import BigNumber from "bignumber.js";
 import { Token } from "../types";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import { calcLeverageApy, calcMaxLeverage } from "../utils";
 import ActionBtn from "../components/ActionBtn";
 import ERC20 from "../contract-hooks/ERC20";
@@ -13,47 +13,68 @@ import TokenAmount from "../components/TokenAmount";
 import APYInfo from "../components/sections/InfoSection";
 import LeverageBreakdown from "../components/LeverageBreakdown";
 import Action from "../components/Action";
+import LeverageViaPyUSD from "../contract-hooks/LeverageWrapper";
+import { useNavigate, useParams } from "react-router-dom";
+import { readCollateralToken } from "../config/contractsData";
 
-const Loop = ({
+const Leverage = ({
     positionManager,
     flashLeverage,
+    leverageWrapper,
 }: {
     positionManager: PositionManager;
     flashLeverage: FlashLeverage;
+    leverageWrapper: LeverageViaPyUSD;
 }) => {
     const [collateralToken, setCollateralToken] = useState<Token>();
+    const [fromToken, setFromToken] = useState<Token>();
     const [amountCollateral, setAmountCollateral] = useState("");
     const [amountCollateralInUsd, setAmountCollateralInUsd] = useState<BigNumber>(BigNumber(0));
     const [desiredLtv, setLtv] = useState("75");
     const [maxLeverage, setMaxLeverage] = useState("");
-    const [showActions, setShowActions] = useState(false);
+    const [showSummary, setShowSummary] = useState(false);
     const [actionBtn, setActionBtn] = useState({
-        text: "Borrow: Summary",
+        text: "",
         onClick: () => { },
         disabled: false,
     });
+
+    const { address: collateralTokenAddress } = useParams();
+    const appChainId = useChainId();
 
     const [userCollateralBalance, setUserCollateralBalance] = useState<BigNumber>();
     const [userCollateralAllowance, setUserCollateralAllowance] = useState<BigNumber>();
 
     const { chainId, address } = useAccount();
+    const navigate = useNavigate();
 
     useEffect(() => {
-        if (!positionManager || !flashLeverage) return;
-        setCollateralToken(flashLeverage.collateralTokens[0]);
+        async function initializeFromToken() {
+            if (!collateralTokenAddress) return;
+            const _collateralToken = await readCollateralToken(appChainId, collateralTokenAddress);
+
+            setCollateralToken(_collateralToken);
+        }
+
+        initializeFromToken();
+    }, [collateralTokenAddress, appChainId]);
+
+    useEffect(() => {
+        if (!positionManager || !flashLeverage || !leverageWrapper) return;
+        setFromToken(leverageWrapper.frxUSD);
 
         setActionBtn({
-            text: "Loop",
-            onClick: () => setShowActions(true),
+            text: "Leverage",
+            onClick: () => setShowSummary(true),
             disabled: false,
         });
-    }, [positionManager, flashLeverage]);
+    }, [positionManager, flashLeverage, leverageWrapper]);
 
     useEffect(() => {
         async function updateCollateralValueInUsd() {
-            if (positionManager && collateralToken && amountCollateral) {
+            if (positionManager && fromToken && amountCollateral) {
                 setAmountCollateralInUsd(
-                    await positionManager.getTokenUsdValue(collateralToken, amountCollateral)
+                    collateralToken == fromToken ? await positionManager.getTokenUsdValue(fromToken, amountCollateral) : BigNumber(amountCollateral)
                 );
             } else {
                 setAmountCollateralInUsd(BigNumber(0));
@@ -61,7 +82,7 @@ const Loop = ({
         }
 
         updateCollateralValueInUsd();
-    }, [positionManager, collateralToken, amountCollateral]);
+    }, [positionManager, fromToken, amountCollateral]);
 
     useEffect(() => {
         setMaxLeverage(calcMaxLeverage(desiredLtv));
@@ -70,22 +91,29 @@ const Loop = ({
     useEffect(() => {
         updateUserCollateralBalance();
         updateUserCollateralAllowance();
-    }, [address, collateralToken]);
+    }, [address, collateralToken, fromToken]);
 
     const updateUserCollateralBalance = async () => {
-        if (!address || !collateralToken) return;
-        const balance = await new ERC20(collateralToken).balanceOf(address);
+        if (!address || !fromToken) return;
+        const balance = await new ERC20(fromToken).balanceOf(address);
         setUserCollateralBalance(balance);
     };
 
     const updateUserCollateralAllowance = async () => {
-        if (!address || !collateralToken) return;
-        const allowance = await new ERC20(collateralToken).allowance(address, flashLeverage.address);
+        if (!address || !collateralToken || !fromToken) return;
+
+        let allowance
+        if (fromToken == collateralToken) {
+            allowance = await new ERC20(fromToken).allowance(address, flashLeverage.address);
+        } else {
+            allowance = await new ERC20(fromToken).allowance(address, leverageWrapper.address);
+        }
+
         setUserCollateralAllowance(allowance);
     };
 
-    const handleCollateralTokenChange = (token: Token) => {
-        setCollateralToken(token);
+    const handleFromTokenChange = (token: Token) => {
+        setFromToken(token);
         setAmountCollateral("");
     };
 
@@ -94,23 +122,35 @@ const Loop = ({
     };
 
     async function handleApprove() {
-        if (!flashLeverage || !collateralToken) return;
-        await new ERC20(collateralToken).approve(flashLeverage.address, amountCollateral);
+        if (!address || !collateralToken || !fromToken) return;
+
+        if (collateralToken == fromToken) {
+            await new ERC20(fromToken).approve(flashLeverage.address, amountCollateral);
+        } else {
+            await new ERC20(fromToken).approve(leverageWrapper.address, amountCollateral);
+        }
         setUserCollateralAllowance(BigNumber(amountCollateral));
     }
 
     async function handleLeverage() {
-        if (!flashLeverage || !collateralToken) return;
-        await flashLeverage.leverage(collateralToken, amountCollateral, desiredLtv);
+        if (!flashLeverage || !fromToken || !address || !collateralToken) return;
+
+        if (collateralToken == fromToken) {
+            await flashLeverage.leverage(address, fromToken, amountCollateral, desiredLtv);
+        } else {
+            await leverageWrapper.leverage(fromToken, amountCollateral, collateralToken, desiredLtv,);
+        }
+
+        navigate("/my-positions");
     }
 
     return (
-        flashLeverage &&
-        collateralToken && (
+        collateralToken && flashLeverage &&
+        leverageWrapper && fromToken && (
             <div className="pb-16">
                 <div className="py-16">
                     <PageTitle
-                        title={"Auto Loop"}
+                        title={`Auto Loop ${collateralToken.symbol}`}
                         subheading={`Seamlessly Leverage in one click, with our cost-efficient Auto-looping powered by stblUSD's Flashmint`}
                     />
                 </div>{" "}
@@ -122,9 +162,9 @@ const Loop = ({
                                     <TokenAmount
                                         title="Loop"
                                         titleHoverInfo="Loop your assets to enjoy fixed leveraged yield"
-                                        tokens={positionManager.collateralTokens}
-                                        selectedToken={collateralToken}
-                                        handleTokenChange={handleCollateralTokenChange}
+                                        tokens={[leverageWrapper.frxUSD, collateralToken]}
+                                        selectedToken={fromToken}
+                                        handleTokenChange={handleFromTokenChange}
                                         amount={amountCollateral}
                                         handleAmountChange={setAmountCollateral}
                                         amountInUsd={amountCollateralInUsd}
@@ -159,7 +199,7 @@ const Loop = ({
                     <div className="sticky top-2 hidden h-fit xl:block">
                         <section className="rounded-sm p-0 grid h-fit grid-cols-1 sm:grid-cols-[3fr_2fr] xl:grid-cols-1">
                             <APYInfo
-                                title={collateralToken.isPT ? "Fixed Leveraged APY" : "Max Leveraged APY"}
+                                title={`${collateralToken.isPT ? "Fixed Leveraged APY" : "Max Leveraged APY"} (${collateralToken.symbol})`}
                                 description="Loop your staked stable's for fixed leveraged yield"
                                 apy={`${!collateralToken.isPT ? "~" : ""} ${calcLeverageApy(
                                     collateralToken.apy,
@@ -176,7 +216,7 @@ const Loop = ({
                             />
 
                             {/* Actions */}
-                            {showActions && (
+                            {showSummary && (
                                 <section className="rounded-sm text-white">
                                     <section className="flex flex-col gap-2">
                                         <div className="flex items-center justify-between">
@@ -186,14 +226,14 @@ const Loop = ({
                                             <div className="grid grid-cols-[auto_1fr_auto] gap-x-3 sm:gap-x-8 md:grid-cols-[auto_auto_auto_1fr_auto]">
                                                 <Action
                                                     text="Approve"
-                                                    token={collateralToken}
+                                                    token={fromToken}
                                                     amountToken={amountCollateral}
                                                     actionHandler={handleApprove}
                                                     completed={userCollateralAllowance?.gte(BigNumber(amountCollateral))}
                                                 />
                                                 <Action
                                                     text="Loop"
-                                                    token={collateralToken}
+                                                    token={fromToken}
                                                     amountToken={amountCollateral}
                                                     actionHandler={handleLeverage}
                                                 />
@@ -210,4 +250,4 @@ const Loop = ({
     );
 };
 
-export default Loop;
+export default Leverage;

@@ -2,7 +2,7 @@ import axios from "axios";
 import { chainConfig } from "../config/chainConfig";
 import { getTokens } from "./getTokens.ts";
 import { addTokenToWallet } from "./addTokensToWallet.ts";
-import { readCollateralTokens } from "../config/contractsData.ts";
+import { readCollateralTokens, readfrxUSD, readStblUSD } from "../config/contractsData.ts";
 
 const amountCollateralTokens = "10000";
 
@@ -15,6 +15,11 @@ export const onboard = async (chainId: number, userAddress: string) => {
     amountCollateralTokens,
   });
 
-  const collateralTokens = await readCollateralTokens(chainId);
-  return collateralTokens.map((collateralToken) => addTokenToWallet(collateralToken));
+  const [collateralTokens, frxUSD, stblUSD] = await Promise.all([
+    readCollateralTokens(chainId),
+    readfrxUSD(chainId),
+    readStblUSD(chainId),
+  ]);
+
+  return [...collateralTokens, frxUSD, stblUSD].map((token) => addTokenToWallet(token));
 };

@@ -60,7 +60,7 @@ export class Base {
       __mode: "prepared", // Needs to be uncommented on local
     });
 
-    await wait(4);
+    // await wait(4);
 
     return waitForTransactionReceipt(config, { hash, confirmations: 1 });
   }

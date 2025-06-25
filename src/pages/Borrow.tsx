@@ -11,16 +11,25 @@ import LTVSlider from "../components/LTVSlider";
 import TokenAmount from "../components/TokenAmount";
 import APYInfo from "../components/sections/InfoSection";
 import Action from "../components/Action";
+import BorrowPyUsd from "../contract-hooks/BorrowSwapper";
+import { useNavigate } from "react-router-dom";
 
-const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
+const Borrow = ({
+    positionManager,
+    borrowSwapper,
+}: {
+    positionManager: PositionManager;
+    borrowSwapper: BorrowPyUsd;
+}) => {
     const [collateralToken, setCollateralToken] = useState<Token>();
+    const [borrowToken, setBorrowToken] = useState<Token>();
     const [amountCollateral, setAmountCollateral] = useState("");
     const [amountStblUSD, setAmountStblUSD] = useState("");
     const [amountCollateralInUsd, setAmountCollateralInUsd] = useState<BigNumber>(BigNumber(0));
     const [showSummary, setShowSummary] = useState(false);
 
     const [actionBtn, setActionBtn] = useState({
-        text: "Borrow: Summary",
+        text: "Borrow",
         onClick: () => { },
         disabled: false,
     });
@@ -29,11 +38,13 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
     const [userCollateralAllowance, setUserCollateralAllowance] = useState<BigNumber>();
 
     const { chainId, address } = useAccount();
+    const navigate = useNavigate();
 
     useEffect(() => {
         updateUserCollateralBalance();
         updateUserCollateralAllowance();
-    }, [address, collateralToken]);
+
+    }, [address, collateralToken, borrowToken]);
 
     const updateUserCollateralBalance = async () => {
         if (!address || !collateralToken) return;
@@ -42,8 +53,15 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
     };
 
     const updateUserCollateralAllowance = async () => {
-        if (!address || !collateralToken) return;
-        const allowance = await new ERC20(collateralToken).allowance(address, positionManager.address);
+        if (!address || !collateralToken || !borrowToken) return;
+
+        let allowance;
+        if (borrowToken.address == positionManager.stblUSD.address) {
+            allowance = await new ERC20(collateralToken).allowance(address, positionManager.address);
+        } else {
+            allowance = await new ERC20(collateralToken).allowance(address, borrowSwapper.address);
+        }
+
         setUserCollateralAllowance(allowance);
     };
 
@@ -51,9 +69,10 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
     useEffect(() => {
         if (!positionManager) return;
         setCollateralToken(positionManager.collateralTokens[0]);
+        setBorrowToken(borrowSwapper.frxUSD);
 
         setActionBtn({
-            text: "Borrow: Summary",
+            text: "Borrow",
             onClick: () => setShowSummary(true),
             disabled: false,
         });
@@ -73,6 +92,16 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
         updateCollateralValueInUsd();
     }, [positionManager, collateralToken, amountCollateral]);
 
+    const handleCollateralTokenChange = (token: Token) => {
+        setCollateralToken(token);
+        setAmountCollateral("");
+    };
+
+    const handleBorrowTokenChange = (token: Token) => {
+        setBorrowToken(token);
+        setAmountStblUSD("");
+    };
+
     const handleLtvSlider = (e: React.ChangeEvent<HTMLInputElement>) => {
         const ltv = e.target.value;
         const _adjustedStblUSD = BigNumber(amountCollateralInUsd).multipliedBy(BigNumber(ltv).div(100));
@@ -80,20 +109,34 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
     };
 
     async function handleApprove() {
-        if (!positionManager || !collateralToken) return;
-        await new ERC20(collateralToken).approve(positionManager.address, amountCollateral);
+        if (!positionManager || !collateralToken || !borrowSwapper || !borrowToken) return;
+
+        if (borrowToken.address == positionManager.stblUSD.address) {
+            await new ERC20(collateralToken).approve(positionManager.address, amountCollateral);
+        } else {
+            await new ERC20(collateralToken).approve(borrowSwapper.address, amountCollateral);
+        }
         setUserCollateralAllowance(BigNumber(amountCollateral));
     }
 
     async function handleBorrow() {
-        if (!positionManager || !collateralToken) return;
-        await positionManager?.openPosition(collateralToken, amountCollateral, amountStblUSD);
+        if (!positionManager || !collateralToken || !borrowSwapper || !borrowToken) return;
+
+        if (borrowToken.address == positionManager.stblUSD.address) {
+            await positionManager.openPosition(collateralToken, amountCollateral, amountStblUSD);
+        } else {
+            await borrowSwapper.openPosition(collateralToken, borrowToken, amountCollateral, amountStblUSD);
+        }
+
         updateUserCollateralBalance();
+        navigate("/my-positions");
     }
 
     return (
         positionManager &&
-        collateralToken && (
+        collateralToken &&
+        borrowSwapper &&
+        borrowToken && (
             <div className="pb-16">
                 <div className="py-16">
                     <PageTitle
@@ -112,7 +155,7 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
                                         titleHoverInfo="Deposit Collateral"
                                         tokens={positionManager.collateralTokens}
                                         selectedToken={collateralToken}
-                                        handleTokenChange={setCollateralToken}
+                                        handleTokenChange={handleCollateralTokenChange}
                                         amount={amountCollateral}
                                         handleAmountChange={setAmountCollateral}
                                         amountInUsd={amountCollateralInUsd}
@@ -121,7 +164,10 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
 
                                     <TokenAmount
                                         title="Borrow"
-                                        selectedToken={positionManager.stblUSD}
+                                        titleHoverInfo="Select between native and swapped borrow token"
+                                        tokens={[borrowSwapper.frxUSD, positionManager.stblUSD]}
+                                        selectedToken={borrowToken}
+                                        handleTokenChange={handleBorrowTokenChange}
                                         amount={amountStblUSD}
                                         handleAmountChange={setAmountStblUSD}
                                         amountInUsd={BigNumber(amountStblUSD || "0.00")}
@@ -153,7 +199,7 @@ const Borrow = ({ positionManager }: { positionManager: PositionManager }) => {
                             <APYInfo
                                 title="Fixed Borrow Rate"
                                 apy={positionManager.borrowApy}
-                                description="Borrow stblUSD directly from your PT's or Staked Stablecoins"
+                                description="Borrow against your stable PT's / Staked Stablecoins"
                             />
 
                             {/* Actions */}

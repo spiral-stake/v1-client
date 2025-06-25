@@ -4,8 +4,13 @@ import bell from "../assets/bell.svg";
 import menuIcon from "../assets/icons/menu.svg";
 import { Link } from "react-router-dom";
 import ConnectWalletBtn from "./ConnectWalletButton";
+import { useChainId } from "wagmi";
+import { chainConfig } from "../config/chainConfig";
 
 function Navbar({ showDropdown }: { showDropdown: (bool: boolean) => void }) {
+
+  const appChainId = useChainId();
+
   return (
     <>
       <div className="w-full px-4 lg:px-16 py-4 border-b-[0.72px] border-white border-opacity-10 inline-flex justify-start items-center gap-3">
@@ -31,14 +36,11 @@ function Navbar({ showDropdown }: { showDropdown: (bool: boolean) => void }) {
               <Link target="blank" to="https://spiral-stake.gitbook.io/spiral-stake-docs">
                 <div className="cursor-pointer text-center ">Learn</div>
               </Link>
-              <Link to={"/markets"}>
-                <div className="cursor-pointer text-center ">Markets</div>
+              <Link to={"/products"}>
+                <div className="cursor-pointer text-center ">Products</div>
               </Link>
               <Link to={"/borrow"}>
                 <div className="cursor-pointer text-center ">Borrow</div>
-              </Link>
-              <Link to={"/loop"}>
-                <div className="cursor-pointer text-center ">Loop</div>
               </Link>
               <Link to={"/my-positions"}>
                 <div className="cursor-pointer text-center ">Portfolio</div>
@@ -50,9 +52,9 @@ function Navbar({ showDropdown }: { showDropdown: (bool: boolean) => void }) {
             <div className="rounded-full flex justify-center items-center gap-2 overflow-hidden">
               <div className="cursor-pointer flex justify-start items-center gap-1">
                 <div className=" relative overflow-hidden">
-                  <img src={fraxIcon} alt="" className="w-5 h-5" />
+                  <img src={chainConfig[appChainId].logo} alt="" className="w-7 h-7" />
                 </div>
-                <span className="hidden md:inline-flex font-semibold text-sm">Fraxtal</span>
+                <span className="hidden md:inline-flex font-semibold text-sm">Arbtitrum Testnet</span>
                 {/* <div>
                   <img src={dropdown} alt="" className="h-3 w-3" /> 
                 </div> */}

@@ -47,6 +47,23 @@ export const readStblUSD = async (chainId: number): Promise<Token> => {
   };
 };
 
+export const readfrxUSD = async (chainId: number): Promise<Token> => {
+  const [addressesModule] = await Promise.all([
+    import(`../addresses/${chainId}.json`) as Promise<{
+      default: { frxUSD: Token };
+    }>,
+    import(`../token-data/${chainId}.json`) as Promise<{ default: TokenData }>,
+  ]);
+
+  const { frxUSD } = addressesModule.default;
+
+  return {
+    ...frxUSD,
+    isPT: false,
+    apy: "0",
+  };
+};
+
 export const readCollateralToken = async (
   chainId: number,
   tokenAddress: string
