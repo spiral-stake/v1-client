@@ -17,6 +17,9 @@ import LeverageViaPyUSD from "../contract-hooks/LeverageWrapper";
 import { useNavigate, useParams } from "react-router-dom";
 import { readCollateralToken } from "../config/contractsData";
 import Loader from "../components/low-level/Loader";
+import SectionOverlay from "../components/low-level/SectionOverlay";
+import lockIcon from "../assets/icons/lock-svgrepo-com.svg";
+import closeIcon from "../assets/icons/close.svg";
 
 const Leverage = ({
   positionManager,
@@ -241,16 +244,35 @@ const Leverage = ({
           <div className="pb-16">
             <div className="py-16">
               <PageTitle
-                title={`Auto Loop ${collateralToken.symbol}`}
+                title={`Auto Loop \u00A0 ⟳ \u00A0 ${collateralToken.symbol}`}
                 subheading={`Seamlessly Leverage in one click, with our cost-efficient Auto-looping powered by stblUSD's Flashmint`}
               />
             </div>{" "}
             <div className="xl:grid xl:grid-cols-[67%_calc(33%-18px)] xl:gap-[18px]">
               <form
                 onSubmit={(e) => e.preventDefault()}
-                className="flex flex-1 flex-col gap-4"
+                className="flex flex-1 flex-col gap-4 relative"
               >
-                <section className="rounded-sm flex flex-col gap-3 p-1.5 bg-gradient-to-b from-slate-900 to-gray-950">
+                {showSummary && (
+                  <SectionOverlay
+                    overlay={
+                      <div className="w-full h-full relative p-2">
+                        <img
+                          className="w-7 absolute h-full justify-self-center"
+                          src={lockIcon}
+                          alt=""
+                        />
+                        <img
+                          className="w-10 absolute justify-self-end cursor-pointer"
+                          onClick={() => setShowSummary(false)}
+                          src={closeIcon}
+                          alt=""
+                        />
+                      </div>
+                    }
+                  />
+                )}
+                <section className="flex flex-col gap-3 p-1.5 bg-gradient-to-b from-slate-900 to-gray-950">
                   <div className="flex flex-col gap-3">
                     <div className="relative grid grid-cols-1 md:grid-cols-2">
                       <TokenAmount
