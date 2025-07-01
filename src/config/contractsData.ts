@@ -28,6 +28,8 @@ export const readCollateralTokens = async (chainId: number): Promise<Token[]> =>
       ...tokenData[tokenAddress],
     };
   });
+
+
 };
 
 export const readStblUSD = async (chainId: number): Promise<Token> => {

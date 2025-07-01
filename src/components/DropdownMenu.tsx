@@ -1,15 +1,24 @@
 import fraxIcon from "../assets/icons/frax.svg";
 import close from "../assets/icons/close.svg";
-import ConnectWalletBtn from "./ConnectWalletButton";
+import ConnectWalletBtn from "./ConnectWalletBtn";
 import { Link } from "react-router-dom";
 
-const DropdownMenu = ({ showDropdown }: { showDropdown: (bool: boolean) => void }) => {
+const DropdownMenu = ({
+  showDropdown,
+}: {
+  showDropdown: (bool: boolean) => void;
+}) => {
   return (
     // <div className="w-full self-stretch px-4 pt-4 pb-8 inline-flex flex-col items-center gap-6">
     <div className="lg:hidden w-full h-[100vh] relative flex flex-col justify-between items-center p-5 ">
       <div className="w-full flex flex-col justify-start items-start gap-4">
         <div className="w-full mb-10">
-          <img src={close} alt="" onClick={() => showDropdown(false)} className="cursor-pointer" />
+          <img
+            src={close}
+            alt=""
+            onClick={() => showDropdown(false)}
+            className="cursor-pointer"
+          />
         </div>
         <div className="w-full" onClick={() => showDropdown(false)}>
           <Link to={"/pools"}>
@@ -25,7 +34,7 @@ const DropdownMenu = ({ showDropdown }: { showDropdown: (bool: boolean) => void 
           </Link>
         </div>
         <div className="w-full" onClick={() => showDropdown(false)}>
-          <Link to={"/pools/create"} >
+          <Link to={"/pools/create"}>
             <div className="self-stretch pt-2 pb-4 border-b border-gray-200 border-opacity-10 flex flex-col justify-center items-start gap-3">
               <div className="self-stretch inline-flex justify-between items-center">
                 <div className="flex-1 inline-flex flex-col justify-start items-start gap-3">
@@ -38,7 +47,10 @@ const DropdownMenu = ({ showDropdown }: { showDropdown: (bool: boolean) => void 
           </Link>
         </div>
         <div className="w-full" onClick={() => showDropdown(false)}>
-          <Link target="blank" to="https://spiral-stake.gitbook.io/spiral-stake-docs">
+          <Link
+            target="blank"
+            to="https://spiral-stake.gitbook.io/spiral-stake-docs"
+          >
             <div className="self-stretch pt-2 pb-4 border-b border-gray-200 border-opacity-10 flex flex-col justify-center items-start gap-3">
               <div className="self-stretch inline-flex justify-between items-center">
                 <div className="flex-1 inline-flex flex-col justify-start items-start gap-3">

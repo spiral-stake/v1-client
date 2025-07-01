@@ -1,6 +1,6 @@
 import { useAccount, useSwitchChain } from "wagmi";
 import { chainConfig } from "../config/chainConfig";
-import ConnectWalletBtn from "./ConnectWalletButton";
+import ConnectWalletBtn from "./ConnectWalletBtn";
 import BtnFull from "./low-level/BtnFull";
 
 const ActionBtn = ({
@@ -9,7 +9,7 @@ const ActionBtn = ({
   disabled,
   text,
   btnLoading,
-  completed
+  completed,
 }: {
   expectedChainId: number;
   onClick: () => void;
@@ -23,7 +23,13 @@ const ActionBtn = ({
 
   return address ? (
     chainId === expectedChainId ? (
-      <BtnFull text={text} onClick={onClick} disabled={disabled} btnLoading={btnLoading} completed={completed} />
+      <BtnFull
+        text={text}
+        onClick={onClick}
+        disabled={disabled}
+        btnLoading={btnLoading}
+        completed={completed}
+      />
     ) : (
       <BtnFull
         text={`Switch to ${chainConfig[expectedChainId].name}`}

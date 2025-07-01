@@ -4,7 +4,14 @@ import BtnFull from "./low-level/BtnFull";
 const ConnectWalletBtn = () => {
   return (
     <ConnectButton.Custom>
-      {({ account, chain, openAccountModal, openChainModal, openConnectModal, mounted }) => {
+      {({
+        account,
+        chain,
+        openAccountModal,
+        openChainModal,
+        openConnectModal,
+        mounted,
+      }) => {
         const ready = mounted;
         const connected = ready && account && chain;
 
@@ -16,7 +23,9 @@ const ConnectWalletBtn = () => {
           return <BtnFull text={"Wrong Network"} onClick={openChainModal} />;
         }
 
-        return <BtnFull text={account.displayName} onClick={openAccountModal} />;
+        return (
+          <BtnFull text={account.displayName} onClick={openAccountModal} />
+        );
       }}
     </ConnectButton.Custom>
   );

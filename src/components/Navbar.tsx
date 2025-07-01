@@ -1,19 +1,16 @@
-import logo from "../assets/logo.svg";
-import fraxIcon from "../assets/icons/frax.svg";
-import bell from "../assets/bell.svg";
-import menuIcon from "../assets/icons/menu.svg";
 import { Link } from "react-router-dom";
-import ConnectWalletBtn from "./ConnectWalletButton";
 import { useChainId } from "wagmi";
 import { chainConfig } from "../config/chainConfig";
+import logo from "../assets/logo.svg"
+import menuIcon from "../assets/icons/menu.svg"
+import ConnectWalletBtn from "./ConnectWalletBtn";
 
-function Navbar({ showDropdown }: { showDropdown: (bool: boolean) => void }) {
+const Navbar = ({showDropdown}:{ showDropdown : (bool: boolean)=>void}) => {
 
-  const appChainId = useChainId();
+    const appChainId = useChainId();
 
-  return (
-    <>
-      <div className="w-full px-4 lg:px-16 py-4 border-b-[0.72px] border-white border-opacity-10 inline-flex justify-start items-center gap-3">
+    return ( <>
+  <div className="w-full px-4 lg:px-16 py-4 border-b-[0.72px] border-white border-opacity-10 inline-flex justify-start items-center gap-3">
         <div className="w-6 h-6 relative overflow-hidden lg:hidden">
           <img
             src={menuIcon}
@@ -74,8 +71,8 @@ function Navbar({ showDropdown }: { showDropdown: (bool: boolean) => void }) {
           </div>
         </div>
       </div>
-    </>
-  );
+    </> );
 }
-
-export default Navbar;
+ 
+export default Navbar;<div>
+</div>

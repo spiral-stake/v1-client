@@ -1,62 +1,74 @@
+import { Link } from "react-router-dom";
 import PageTitle from "../components/low-level/PageTitle";
 import PositionManager from "../contract-hooks/PositionManager";
-import { Link } from "react-router-dom";
 import { calcLeverageApy } from "../utils";
 
-const Products = ({ positionManager }: { positionManager: PositionManager }) => {
-    return (
-        positionManager && (
-            <div className="pb-16">
-                <div className="py-16">
-                    <PageTitle
-                        title="Stable Leveraged Yields"
-                        subheading="Seamlessly Enjoy Leveraged Yield in one click, with our FlashLeverage powered by stblUSD"
-                    />
+const Products = ({
+  positionManager,
+}: {
+  positionManager: PositionManager;
+}) => {
+  return (
+    positionManager && (
+      <div className="pb-16">
+        <div className="py-16">
+          <PageTitle
+            title="Stable Leveraged Yields"
+            subheading="Seamlessly Enjoy Leveraged Yield in one click, with our FlashLeverage powered by stblUSD"
+          />
+        </div>
+
+        <div className="relative w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 justify-center">
+            {positionManager.collateralTokens.map((collateralToken, index) => (
+              <div
+                key={index}
+                className="bg-gradient-to-b from-slate-900 to-gray-950 rounded-2xl p-6 relative backdrop-blur-sm bg-opacity-90 text-white"
+              >
+                {/* Token Image Badge */}
+                <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-white bg-opacity-80">
+                  <img
+                    className="w-11"
+                    src={collateralToken.image}
+                    alt={collateralToken.symbol}
+                  />
                 </div>
 
-                <div className="relative w-full">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 justify-center">
-                        {positionManager.collateralTokens.map((collateralToken, index) => (
-                            <div
-                                key={index}
-                                className="bg-gradient-to-b from-slate-900 to-gray-950 rounded-2xl p-6 relative backdrop-blur-sm bg-opacity-90 text-white"
-                            >
-                                {/* Token Image Badge */}
-                                <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-white bg-opacity-80">
-                                    <img className="w-11" src={collateralToken.image} alt={collateralToken.symbol} />
-                                </div>
+                {/* Token Symbol */}
+                <h3 className="text-gray-200 text-lg font-semibold mb-10">
+                  {collateralToken.symbol}
+                </h3>
 
-                                {/* Token Symbol */}
-                                <h3 className="text-gray-200 text-lg font-semibold mb-10">
-                                    {collateralToken.symbol}
-                                </h3>
-
-                                {/* Interest Rate Display */}
-                                <div className="mb-20">
-                                    <p className="text-gray-300 text-sm mb-1">
-                                        {collateralToken.isPT ? "Fixed" : "Max"} Leveraged
-                                    </p>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-3xl font-bold text-gray-200">
-                                            {calcLeverageApy(collateralToken.apy, positionManager.borrowApy, "80")}
-                                        </span>
-                                        <span className="text-gray-400 text-sm">APY</span>
-                                    </div>
-                                </div>
-
-                                {/* Know More Button */}
-                                <Link to={`/leverage/${collateralToken.address}`}>
-                                    <button className="w-full bg-black py-3 px-6 rounded-lg font-medium hover:bg-gray-800 transition-colors">
-                                        Know more
-                                    </button>
-                                </Link>
-                            </div>
-                        ))}
-                    </div>
+                {/* Interest Rate Display */}
+                <div className="mb-20">
+                  <p className="text-gray-300 text-sm mb-1">
+                    {collateralToken.isPT ? "Fixed" : "Max"} Leveraged
+                  </p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold text-gray-200">
+                      {calcLeverageApy(
+                        collateralToken.apy,
+                        positionManager.borrowApy,
+                        "80"
+                      )}
+                    </span>
+                    <span className="text-gray-400 text-sm">APY</span>
+                  </div>
                 </div>
-            </div>
-        )
-    );
+
+                {/* Know More Button */}
+                <Link to={`/leverage/${collateralToken.address}`}>
+                  <button className="w-full bg-black py-3 px-6 rounded-lg font-medium hover:bg-gray-800 transition-colors">
+                    Know more
+                  </button>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  );
 };
 
 export default Products;
