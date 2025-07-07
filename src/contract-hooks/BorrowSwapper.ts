@@ -2,7 +2,7 @@ import { Position, Token } from "../types/index";
 import { Base } from "./Base.ts";
 import { abi as BORROW_SWAPPER_ABI } from "../abi/BorrowSwapper.sol/BorrowSwapper.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
-import { readfrxUSD } from "../config/contractsData.ts";
+import { readToken } from "../config/contractsData.ts";
 
 export default class BorrowSwapper extends Base {
   public frxUSD: Token;
@@ -12,14 +12,16 @@ export default class BorrowSwapper extends Base {
   }
 
   static async createInstance(chainId: number) {
-    const [{ borrowSwapperAddress }, frxUSD] = await Promise.all([
-      import(`../addresses/${chainId}.json`),
-      readfrxUSD(chainId),
-    ]);
+    try {
+      const [{ borrowSwapperAddress }, frxUSD] = await Promise.all([
+        import(`../addresses/${chainId}.json`),
+        readToken(chainId, "frxUSD"),
+      ]);
 
-    const instance = new BorrowSwapper(borrowSwapperAddress);
-    instance.frxUSD = frxUSD;
-    return instance;
+      const instance = new BorrowSwapper(borrowSwapperAddress);
+      instance.frxUSD = frxUSD;
+      return instance;
+    } catch (e) {}
   }
 
   DEFAULT_DECIMALS = 18;

@@ -21,12 +21,12 @@ const DropdownMenu = ({
           />
         </div>
         <div className="w-full" onClick={() => showDropdown(false)}>
-          <Link to={"/pools"}>
+          <Link to={"/products"}>
             <div className=" pt-2 pb-4 border-b border-gray-200 border-opacity-10 flex flex-col justify-center items-start gap-3">
               <div className="self-stretch inline-flex justify-between items-center">
                 <div className="flex-1 inline-flex flex-col justify-start items-start gap-3">
                   <div className="justify-center text-neutral-200 text-sm font-['Outfit'] cursor-pointer">
-                    Pools
+                    Products
                   </div>
                 </div>
               </div>
@@ -34,12 +34,12 @@ const DropdownMenu = ({
           </Link>
         </div>
         <div className="w-full" onClick={() => showDropdown(false)}>
-          <Link to={"/pools/create"}>
+          <Link to={"/portfolio"}>
             <div className="self-stretch pt-2 pb-4 border-b border-gray-200 border-opacity-10 flex flex-col justify-center items-start gap-3">
               <div className="self-stretch inline-flex justify-between items-center">
                 <div className="flex-1 inline-flex flex-col justify-start items-start gap-3">
                   <div className="justify-center text-neutral-200 text-sm font-['Outfit'] cursor-pointer">
-                    Create
+                    Portfolio
                   </div>
                 </div>
               </div>

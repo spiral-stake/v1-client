@@ -1,27 +1,14 @@
 {
   "0x3d3aF2eCfaa71343B15aCf5D64d6fbBC2B22AD26": {
-    "isPT": true,
     "apy": "8.73",
     "image": "https://storage.googleapis.com/prod-pendle-bucket-a/images/uploads/e4fd2895-9f30-4e16-9c74-e827cf0bd0ec.svg"
   },
   "0x1b922B45fd00D1d1E524538B45c963bC0C325189": {
-    "isPT": true,
     "apy": "7.47",
     "image": "https://storage.googleapis.com/prod-pendle-bucket-a/images/uploads/b79fab6c-406f-44cb-af9c-7ce2cffbb128.svg"
   },
   "0xb97e2Eaff562b702cB744352Da05646b6e9DD65F": {
-    "isPT": true,
     "apy": "9.51",
     "image": "https://storage.googleapis.com/prod-pendle-bucket-a/images/uploads/de66af5d-f071-4c90-81f7-0ae01ac0d45d.svg"
-  },
-  "0xE4408cECD1eC5D8336b16998f010cf4f8497AB23": {
-    "isPT": false,
-    "apy": "4.6",
-    "image": "https://static.frax.com/images/tokens/sfrxusd.png"
-  },
-  "0xb4ccD7d85bC96E6F260671E5f218B615a5cC62D9": {
-    "isPT": false,
-    "apy": "10.03",
-    "image": "https://storage.googleapis.com/prod-pendle-bucket-a/images/uploads/1a2de87b-09fe-4475-ad66-01c06257fb66.svg"
   }
 }

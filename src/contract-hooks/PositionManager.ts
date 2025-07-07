@@ -1,4 +1,4 @@
-import { Position, Token } from "./../types/index";
+import { CollateralToken, Position, Token } from "./../types/index";
 import { Base } from "./Base";
 import { abi as POSITION_MANAGER_ABI } from "../abi/PositionManager.sol/PositionManager.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
@@ -9,7 +9,7 @@ export default class PositionManager extends Base {
   public chainId: number;
   public maxLtv: string;
   public liqLtv: string;
-  public collateralTokens: Token[]; // Supported Collateral Tokens to borrow against
+  public collateralTokens: CollateralToken[]; // Supported Collateral Tokens to borrow against
   public stblUSD: Token;
   public borrowApy: string;
 
@@ -18,28 +18,30 @@ export default class PositionManager extends Base {
   }
 
   static async createInstance(chainId: number) {
-    const { positionManagerAddress } = await import(`../addresses/${chainId}.json`);
+    try {
+      const { positionManagerAddress } = await import(`../addresses/${chainId}.json`);
 
-    const instance = new PositionManager(positionManagerAddress);
+      const instance = new PositionManager(positionManagerAddress);
 
-    const [_maxLtv, _liqLtv, _collateralTokens, stblUSD] = await Promise.all([
-      instance.read("MAX_LTV"),
-      instance.read("LIQ_LTV"),
-      readCollateralTokens(chainId),
-      readStblUSD(chainId),
-    ]);
+      const [_maxLtv, _liqLtv, _collateralTokens, stblUSD] = await Promise.all([
+        instance.read("MAX_LTV"),
+        instance.read("LIQ_LTV"),
+        readCollateralTokens(chainId),
+        readStblUSD(chainId),
+      ]);
 
-    instance.chainId = chainId;
-    instance.maxLtv = formatUnits(_maxLtv as bigint, instance.DEFAULT_DECIMALS)
-      .multipliedBy(100)
-      .toFixed(2);
-    instance.liqLtv = formatUnits(_liqLtv as bigint, instance.DEFAULT_DECIMALS)
-      .multipliedBy(100)
-      .toFixed(2);
-    instance.collateralTokens = _collateralTokens;
-    instance.borrowApy = "3.6";
-    instance.stblUSD = stblUSD;
-    return instance;
+      instance.chainId = chainId;
+      instance.maxLtv = formatUnits(_maxLtv as bigint, instance.DEFAULT_DECIMALS)
+        .multipliedBy(100)
+        .toFixed(2);
+      instance.liqLtv = formatUnits(_liqLtv as bigint, instance.DEFAULT_DECIMALS)
+        .multipliedBy(100)
+        .toFixed(2);
+      instance.collateralTokens = _collateralTokens;
+      instance.borrowApy = "3.6";
+      instance.stblUSD = stblUSD;
+      return instance;
+    } catch (e) {}
   }
 
   DEFAULT_DECIMALS = 18;

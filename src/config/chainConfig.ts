@@ -1,12 +1,13 @@
 import { defineChain } from "../../node_modules/viem/utils/chain/defineChain.ts";
+import { chainConfig as opChainConfig } from "../../node_modules/viem/op-stack/chainConfig.ts";
 
-const fraxtalLocal: any = defineChain({
+const local: any = defineChain({
   id: 31337,
-  name: "Frax Local",
+  name: "Local",
   nativeCurrency: {
     decimals: 18,
-    name: "Frax Ether",
-    symbol: "frxETH",
+    name: "Ether",
+    symbol: "ETH",
   },
   rpcUrls: {
     default: {
@@ -14,7 +15,7 @@ const fraxtalLocal: any = defineChain({
       webSocket: ["ws://127.0.0.1:8545"],
     },
   },
-  logo: "/logo/reya-logo.webp",
+  logo: "/logos/base.svg",
   api: "http://localhost:5000",
   onboard: {
     amountNative: "1",
@@ -75,13 +76,66 @@ const arbitrumTestnet: any = defineChain({
   },
 });
 
-interface ChainConfigType {
+const sourceId = 1; // mainnet
+const baseMainnet: any = defineChain({
+  ...opChainConfig,
+  id: 8453,
+  name: "Base",
+  logo: "/logos/base.svg",
+  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: ["https://mainnet.base.org"],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Basescan",
+      url: "https://basescan.org",
+      apiUrl: "https://api.basescan.org/api",
+    },
+  },
+
+  contracts: {
+    ...opChainConfig.contracts,
+    disputeGameFactory: {
+      [sourceId]: {
+        address: "0x43edB88C4B80fDD2AdFF2412A7BebF9dF42cB40e",
+      },
+    },
+    l2OutputOracle: {
+      [sourceId]: {
+        address: "0x56315b90c40730925ec5485cf004d835058518A0",
+      },
+    },
+    multicall3: {
+      address: "0xca11bde05977b3631167028862be2a173976ca11",
+      blockCreated: 5022,
+    },
+    portal: {
+      [sourceId]: {
+        address: "0x49048044D57e1C92A77f79988d21Fa8fAF74E97e",
+        blockCreated: 17482143,
+      },
+    },
+    l1StandardBridge: {
+      [sourceId]: {
+        address: "0x3154Cf16ccdb4C6d922629664174b904d80F2C35",
+        blockCreated: 17482143,
+      },
+    },
+  },
+  sourceId,
+});
+
+interface chainType {
   [key: number]: any;
 }
 
-export const chainConfig: ChainConfigType = {
-  // 31337: fraxtalLocal,
+export const chainConfig: chainType = {
+  // 31337: local,
   // 31338: arbitrumLocal,
   // 2522: fraxtalTestnet,
-  421614: arbitrumTestnet,
+  // 421614: arbitrumTestnet,
+  8453: baseMainnet,
 };

@@ -8,7 +8,6 @@ import {
 } from "wagmi/actions";
 import { wagmiConfig as config } from "../config/wagmiConfig.ts";
 import { formatUnits } from "../utils/formatUnits.ts";
-import { wait } from "../utils/time.ts";
 const { connector } = getAccount(config);
 
 export class Base {
@@ -43,7 +42,7 @@ export class Base {
         args,
         account:
           (await connector?.getAccounts?.())?.[0] ||
-          ("0x0000000000000000000000000000000000000000" as `0x${string}`),
+          ("0xD9bbfA9D50d75F220877439ce5fDc5165f673816" as `0x${string}`),
         value,
         chainId: chainId as 2522 | undefined,
       })
@@ -57,7 +56,7 @@ export class Base {
       functionName,
       args,
       value,
-      __mode: "prepared", // Needs to be uncommented on local
+      // __mode: "prepared", // Needs to be uncommented on local
     });
 
     // await wait(4);

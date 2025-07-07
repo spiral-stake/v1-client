@@ -1,43 +1,25 @@
 {
-  "stblUSD": {
-    "address": "0x416C42991d05b31E9A6dC209e91AD22b79D87Ae6",
-    "decimals": "18",
-    "name": "Spiral Stake USD",
-    "symbol": "stblUSD"
-  },
   "collateralTokens": {
-    "0x34A1D3fff3958843C43aD80F30b94c510645C316": {
-      "address": "0x34A1D3fff3958843C43aD80F30b94c510645C316",
-      "decimals": "18",
-      "name": "PT-slvlUSD-25SEP2025",
-      "symbol": "PT-slvlUSD"
-    },
-    "0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496": {
-      "address": "0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496",
-      "decimals": "18",
-      "name": "PT-sUSDE-25SEP2025",
-      "symbol": "PT-sUSDE"
-    },
-    "0x90193C961A926261B756D1E5bb255e67ff9498A1": {
-      "address": "0x90193C961A926261B756D1E5bb255e67ff9498A1",
-      "decimals": "18",
-      "name": "PT-csUSDL-31JUL2025",
-      "symbol": "PT-csUSDL"
-    },
-    "0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496": {
-      "address": "0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496",
-      "decimals": "18",
-      "name": "Staked frxUSD",
-      "symbol": "sfrxUSD"
-    },
-    "0xBb2180ebd78ce97360503434eD37fcf4a1Df61c3": {
-      "address": "0xBb2180ebd78ce97360503434eD37fcf4a1Df61c3",
-      "decimals": "18",
-      "name": "Staked USDf",
-      "symbol": "sUSDf"
+    "0xa6f0a4d18b6f6ddd408936e81b7b3a8befa18e77": {
+      "address": "0xa6f0a4d18b6f6ddd408936e81b7b3a8befa18e77",
+      "decimals": 18,
+      "name": "PT Resolv USD 25SEP2025",
+      "symbol": "PT-USR",
+      "underlyingToken": {
+        "address": "0x35e5db674d8e93a03d814fa0ada70731efe8a4b9",
+        "decimals": 18,
+        "name": "Resolv USD",
+        "symbol": "USR"
+      },
+      "pendleMarket": "0x715509bde846104cf2ccebf6fdf7ef1bb874bc45"
     }
   },
-  "flashLeverageAddress": "0x8B71b41D4dBEb2b6821d44692d3fACAAf77480Bb",
-  "frxUSD": "0x4f559F30f5eB88D635FDe1548C4267DB8FaB0351",
-  "positionManagerAddress": "0xd21060559c9beb54fC07aFd6151aDf6cFCDDCAeB"
+  "USDC": {
+    "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "name": "Circle USD",
+    "symbol": "USDC",
+    "decimals": 6
+  },
+  "flashLeverageAddress": "0x70d309EcBE4e62BCDa8c6Ee853033cf3ED6a3Fc9",
+  "leverageWrapperAddress": ""
 }

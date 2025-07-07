@@ -60,7 +60,7 @@ const PositionNft = ({
       </div>
       <div className="text-center mt-3 text-xs">
         <span className="">
-          {position.winningCycle ? `Winner of Cycle ${position.winningCycle}` : "Yet to win"}
+          {position.winningCycle ? `Winner of Cycle ${position.winningCycle}` : "No Open Positions"}
         </span>
       </div>
     </div>

@@ -1,83 +1,66 @@
 import { useEffect, useState } from "react";
 import Loader from "../components/low-level/Loader";
 import PageTitle from "../components/low-level/PageTitle";
-import PositionCard from "../components/low-level/PositionCard";
 import { LeveragePosition, Position, Token } from "../types";
 import { useAccount, useChainId } from "wagmi";
-import PositionManager from "../contract-hooks/PositionManager";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import LeveragePositionCard from "../components/low-level/LeveragePositionCard";
 
-const Portfolio = ({ positionManager, flashLeverage }: { positionManager: PositionManager, flashLeverage: FlashLeverage }) => {
+const Portfolio = ({
+    flashLeverage,
+}: {
+    flashLeverage: FlashLeverage;
+}) => {
     const [positions, setPositions] = useState<Position[]>([]);
     const [leveragePositions, setLeveragePositions] = useState<LeveragePosition[]>([]);
+    const [showLoader, setShowLoader] = useState(true)
 
     const { address } = useAccount();
     const chainId = useChainId();
 
     useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowLoader(false);
+        }, 2500); // 2.5 seconds
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    useEffect(() => {
         async function getUserPositions() {
-            if (!chainId || !address || !positionManager || !flashLeverage) return;
-            setPositions([...(await positionManager.getUserPositions(address))]);
-            setLeveragePositions([...(await flashLeverage.getUserLeveragePositions(address, positionManager))]);
+            if (!chainId || !address) return;
+
+            if (flashLeverage) {
+                setLeveragePositions([
+                    ...(await flashLeverage.getUserLeveragePositions(address)),
+                ]);
+            }
         }
 
         getUserPositions();
-    }, [address, positionManager, flashLeverage]);
+    }, [address, flashLeverage]);
+
+    function deleteLeveragePosition(positionId: number) {
+        setLeveragePositions(prev =>
+            prev.filter(position => position.id !== positionId)
+        );
+    }
 
     return (
-        <div className="pb-16">
+        flashLeverage ? (<div className="pb-16">
             <div className="py-16">
                 <PageTitle
-                    title={"Your Positions"}
+                    title={"Your Leveraged Positions"}
                     subheading={`Manage all your borrowing and looping positions in one place`}
                 />
             </div>
-            <div className="pb-10">
-                <h2 className="text-xl font-semibold">Borrowing Positions</h2>
-            </div>
-            {positions.length ? (
-                <div>
-                    <div className="hidden pb-5 w-full lg:grid grid-cols-8 pr-5 border-b border-gray-900">
-                        <div className="col-span-3 flex justify-center items-center pl-3">
-                            <span className="w-full px-5 inline-flex justify-start items-center gap-4">
-                                Collateral
-                            </span>
-                        </div>
-
-                        <div className="col-span-1 flex justify-end items-center">
-                            <span>Deposited</span>
-                        </div>
-                        <div className="col-span-1 flex justify-end items-center">
-                            <span>Borrowed</span>
-                        </div>
-                        <div className="col-span-1 flex justify-end items-center">
-                            <span>Borrow APY</span>
-                        </div>
-                        <div className="col-span-1 flex justify-end items-center">
-                            <span>LTV</span>
-                        </div>
-                        <div className="col-span-1 flex justify-end items-center">
-                            <span>Liq. LTV</span>
-                        </div>
-                    </div>
-                    {/* <div className="h-0 w-full px-5 outline-[10px] outline-gray-600"/> */}
-                    <div>
-                        {positions.map((position: Position, index: number) => (
-                            <PositionCard key={index} position={position} liqLtv={positionManager?.liqLtv} borrowApy={positionManager.borrowApy} />
-                        ))}
-                    </div>
-                </div>
-            ) : (
+            {showLoader ? (
                 <Loader />
-            )}
-
-
-            {leveragePositions.length ? (
+            ) : leveragePositions.length ? (
                 <>
-                    <div className="py-10">
-                        <h2 className="text-xl font-semibold">Looping Positions</h2>
-                    </div>
+                    {/* <div className="py-10">
+            <h2 className="text-xl font-semibold">Looping Positions</h2>
+        </div> */}
                     <div>
                         <div className="hidden pb-5 w-full lg:grid grid-cols-8 pr-5 border-b border-gray-900">
                             <div className="col-span-3 flex justify-center items-center pl-3">
@@ -93,23 +76,34 @@ const Portfolio = ({ positionManager, flashLeverage }: { positionManager: Positi
                                 <span>Leveraged</span>
                             </div>
                             <div className="col-span-1 flex justify-end items-center">
-                                <span>Position Size</span>
+                                <span>Max APY</span>
                             </div>
                             <div className="col-span-1 flex justify-end items-center">
                                 <span>LTV</span>
                             </div>
                             <div className="col-span-1 flex justify-end items-center">
-                                <span>Max APY</span>
+                                Actions
                             </div>
                         </div>
                         {/* <div className="h-0 w-full px-5 outline-[10px] outline-gray-600"/> */}
                         <div>
                             {leveragePositions.map((leveragePosition: LeveragePosition, index: number) => (
-                                <LeveragePositionCard key={index} leveragePosition={leveragePosition} liqLtv={positionManager?.liqLtv} />
+                                <LeveragePositionCard
+                                    key={index}
+                                    leveragePosition={leveragePosition}
+                                    flashLeverage={flashLeverage}
+                                    deleteLeveragePosition={deleteLeveragePosition}
+                                />
                             ))}
                         </div>
-                    </div></>) : ""}
-        </div>
+                    </div>
+                </>
+            ) : (
+                <h1 className="text-3xl w-full text-center text-gray-300">No Open Positions</h1>
+            )}
+        </div>) : (<div className="mt-10">
+            <Loader />
+        </div>)
     );
 };
 

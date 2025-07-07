@@ -5,17 +5,17 @@ export const handleAsync = <T extends any[]>(
   setLoading: (value: boolean) => void
 ) => {
   return async (...args: T) => {
-    setLoading(true); 
+    setLoading(true);
 
     try {
       const result = await fn(...args);
       return result;
     } catch (error) {
-      console.log(error); 
-      toastError("Error", "Something went wrong");
+      console.dir(error);
+      toastError(error.name, error.shortMessage);
       return undefined;
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 };

@@ -29,18 +29,6 @@
       "decimals": "18",
       "name": "PT-csUSDL-31JUL2025",
       "symbol": "PT-csUSDL"
-    },
-    "0xE4408cECD1eC5D8336b16998f010cf4f8497AB23": {
-      "address": "0xE4408cECD1eC5D8336b16998f010cf4f8497AB23",
-      "decimals": "18",
-      "name": "Staked frxUSD",
-      "symbol": "sfrxUSD"
-    },
-    "0xb4ccD7d85bC96E6F260671E5f218B615a5cC62D9": {
-      "address": "0xb4ccD7d85bC96E6F260671E5f218B615a5cC62D9",
-      "decimals": "18",
-      "name": "Staked USDf",
-      "symbol": "sUSDf"
     }
   },
 

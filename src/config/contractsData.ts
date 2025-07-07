@@ -1,17 +1,18 @@
-import { Token } from "../types";
+import BigNumber from "bignumber.js";
+import { CollateralToken, Token } from "../types";
 
 interface CollateralTokensObject {
-  [symbol: string]: Token;
+  [symbol: string]: CollateralToken;
 }
 
 interface TokenData {
   [symbol: string]: {
-    isPT: boolean;
+    image: string;
     apy: string;
   };
 }
 
-export const readCollateralTokens = async (chainId: number): Promise<Token[]> => {
+export const readCollateralTokens = async (chainId: number): Promise<CollateralToken[]> => {
   const [addressesModule, tokenDataModule] = await Promise.all([
     import(`../addresses/${chainId}.json`) as Promise<{
       default: { collateralTokens: CollateralTokensObject };
@@ -28,8 +29,6 @@ export const readCollateralTokens = async (chainId: number): Promise<Token[]> =>
       ...tokenData[tokenAddress],
     };
   });
-
-
 };
 
 export const readStblUSD = async (chainId: number): Promise<Token> => {
@@ -44,32 +43,30 @@ export const readStblUSD = async (chainId: number): Promise<Token> => {
 
   return {
     ...stblUSD,
-    isPT: false,
-    apy: "0",
   };
 };
 
-export const readfrxUSD = async (chainId: number): Promise<Token> => {
+export const readToken = async (chainId: number, symbol: string): Promise<Token> => {
   const [addressesModule] = await Promise.all([
     import(`../addresses/${chainId}.json`) as Promise<{
-      default: { frxUSD: Token };
+      default: Record<string, Token>;
     }>,
-    import(`../token-data/${chainId}.json`) as Promise<{ default: TokenData }>,
+    import(`../token-data/${chainId}.json`) as Promise<{ default: any }>,
   ]);
 
-  const { frxUSD } = addressesModule.default;
+  const token = addressesModule.default[symbol];
 
-  return {
-    ...frxUSD,
-    isPT: false,
-    apy: "0",
-  };
+  if (!token) {
+    throw new Error(`Token with symbol ${symbol} not found for chainId ${chainId}`);
+  }
+
+  return token;
 };
 
 export const readCollateralToken = async (
   chainId: number,
   tokenAddress: string
-): Promise<Token> => {
+): Promise<CollateralToken> => {
   const [addressesModule, tokenDataModule] = await Promise.all([
     import(`../addresses/${chainId}.json`) as Promise<{
       default: { collateralTokens: CollateralTokensObject };

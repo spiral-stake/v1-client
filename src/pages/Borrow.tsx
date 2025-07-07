@@ -32,7 +32,7 @@ const Borrow = ({
 
   const [actionBtn, setActionBtn] = useState({
     text: "Borrow",
-    onClick: () => {},
+    onClick: () => { },
     disabled: false,
   });
 
@@ -160,7 +160,7 @@ const Borrow = ({
     }
 
     updateUserCollateralBalance();
-    navigate("/my-positions");
+    navigate("/portfolio");
   }
 
   return (
