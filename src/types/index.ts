@@ -29,6 +29,7 @@ export interface Position {
 }
 
 export interface LeveragePosition {
+  open: boolean;
   owner: string;
   id: number; // user => LeveragePosition[index]
   collateralToken: CollateralToken;
@@ -39,7 +40,16 @@ export interface LeveragePosition {
   ltv: string;
 }
 
-// Pendle Swap Aggregator Related
+export interface InternalSwapData {
+  approxParams: any;
+  pendleSwap: string;
+  swapData: any;
+  limitOrderData: any;
+}
+
+export interface ExternalSwapData extends InternalSwapData {
+  minCollateralOut: bigint;
+}
 
 export type SwapData = { amountOut: string; priceImpact: number };
 export type AddLiquidityData = { amountLpOut: string; amountYtOut: string; priceImpact: number };

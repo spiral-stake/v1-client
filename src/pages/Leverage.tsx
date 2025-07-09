@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import PageTitle from "../components/low-level/PageTitle";
 import LTVSlider from "../components/LTVSlider";
 import BigNumber from "bignumber.js";
-import { CollateralToken, Token } from "../types";
+import { CollateralToken, ExternalSwapData, InternalSwapData, Token } from "../types";
 import { useAccount, useChainId } from "wagmi";
 import { calcLeverageApy, calcLtv, calcMaxLeverage } from "../utils";
 import ActionBtn from "../components/ActionBtn";
@@ -16,10 +16,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import SectionOverlay from "../components/low-level/SectionOverlay";
 import lockIcon from "../assets/icons/lock-svgrepo-com.svg";
 import closeIcon from "../assets/icons/close.svg";
-import { getPendleSwapData } from "../utils/pendleSwapAggregator";
+import { getExternalSwapData, getInternalSwapData } from "../utils/swapAggregator";
 import { displayTokenAmount } from "../utils/displayTokenAmounts";
+import LeverageWrapper from "../contract-hooks/LeverageWrapper";
 
-const Leverage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
+const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeverage, leverageWrapper: LeverageWrapper }) => {
   const [collateralToken, setCollateralToken] = useState<CollateralToken>();
   const [fromToken, setFromToken] = useState<Token>();
   const [amountCollateral, setAmountCollateral] = useState("");
@@ -36,6 +37,8 @@ const Leverage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     disabled: false,
     error: "",
   });
+  const [externalSwapData, setExternalSwapData] = useState<ExternalSwapData>(); // Only used by leverageWrapper
+  const [internalSwapData, setInternalSwapData] = useState<InternalSwapData>();
 
   const { address: collateralTokenAddress } = useParams();
 
@@ -49,7 +52,7 @@ const Leverage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       ) as CollateralToken;
 
       setCollateralToken({ ...collateralToken });
-      setFromToken({ ...collateralToken });
+      setFromToken({ ...flashLeverage.usdc });
       setDesiredLtv(collateralToken.maxLtv);
     }
 
@@ -101,6 +104,7 @@ const Leverage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       } else {
         return setActionBtn((prev) => ({
           ...prev,
+          text: "Leverage",
           disabled: false,
           error: "",
         }));
@@ -109,6 +113,30 @@ const Leverage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
     updateActionBtn();
   }, [amountCollateral, userFromTokenBalance]);
+
+  useEffect(() => {
+    if (!collateralToken || !fromToken) return;
+
+    const fetchSwapData = async () => {
+      if (showSummary) {
+        if (collateralToken.address === fromToken.address) {
+          setInternalSwapData(await getInternalSwapData(
+            flashLeverage,
+            collateralToken,
+            amountCollateral
+          ));
+        } else {
+          const _externalSwapData = (await getExternalSwapData(leverageWrapper.address, fromToken, amountCollateral, collateralToken));
+          setInternalSwapData(await getInternalSwapData(flashLeverage, collateralToken, _externalSwapData.minCollateralOut))
+          setExternalSwapData(_externalSwapData);
+        }
+      } else {
+        setInternalSwapData(undefined);
+      }
+    }
+
+    fetchSwapData();
+  }, [showSummary])
 
   const updateUserCollateralBalance = async () => {
     if (!address || !fromToken) return;
@@ -119,25 +147,23 @@ const Leverage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const updateUserCollateralAllowance = async () => {
     if (!address || !collateralToken || !fromToken) return;
 
-    // Temporary
     let allowance;
-    allowance = await new ERC20(fromToken).allowance(address, flashLeverage.address);
-
     if (fromToken == collateralToken) {
+      allowance = await new ERC20(fromToken).allowance(address, flashLeverage.address);
     } else {
-      // allowance = await new ERC20(fromToken).allowance(
-      //   address,
-      //   leverageWrapper.address
-      // );
+      allowance = await new ERC20(fromToken).allowance(
+        address,
+        leverageWrapper.address
+      );
     }
 
     setUserFromTokenAllowance(allowance);
   };
 
-  // const handleFromTokenChange = (token: Token) => {
-  //   setFromToken(token);
-  //   setAmountCollateral("");
-  // };
+  const handleFromTokenChange = (token: Token) => {
+    setFromToken(token);
+    setAmountCollateral("");
+  };
 
   const handleLtvSlider = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDesiredLtv(BigNumber(e.target.value).toFixed(2));
@@ -149,45 +175,39 @@ const Leverage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     if (collateralToken.address == fromToken.address) {
       await new ERC20(fromToken).approve(flashLeverage.address, amountCollateral);
     } else {
-      // await new ERC20(fromToken).approve(
-      //   leverageWrapper.address,
-      //   amountCollateral
-      // );
+      await new ERC20(fromToken).approve(
+        leverageWrapper.address,
+        amountCollateral
+      );
     }
     setUserFromTokenAllowance(BigNumber(amountCollateral));
   }
 
   async function handleLeverage() {
-    if (!flashLeverage || !fromToken || !address || !collateralToken) return;
-
-    const pendleSwapData = await getPendleSwapData(
-      flashLeverage,
-      collateralToken,
-      amountCollateral
-    );
+    if (!flashLeverage || !fromToken || !address || !collateralToken || !internalSwapData) return;
 
     if (collateralToken.address == fromToken.address) {
-      // console.log(pendleSwapData);
 
       await flashLeverage.leverage(
         address,
         fromToken,
         amountCollateral,
-        pendleSwapData.approxParams,
-        pendleSwapData.pendleSwap,
-        pendleSwapData.swapData,
-        pendleSwapData.limitOrderData
+        internalSwapData
       );
     } else {
-      // await leverageWrapper.leverage(
-      //   fromToken,
-      //   amountCollateral,
-      //   collateralToken,
-      //   desiredLtv
-      // );
+      if (!externalSwapData) return;
+
+      await leverageWrapper.leverage(
+        fromToken, amountCollateral, externalSwapData, collateralToken, flashLeverage.usdc, internalSwapData
+      );
     }
 
     navigate("/portfolio");
+  }
+
+  const setAmountToMax = () => {
+    const truncated = (Math.floor(userFromTokenBalance.toNumber() * 100) / 100).toFixed(2);
+    setAmountCollateral(truncated);
   }
 
   return (
@@ -230,16 +250,18 @@ const Leverage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   <TokenAmount
                     title="Loop"
                     titleHoverInfo="Loop your assets to enjoy Max leveraged yield"
-                    tokens={[collateralToken]}
+                    tokens={[flashLeverage.usdc, collateralToken]}
                     selectedToken={fromToken}
-                    // handleTokenChange={handleFromTokenChange}
+                    handleTokenChange={handleFromTokenChange}
                     amount={amountCollateral}
                     handleAmountChange={setAmountCollateral}
                     amountInUsd={BigNumber(amountCollateral).multipliedBy(
-                      collateralToken.valueInUsd
+                      fromToken.valueInUsd
                     )}
                     bgStyle={"bg-slate-950"}
                     error={actionBtn.error}
+                    balance={userFromTokenBalance}
+                    setAmountToMax={setAmountToMax}
                   />
 
                   <section className="rounded-sm p-4 sm:p-5 md:p-8 flex flex-1 justify-center items-center flex-col gap-4 bg-gradient-to-l from-slate-950 via-gray-900 to-slate-950">
@@ -308,7 +330,7 @@ const Leverage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                           token={fromToken}
                           amountToken={amountCollateral}
                           actionHandler={handleLeverage}
-                          disabled={userFromTokenAllowance.lt(amountCollateral)}
+                          disabled={userFromTokenAllowance.lt(amountCollateral) || !internalSwapData}
                         />
                       </div>
                     </div>

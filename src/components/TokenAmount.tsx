@@ -17,6 +17,8 @@ const TokenAmount = ({
   amountInUsd,
   bgStyle,
   error,
+  balance,
+  setAmountToMax
 }: {
   title: string;
   titleHoverInfo?: string;
@@ -28,6 +30,8 @@ const TokenAmount = ({
   amountInUsd: BigNumber;
   bgStyle: string;
   error?: string;
+  balance: BigNumber;
+  setAmountToMax: () => void
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -95,12 +99,15 @@ const TokenAmount = ({
                 )}
               </div>
               <div className="flex min-w-0 flex-col gap-0.5">
-                <Input
-                  name="amountCollateral"
-                  placeholder="0"
-                  onChange={(e: any) => handleAmountChange(e.target.value)}
-                  value={amount}
-                />
+                <div className="flex justify-between">
+                  <Input
+                    name="amountCollateral"
+                    placeholder="0"
+                    onChange={(e: any) => handleAmountChange(e.target.value)}
+                    value={amount}
+                  />
+                  <div onClick={setAmountToMax} className="text-sm w-10 text-right underline cursor-pointer">max</div>
+                </div>
                 <div
                   data-testid="component-AssetInput-inputUsdValue"
                   className="text-xs truncate text-gray-400"

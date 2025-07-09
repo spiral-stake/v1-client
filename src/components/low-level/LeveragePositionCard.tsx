@@ -8,7 +8,7 @@ import { calcLeverageApy, calcLtv, calcMaxLeverage } from "../../utils";
 import FlashLeverage from "../../contract-hooks/FlashLeverage";
 import ActionBtn from "../ActionBtn";
 import { useAccount } from "wagmi";
-import { getPendleReswapData } from "../../utils/pendleSwapAggregator";
+import { getInternalReswapData } from "../../utils/swapAggregator";
 import { handleAsync } from "../../utils/handleAsyncFunction";
 import { useState } from "react";
 import { toastSuccess } from "../../utils/toastWrapper";
@@ -18,7 +18,7 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
     const [loading, setLoading] = useState<boolean>(false);
 
     const handleCloseLeveragePosition = async () => {
-        const { pendleSwap, swapData, limitOrderData } = await getPendleReswapData(flashLeverage, leveragePosition.collateralToken, leveragePosition.amountTotalCollateral)
+        const { pendleSwap, swapData, limitOrderData } = await getInternalReswapData(flashLeverage, leveragePosition.collateralToken, leveragePosition.amountTotalCollateral)
         const amountReturned = await flashLeverage.unleverage(leveragePosition.id, pendleSwap, swapData, limitOrderData);
 
         deleteLeveragePosition(leveragePosition.id);

@@ -42,7 +42,7 @@ export class Base {
         args,
         account:
           (await connector?.getAccounts?.())?.[0] ||
-          ("0xD9bbfA9D50d75F220877439ce5fDc5165f673816" as `0x${string}`),
+          ("0x08675879B01177a9Bc80A7FC58c032cFA2Bb7742" as `0x${string}`),
         value,
         chainId: chainId as 2522 | undefined,
       })

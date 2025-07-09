@@ -1,26 +1,19 @@
-import { Position, Token } from "../types/index";
+import { CollateralToken, ExternalSwapData, InternalSwapData } from "./../types/index";
+import { Token } from "../types/index";
 import { Base } from "./Base.ts";
-import { abi as LEVERAGE_VIA_PYUSD_ABI } from "../abi/LeverageWrapper.sol/LeverageWrapper.json";
-import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
-import { readToken } from "../config/contractsData.ts";
-import BigNumber from "bignumber.js";
-
+import { abi as LEVERAGE_WRAPPER_ABI } from "../abi/FlashLeverageWrapper.sol/FlashLeverageWrapper.json";
+import { parseUnits } from "../utils/formatUnits.ts";
 export default class LeverageWrapper extends Base {
-  public frxUSD: Token;
-
   constructor(leverageWrapperAddress: string) {
-    super(leverageWrapperAddress, LEVERAGE_VIA_PYUSD_ABI);
+    super(leverageWrapperAddress, LEVERAGE_WRAPPER_ABI);
   }
 
   static async createInstance(chainId: number) {
     try {
-      const [{ leverageWrapperAddress }, frxUSD] = await Promise.all([
+      const [{ leverageWrapperAddress }] = await Promise.all([
         import(`../addresses/${chainId}.json`),
-        readToken(chainId, "frxUSD"),
       ]);
       const instance = new LeverageWrapper(leverageWrapperAddress);
-
-      instance.frxUSD = frxUSD;
       return instance;
     } catch (e) {}
   }
@@ -32,15 +25,38 @@ export default class LeverageWrapper extends Base {
 
   async leverage(
     fromToken: Token,
-    amountToken: string,
-    collateralToken: Token,
-    desiredLtv: string
+    amount: string,
+    externalSwapData: ExternalSwapData,
+    collateralToken: CollateralToken,
+    loanToken: Token,
+    internalSwapData: InternalSwapData
   ) {
+    console.log(
+      {
+        tokenIn: fromToken.address,
+        amountTokenIn: parseUnits(amount, fromToken.decimals),
+        ...externalSwapData, // spread must be outside any key-value pair
+      },
+      {
+        collateralToken: collateralToken.address,
+        loanToken: loanToken.address,
+        amountUserCollateral: externalSwapData.minCollateralOut,
+        ...internalSwapData,
+      }
+    );
+
     await this.write("leverage", [
-      fromToken.address,
-      parseUnits(amountToken, fromToken.decimals),
-      collateralToken.address,
-      parseUnits(BigNumber(desiredLtv).dividedBy(100).toFixed(2), this.DEFAULT_DECIMALS),
+      {
+        tokenIn: fromToken.address,
+        amountTokenIn: parseUnits(amount, fromToken.decimals),
+        ...externalSwapData,
+      },
+      {
+        collateralToken: collateralToken.address,
+        loanToken: loanToken.address,
+        amountUserCollateral: externalSwapData.minCollateralOut,
+        ...internalSwapData,
+      },
     ]);
   }
 }

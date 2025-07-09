@@ -18,8 +18,9 @@
     "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
     "name": "Circle USD",
     "symbol": "USDC",
-    "decimals": 6
+    "decimals": 6,
+    "valueInUsd": 1
   },
-  "flashLeverageAddress": "0x70d309EcBE4e62BCDa8c6Ee853033cf3ED6a3Fc9",
-  "leverageWrapperAddress": ""
+  "flashLeverageAddress": "0xEbC618c171fe8D4c3DBffaEB9F2Fe94954b10499",
+  "leverageWrapperAddress": "0xa92DA66dAc250Ac0e42e8973051BC89273214C16"
 }

@@ -1,6 +1,6 @@
 import axios from "axios";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
-import { CollateralToken, SwapData } from "../types";
+import { CollateralToken, ExternalSwapData, SwapData, Token } from "../types";
 import { parseUnits } from "./formatUnits";
 import BigNumber from "bignumber.js";
 
@@ -25,10 +25,41 @@ export async function callSDK<Data>(path: string, params: Record<string, any> = 
   return response.data;
 }
 
-export async function getPendleSwapData(
+export async function getExternalSwapData(
+  leverageWrapperAddress: string,
+  fromToken: Token,
+  amount: string,
+  collateralToken: CollateralToken
+): Promise<ExternalSwapData> {
+  const params = {
+    receiver: leverageWrapperAddress,
+    slippage: 0.01, // 1%
+    tokenIn: fromToken.address,
+    tokenOut: collateralToken.address,
+    amountIn: parseUnits(amount, fromToken.decimals),
+    enableAggregator: true,
+  };
+
+  console.log(params, "external swap");
+
+  const res = await callSDK<SwapData>(
+    `v1/sdk/${8453}/markets/${collateralToken.pendleMarket}/swap`,
+    params
+  );
+
+  return {
+    minCollateralOut: BigInt(res.data.amountOut),
+    approxParams: res.contractCallParams[3],
+    pendleSwap: res.contractCallParams[4].pendleSwap,
+    swapData: res.contractCallParams[4].swapData,
+    limitOrderData: res.contractCallParams[5],
+  };
+}
+
+export async function getInternalSwapData(
   flashLeverage: FlashLeverage,
   collateralToken: CollateralToken,
-  amountCollateral: string
+  amountCollateral: string | bigint
 ) {
   // Need to do this calculation in client itself
   const amountLoan = await flashLeverage.getLoanAmount(collateralToken, amountCollateral);
@@ -41,6 +72,8 @@ export async function getPendleSwapData(
     amountIn: amountLoan,
     enableAggregator: true,
   };
+
+  console.log(params, "internal swap");
 
   const res = await callSDK<SwapData>(
     `v1/sdk/${8453}/markets/${collateralToken.pendleMarket}/swap`,
@@ -55,7 +88,7 @@ export async function getPendleSwapData(
   };
 }
 
-export async function getPendleReswapData(
+export async function getInternalReswapData(
   flashLeverage: FlashLeverage,
   collateralToken: CollateralToken,
   amountTotalCollateral: BigNumber
@@ -68,6 +101,8 @@ export async function getPendleReswapData(
     amountIn: String(parseUnits(String(amountTotalCollateral), collateralToken.decimals)),
     enableAggregator: true,
   };
+
+  console.log(params);
 
   const res = await callSDK<SwapData>(
     `v1/sdk/${8453}/markets/${collateralToken.pendleMarket}/swap`,

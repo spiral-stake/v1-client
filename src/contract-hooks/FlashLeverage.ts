@@ -1,4 +1,4 @@
-import { Token, CollateralToken, LeveragePosition } from "./../types/index";
+import { Token, CollateralToken, LeveragePosition, InternalSwapData } from "./../types/index";
 import { Base } from "./Base";
 import { abi as FLASH_LEVERAGE_ABI } from "../abi/FlashLeverage.sol/FlashLeverage.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
@@ -32,7 +32,7 @@ export default class FlashLeverage extends Base {
           async (collateralToken: CollateralToken): Promise<CollateralToken> => {
             const [valueInUsd, maxLtv] = await Promise.all([
               instance.getTokenUsdValue(collateralToken, "1"),
-              instance.getMaxLtv(collateralToken),
+              instance.getMaxLtv(collateralToken, _usdc),
             ]);
 
             return {
@@ -64,19 +64,16 @@ export default class FlashLeverage extends Base {
     userAddress: string,
     collateralToken: Token,
     userCollateralAmount: string,
-    approxParams: any,
-    pendleSwap: string,
-    swapData: any,
-    limitOrderData: any
+    internalSwapData: InternalSwapData
   ) {
     await this.write("leverage", [
       userAddress,
-      collateralToken.address,
-      parseUnits(userCollateralAmount, collateralToken.decimals),
-      approxParams,
-      pendleSwap,
-      swapData,
-      limitOrderData,
+      {
+        collateralToken: collateralToken.address,
+        loanToken: this.usdc.address,
+        amountUserCollateral: parseUnits(userCollateralAmount, collateralToken.decimals),
+        ...internalSwapData,
+      },
     ]);
   }
 
@@ -112,16 +109,16 @@ export default class FlashLeverage extends Base {
   async getUserLeveragePositions(user: string): Promise<LeveragePosition[]> {
     const _userLeveragePositions = (await this.read("getUserLeveragePositions", [user])) as Array<{
       collateralToken: string;
+      loanToken: string;
       amountUserCollateral: bigint;
       amountTotalCollateral: bigint;
       sharesBorrowed: bigint;
+      open: boolean;
     }>;
 
     if (!Array.isArray(_userLeveragePositions)) {
       throw new Error("Invalid positionInfo data received");
     }
-
-    const userLeveragePositions: LeveragePosition[] = [];
 
     // Use Promise.all with map instead of forEach for async operations
     const positions = await Promise.all(
@@ -129,8 +126,6 @@ export default class FlashLeverage extends Base {
         const collateralToken = this.collateralTokens.find(
           (token) => token.address.toLowerCase() === pos.collateralToken.toLowerCase()
         ) as CollateralToken;
-
-        if (!collateralToken) return null;
 
         const amountTotalCollateral = formatUnits(
           pos.amountTotalCollateral,
@@ -142,6 +137,7 @@ export default class FlashLeverage extends Base {
         const amountLoan = await this.getRepayAmount(collateralToken, pos.sharesBorrowed);
 
         return {
+          open: pos.open,
           owner: user,
           id: index,
           collateralToken,
@@ -155,7 +151,7 @@ export default class FlashLeverage extends Base {
     );
 
     // Filter out null values and return the result
-    return positions.filter((pos): pos is LeveragePosition => pos !== null);
+    return positions.filter((pos): pos is LeveragePosition => pos.open);
   }
 
   async getTokenUsdValue(token: Token, amount: string) {
@@ -167,17 +163,21 @@ export default class FlashLeverage extends Base {
     return formatUnits(tokenUsdValue as bigint, this.DEFAULT_DECIMALS);
   }
 
-  async getMaxLtv(collateralToken: CollateralToken) {
-    const maxLtv = await this.read("getMaxLtv", [collateralToken.address]);
+  async getMaxLtv(collateralToken: CollateralToken, loanToken: Token) {
+    const maxLtv = await this.read("getMaxLtv", [collateralToken.address, loanToken.address]);
 
     return formatUnits(maxLtv as bigint, this.DEFAULT_DECIMALS).multipliedBy(100); // in percentage
   }
 
-  async getLoanAmount(collateralToken: CollateralToken, amount: string) {
+  async getLoanAmount(collateralToken: CollateralToken, amount: string | bigint) {
+    if (typeof amount === "string") {
+      amount = parseUnits(amount, collateralToken.decimals);
+    }
+
     const amountLoan = await this.read("calcLoanAmount", [
       collateralToken.address,
       this.usdc.address,
-      parseUnits(amount, collateralToken.decimals),
+      amount,
     ]);
 
     return String(amountLoan);
@@ -186,6 +186,7 @@ export default class FlashLeverage extends Base {
   async getRepayAmount(collateralToken: CollateralToken, sharesBorrowed: bigint) {
     const amountRepay = await this.read("getRepayAmount", [
       collateralToken.address,
+      this.usdc.address,
       sharesBorrowed,
     ]);
 
