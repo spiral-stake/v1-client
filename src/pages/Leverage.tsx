@@ -197,9 +197,14 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
     } else {
       if (!externalSwapData) return;
 
-      await leverageWrapper.leverage(
-        fromToken, amountCollateral, externalSwapData, collateralToken, flashLeverage.usdc, internalSwapData
-      );
+      try {
+        await leverageWrapper.leverage(
+          fromToken, amountCollateral, externalSwapData, collateralToken, flashLeverage.usdc, internalSwapData
+        );
+      } catch (e) {
+        setShowSummary(false);
+        throw (e);
+      }
     }
 
     navigate("/portfolio");
