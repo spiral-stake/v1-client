@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import PageTitle from "../components/low-level/PageTitle";
 import LTVSlider from "../components/LTVSlider";
 import BigNumber from "bignumber.js";
-import { CollateralToken, ExternalSwapData, InternalSwapData, Token } from "../types";
+import {
+  CollateralToken,
+  ExternalSwapData,
+  InternalSwapData,
+  Token,
+} from "../types";
 import { useAccount, useChainId } from "wagmi";
 import { calcLeverageApy, calcLtv, calcMaxLeverage } from "../utils";
 import ActionBtn from "../components/ActionBtn";
@@ -16,19 +21,31 @@ import { useNavigate, useParams } from "react-router-dom";
 import SectionOverlay from "../components/low-level/SectionOverlay";
 import lockIcon from "../assets/icons/lock-svgrepo-com.svg";
 import closeIcon from "../assets/icons/close.svg";
-import { getExternalSwapData, getInternalSwapData } from "../utils/swapAggregator";
+import {
+  getExternalSwapData,
+  getInternalSwapData,
+} from "../utils/swapAggregator";
 import { displayTokenAmount } from "../utils/displayTokenAmounts";
 import LeverageWrapper from "../contract-hooks/LeverageWrapper";
 
-const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeverage, leverageWrapper: LeverageWrapper }) => {
+const Leverage = ({
+  flashLeverage,
+  leverageWrapper,
+}: {
+  flashLeverage: FlashLeverage;
+  leverageWrapper: LeverageWrapper;
+}) => {
   const [collateralToken, setCollateralToken] = useState<CollateralToken>();
   const [fromToken, setFromToken] = useState<Token>();
   const [amountCollateral, setAmountCollateral] = useState("");
   const [desiredLtv, setDesiredLtv] = useState("");
   const [maxLeverage, setMaxLeverage] = useState("");
   const [showSummary, setShowSummary] = useState(false);
-  const [userFromTokenBalance, setUserFromTokenBalance] = useState<BigNumber>(BigNumber(0));
-  const [userFromTokenAllowance, setUserFromTokenAllowance] = useState<BigNumber>(BigNumber(0));
+  const [userFromTokenBalance, setUserFromTokenBalance] = useState<BigNumber>(
+    BigNumber(0)
+  );
+  const [userFromTokenAllowance, setUserFromTokenAllowance] =
+    useState<BigNumber>(BigNumber(0));
   const [actionBtn, setActionBtn] = useState({
     text: "Leverage",
     onClick: () => {
@@ -63,7 +80,9 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
     if (!fromToken || !address) return;
 
     const getFromTokenBalance = async () => {
-      const _userFromTokenBalance = await new ERC20(fromToken).balanceOf(address);
+      const _userFromTokenBalance = await new ERC20(fromToken).balanceOf(
+        address
+      );
       setUserFromTokenBalance(_userFromTokenBalance);
     };
     getFromTokenBalance();
@@ -86,7 +105,9 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
           disabled: true,
           error: "",
         }));
-      } else if (BigNumber(amountCollateral).isGreaterThan(userFromTokenBalance)) {
+      } else if (
+        BigNumber(amountCollateral).isGreaterThan(userFromTokenBalance)
+      ) {
         return setActionBtn((prev) => ({
           ...prev,
           disabled: true,
@@ -120,23 +141,36 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
     const fetchSwapData = async () => {
       if (showSummary) {
         if (collateralToken.address === fromToken.address) {
-          setInternalSwapData(await getInternalSwapData(
-            flashLeverage,
-            collateralToken,
-            amountCollateral
-          ));
+          setInternalSwapData(
+            await getInternalSwapData(
+              flashLeverage,
+              collateralToken,
+              amountCollateral
+            )
+          );
         } else {
-          const _externalSwapData = (await getExternalSwapData(leverageWrapper.address, fromToken, amountCollateral, collateralToken));
-          setInternalSwapData(await getInternalSwapData(flashLeverage, collateralToken, _externalSwapData.minCollateralOut))
+          const _externalSwapData = await getExternalSwapData(
+            leverageWrapper.address,
+            fromToken,
+            amountCollateral,
+            collateralToken
+          );
+          setInternalSwapData(
+            await getInternalSwapData(
+              flashLeverage,
+              collateralToken,
+              _externalSwapData.minCollateralOut
+            )
+          );
           setExternalSwapData(_externalSwapData);
         }
       } else {
         setInternalSwapData(undefined);
       }
-    }
+    };
 
     fetchSwapData();
-  }, [showSummary])
+  }, [showSummary]);
 
   const updateUserCollateralBalance = async () => {
     if (!address || !fromToken) return;
@@ -149,7 +183,10 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
 
     let allowance;
     if (fromToken == collateralToken) {
-      allowance = await new ERC20(fromToken).allowance(address, flashLeverage.address);
+      allowance = await new ERC20(fromToken).allowance(
+        address,
+        flashLeverage.address
+      );
     } else {
       allowance = await new ERC20(fromToken).allowance(
         address,
@@ -173,7 +210,10 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
     if (!address || !collateralToken || !fromToken) return;
 
     if (collateralToken.address == fromToken.address) {
-      await new ERC20(fromToken).approve(flashLeverage.address, amountCollateral);
+      await new ERC20(fromToken).approve(
+        flashLeverage.address,
+        amountCollateral
+      );
     } else {
       await new ERC20(fromToken).approve(
         leverageWrapper.address,
@@ -184,10 +224,16 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
   }
 
   async function handleLeverage() {
-    if (!flashLeverage || !fromToken || !address || !collateralToken || !internalSwapData) return;
+    if (
+      !flashLeverage ||
+      !fromToken ||
+      !address ||
+      !collateralToken ||
+      !internalSwapData
+    )
+      return;
 
     if (collateralToken.address == fromToken.address) {
-
       await flashLeverage.leverage(
         address,
         fromToken,
@@ -199,11 +245,16 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
 
       try {
         await leverageWrapper.leverage(
-          fromToken, amountCollateral, externalSwapData, collateralToken, flashLeverage.usdc, internalSwapData
+          fromToken,
+          amountCollateral,
+          externalSwapData,
+          collateralToken,
+          flashLeverage.usdc,
+          internalSwapData
         );
       } catch (e) {
         setShowSummary(false);
-        throw (e);
+        throw e;
       }
     }
 
@@ -211,15 +262,17 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
   }
 
   const setAmountToMax = () => {
-    const truncated = (Math.floor(userFromTokenBalance.toNumber() * 100) / 100).toFixed(2);
+    const truncated = (
+      Math.floor(userFromTokenBalance.toNumber() * 100) / 100
+    ).toFixed(2);
     setAmountCollateral(truncated);
-  }
+  };
 
   return (
     collateralToken &&
     fromToken && (
       <div className="pb-16">
-        <div className="py-16">
+        <div className="py-10 pt-14 lg:py-16">
           <PageTitle
             title={`Auto Loop \u00A0 ⟳ \u00A0 ${collateralToken.symbol}`}
             subheading={`Seamlessly Leverage in one click, with our cost-efficient Auto-looping`}
@@ -254,7 +307,7 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
                 <div className="relative grid grid-cols-1 md:grid-cols-2">
                   <TokenAmount
                     title="Loop"
-                    extraTitle = "7x Leverage" 
+                    extraTitle={`${maxLeverage}x Leverage`}
                     titleHoverInfo="Loop your assets to enjoy Max leveraged yield"
                     tokens={[flashLeverage.usdc, collateralToken]}
                     selectedToken={fromToken}
@@ -271,7 +324,9 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
                   />
 
                   <section className="rounded-sm p-4 sm:p-5 md:p-8 hidden lg:flex flex-1 justify-center items-center flex-col gap-4 bg-gradient-to-l from-slate-950 via-gray-900 to-slate-950">
-                    <div className="text-4xl font-semibold">{maxLeverage}x Leverage</div>
+                    <div className="text-4xl font-semibold">
+                      {maxLeverage}x Leverage
+                    </div>
                   </section>
                 </div>
 
@@ -298,8 +353,11 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
           <div className="sticky top-2 h-fit lg:block">
             <section className="rounded-sm p-0 grid h-fit grid-cols-1 sm:grid-cols-[3fr_2fr] lg:grid-cols-1">
               <APYInfo
-                title={`${collateralToken.isPT ? "Max Leveraged APY" : "Max Leveraged APY"} (${collateralToken.symbol
-                  })`}
+                title={`${
+                  collateralToken.isPT
+                    ? "Max Leveraged APY"
+                    : "Max Leveraged APY"
+                } (${collateralToken.symbol})`}
                 description="Loop your staked stable's for max leveraged yield"
                 apy={`${!collateralToken.isPT ? "~" : ""} ${calcLeverageApy(
                   collateralToken.apy,
@@ -320,7 +378,9 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
                 <section className="rounded-sm pt-[18px] lg:pt-0 text-white">
                   <section className="flex flex-col gap-2">
                     <div className="flex px-2 lg:px-0 items-center justify-between">
-                      <h3 className="text-xl font-semibold text-white">Actions</h3>
+                      <h3 className="text-xl font-semibold text-white">
+                        Actions
+                      </h3>
                     </div>
                     <div className="rounded-sm border border-[#142435]">
                       <div className="grid grid-cols-[auto_1fr_auto] gap-x-3 sm:gap-x-8 md:grid-cols-[auto_auto_auto_1fr_auto]">
@@ -329,14 +389,19 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
                           token={fromToken}
                           amountToken={amountCollateral}
                           actionHandler={handleApprove}
-                          completed={userFromTokenAllowance?.gte(BigNumber(amountCollateral))}
+                          completed={userFromTokenAllowance?.gte(
+                            BigNumber(amountCollateral)
+                          )}
                         />
                         <Action
                           text="Leverage"
                           token={fromToken}
                           amountToken={amountCollateral}
                           actionHandler={handleLeverage}
-                          disabled={userFromTokenAllowance.lt(amountCollateral) || !internalSwapData}
+                          disabled={
+                            userFromTokenAllowance.lt(amountCollateral) ||
+                            !internalSwapData
+                          }
                         />
                       </div>
                     </div>

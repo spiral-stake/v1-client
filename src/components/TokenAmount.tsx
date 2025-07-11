@@ -114,12 +114,12 @@ const TokenAmount = ({
                     onChange={(e: any) => handleAmountChange(e.target.value)}
                     value={amount}
                   />
-                  <div
+                  {/* <div
                     onClick={setAmountToMax}
                     className="text-sm w-10 text-right underline cursor-pointer"
                   >
                     max
-                  </div>
+                  </div> */}
                 </div>
                 <div
                   data-testid="component-AssetInput-inputUsdValue"
@@ -128,6 +128,12 @@ const TokenAmount = ({
                   ${displayTokenAmount(amountInUsd, undefined, 2)}
                 </div>
               </div>
+              <div
+                    onClick={setAmountToMax}
+                    className="text-sm w-10 text-right underline cursor-pointer"
+                  >
+                    max
+                  </div>
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
           </div>

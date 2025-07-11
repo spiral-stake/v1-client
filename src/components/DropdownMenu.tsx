@@ -1,13 +1,16 @@
-import fraxIcon from "../assets/icons/frax.svg";
 import close from "../assets/icons/close.svg";
 import ConnectWalletBtn from "./ConnectWalletBtn";
 import { Link } from "react-router-dom";
+import { chainConfig } from "../config/chainConfig";
+import { useChainId } from "wagmi";
 
 const DropdownMenu = ({
   showDropdown,
 }: {
   showDropdown: (bool: boolean) => void;
 }) => {
+  const appChainId = useChainId();
+
   return (
     // <div className="w-full self-stretch px-4 pt-4 pb-8 inline-flex flex-col items-center gap-6">
     <div className="lg:hidden w-full h-[100vh] relative flex flex-col justify-between items-center p-5 ">
@@ -81,10 +84,14 @@ const DropdownMenu = ({
         <div className="cursor-pointer self-stretch p-1 rounded-full inline-flex justify-center items-center gap-2 overflow-hidden">
           <div className="flex-1 flex justify-start items-center gap-2">
             <div className="w-6 h-6 relative overflow-hidden">
-              <img src={fraxIcon} alt="" />
+              <img
+                className="w-8 h-8 rounded-full"
+                src={chainConfig[appChainId].logo}
+                alt=""
+              />
             </div>
             <div className="flex-1 justify-start text-white text-sm font-normal font-['Outfit']">
-              Fraxtal
+              Base
             </div>
             {/* <div className="w-7 h-4 relative -rotate-90 overflow-hidden">
               <img src={arrowIcon} alt="" />
