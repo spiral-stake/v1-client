@@ -2,7 +2,7 @@ import { HoverInfo } from "../low-level/HoverInfo";
 
 const APYInfo = ({ title, apy, apyBreakdown, description }: { title: string, apy: string, apyBreakdown?: JSX.Element | React.ReactElement, description: string }) => {
     return (
-        <section className="rounded-sm bg-gradient-to-b from-slate-900 to-gray-950 text-white p-4 sm:p-5 md:p-8 flex flex-col justify-end gap-3 col-span-2">
+        <section className="rounded-sm bg-gradient-to-b pt-8 lg:pt-8 from-slate-900 to-gray-950 text-white p-4 md:p-8 flex flex-col justify-end gap-3 col-span-2">
 
             <h4 className="text-lg font-semibold">{title}</h4>
             <div className="flex flex-col gap-3">

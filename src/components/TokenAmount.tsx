@@ -8,6 +8,7 @@ import { displayTokenAmount } from "../utils/displayTokenAmounts";
 
 const TokenAmount = ({
   title,
+  extraTitle,
   titleHoverInfo,
   tokens,
   selectedToken,
@@ -18,9 +19,10 @@ const TokenAmount = ({
   bgStyle,
   error,
   balance,
-  setAmountToMax
+  setAmountToMax,
 }: {
   title: string;
+  extraTitle: string;
   titleHoverInfo?: string;
   tokens?: Token[];
   selectedToken: Token;
@@ -31,7 +33,7 @@ const TokenAmount = ({
   bgStyle: string;
   error?: string;
   balance: BigNumber;
-  setAmountToMax: () => void
+  setAmountToMax: () => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -59,18 +61,24 @@ const TokenAmount = ({
           <h4 className="text-xl font-semibold text-white">{title}</h4>
           {titleHoverInfo && <HoverInfo content={titleHoverInfo} />}
         </div>
+        <div className="flex lg:hidden h-8 flex-row items-center gap-1">
+          <h4 className="text-xl font-semibold bg-gradient-to-r from-orange-100 to-orange-300 bg-clip-text text-transparent">
+            {extraTitle}
+          </h4>
+        </div>
       </div>
       <div className="flex flex-col gap-1.5">
         <div data-testid="component-MultiAssetSelector-group">
           <div className="flex flex-col gap-2">
-            <div className="grid items-center gap-3 p-2 pr-4 rounded-sm border border-[#142435] from-slate-900 to-gray-950 focus-within:border-[#084FAA] grid-cols-[auto_1fr_auto]">
-              <div className="min-w-[120px] relative" ref={ref}>
+            <div className="grid items-center gap-3 p-2 pr-4 rounded-sm border border-[#142435] from-slate-900 to-gray-950 focus-within:border-[#084FAA] grid-cols-[auto_auto_auto]">
+              <div className="lg:min-w-[120px] relative" ref={ref}>
                 <button
                   type="button"
                   onClick={() => setIsOpen(!isOpen)}
-                  className={`group flex w-full gap-2 items-center justify-between rounded-sm border border-[#142435] bg-[#011B37] text-white p-3 ${tokens &&
+                  className={`group flex w-full gap-2 items-center justify-between rounded-sm border border-[#142435] bg-[#011B37] text-white p-3 ${
+                    tokens &&
                     "hover:border-gray-400 focus-visible:outline-none focus-visible:ring focus-visible:ring-blue-200"
-                    }`}
+                  }`}
                 >
                   <div className="flex flex-row items-center gap-2">
                     {/* Need to add Symbol */}
@@ -106,7 +114,12 @@ const TokenAmount = ({
                     onChange={(e: any) => handleAmountChange(e.target.value)}
                     value={amount}
                   />
-                  <div onClick={setAmountToMax} className="text-sm w-10 text-right underline cursor-pointer">max</div>
+                  <div
+                    onClick={setAmountToMax}
+                    className="text-sm w-10 text-right underline cursor-pointer"
+                  >
+                    max
+                  </div>
                 </div>
                 <div
                   data-testid="component-AssetInput-inputUsdValue"

@@ -254,6 +254,7 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
                 <div className="relative grid grid-cols-1 md:grid-cols-2">
                   <TokenAmount
                     title="Loop"
+                    extraTitle = "7x Leverage" 
                     titleHoverInfo="Loop your assets to enjoy Max leveraged yield"
                     tokens={[flashLeverage.usdc, collateralToken]}
                     selectedToken={fromToken}
@@ -269,7 +270,7 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
                     setAmountToMax={setAmountToMax}
                   />
 
-                  <section className="rounded-sm p-4 sm:p-5 md:p-8 flex flex-1 justify-center items-center flex-col gap-4 bg-gradient-to-l from-slate-950 via-gray-900 to-slate-950">
+                  <section className="rounded-sm p-4 sm:p-5 md:p-8 hidden lg:flex flex-1 justify-center items-center flex-col gap-4 bg-gradient-to-l from-slate-950 via-gray-900 to-slate-950">
                     <div className="text-4xl font-semibold">{maxLeverage}x Leverage</div>
                   </section>
                 </div>
@@ -316,9 +317,9 @@ const Leverage = ({ flashLeverage, leverageWrapper }: { flashLeverage: FlashLeve
 
               {/* Actions */}
               {showSummary && (
-                <section className="rounded-sm text-white">
+                <section className="rounded-sm pt-[18px] lg:pt-0 text-white">
                   <section className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
+                    <div className="flex px-2 lg:px-0 items-center justify-between">
                       <h3 className="text-xl font-semibold text-white">Actions</h3>
                     </div>
                     <div className="rounded-sm border border-[#142435]">
