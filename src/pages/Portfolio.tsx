@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Loader from "../components/low-level/Loader";
 import PageTitle from "../components/low-level/PageTitle";
-import { LeveragePosition, Position, Token } from "../types";
+import { LeveragePosition, Position } from "../types";
 import { useAccount, useChainId } from "wagmi";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import LeveragePositionCard from "../components/low-level/LeveragePositionCard";

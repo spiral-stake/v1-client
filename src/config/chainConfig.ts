@@ -133,9 +133,9 @@ interface chainType {
 }
 
 export const chainConfig: chainType = {
-  // 31337: local,
+  31337: local,
   // 31338: arbitrumLocal,
   // 2522: fraxtalTestnet,
   // 421614: arbitrumTestnet,
-  8453: baseMainnet,
+  // 8453: baseMainnet,
 };

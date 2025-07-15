@@ -1,10 +1,7 @@
 import { displayTokenAmount } from "../../utils/displayTokenAmounts";
 import { Link } from "react-router-dom";
-import TextLoading from "./TextLoading";
-import truncateStr from "../../utils/truncateStr";
-import { LeveragePosition, Position } from "../../types";
-import PositionManager from "../../contract-hooks/PositionManager";
-import { calcLeverageApy, calcLtv, calcMaxLeverage } from "../../utils";
+import { LeveragePosition } from "../../types";
+import { calcLeverageApy, calcMaxLeverage } from "../../utils";
 import FlashLeverage from "../../contract-hooks/FlashLeverage";
 import ActionBtn from "../ActionBtn";
 import { useAccount } from "wagmi";
@@ -18,7 +15,7 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
     const [loading, setLoading] = useState<boolean>(false);
 
     const handleCloseLeveragePosition = async () => {
-        const { pendleSwap, swapData, limitOrderData } = await getInternalReswapData(flashLeverage, leveragePosition.collateralToken, leveragePosition.amountTotalCollateral)
+        const { pendleSwap, swapData, limitOrderData } = await getInternalReswapData(flashLeverage, leveragePosition.collateralToken, leveragePosition.amountLeveragedCollateral)
         const amountReturned = await flashLeverage.unleverage(leveragePosition.id, pendleSwap, swapData, limitOrderData);
 
         deleteLeveragePosition(leveragePosition.id);
@@ -49,8 +46,8 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
 
 
                 <div className="col-span-1 h-16 flex flex-col items-end justify-center truncate">
-                    <div>{displayTokenAmount(leveragePosition.amountUserCollateral, leveragePosition.collateralToken)}</div>
-                    <div className="text-xs">${displayTokenAmount(leveragePosition.amountUserCollateral.multipliedBy(leveragePosition.collateralToken.valueInUsd))}</div>
+                    <div>{displayTokenAmount(leveragePosition.amountCollateral, leveragePosition.collateralToken)}</div>
+                    <div className="text-xs">${displayTokenAmount(leveragePosition.amountCollateral.multipliedBy(leveragePosition.collateralToken.valueInUsd))}</div>
                 </div>
 
                 <div className="col-span-1 lg:col-span-1 h-16  flex flex-col items-end justify-center">

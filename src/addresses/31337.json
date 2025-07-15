@@ -21,6 +21,6 @@
     "decimals": 6,
     "valueInUsd": 1
   },
-  "flashLeverageAddress": "0xEbC618c171fe8D4c3DBffaEB9F2Fe94954b10499",
-  "leverageWrapperAddress": "0xa92DA66dAc250Ac0e42e8973051BC89273214C16"
+  "flashLeverageCoreAddress": "0x15d45863b408f791b9ee9DD5735c2312388f6000",
+  "flashLeverageAddress": "0x3755597297F409198ad7821473d6EAf1dBC9e44f"
 }

@@ -1,38 +1,61 @@
-import { Token, CollateralToken, LeveragePosition, InternalSwapData } from "./../types/index";
-import { Base } from "./Base";
+import { Token } from "./../types/index";
+import { decodeEventLog } from "viem";
+import {
+  CollateralToken,
+  ExternalSwapData,
+  InternalSwapData,
+  LeveragePosition,
+} from "../types/index";
+import { Base } from "./Base.ts";
 import { abi as FLASH_LEVERAGE_ABI } from "../abi/FlashLeverage.sol/FlashLeverage.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
 import { readCollateralTokens, readToken } from "../config/contractsData.ts";
 import BigNumber from "bignumber.js";
-import { decodeEventLog } from "viem";
+import FlashLeverageCore from "./FlashLeverageCore.ts";
 
 export default class FlashLeverage extends Base {
-  public chainId: number;
-  public collateralTokens: CollateralToken[]; // Supported Collateral Tokens to borrow against
-  public borrowApy: string;
-  public usdc: Token;
+  public chainId: number = 0;
+  public collateralTokens: CollateralToken[] = []; // Supported Collateral Tokens to borrow against
+  public borrowApy: string = "";
+  public usdc: Token = {
+    address: "",
+    name: "",
+    symbol: "",
+    decimals: 0,
+    image: "",
+    valueInUsd: BigNumber(0),
+  };
+
+  flashLeverageCore: FlashLeverageCore;
+  DEFAULT_DECIMALS = 18;
 
   constructor(flashLeverageAddress: string) {
     super(flashLeverageAddress, FLASH_LEVERAGE_ABI);
   }
 
   static async createInstance(chainId: number) {
+    const flashLeverageCore = await FlashLeverageCore.createInstance(chainId);
+    if (!flashLeverageCore) return;
+
     try {
-      const { flashLeverageAddress } = await import(`../addresses/${chainId}.json`);
-
-      const instance = new FlashLeverage(flashLeverageAddress);
-
-      let [_collateralTokens, _usdc] = await Promise.all([
+      const [{ flashLeverageAddress }, _collateralTokens, _usdc] = await Promise.all([
+        import(`../addresses/${chainId}.json`),
         readCollateralTokens(chainId),
         readToken(chainId, "USDC"),
       ]);
 
-      _collateralTokens = await Promise.all(
+      const instance = new FlashLeverage(flashLeverageAddress);
+
+      instance.flashLeverageCore = flashLeverageCore;
+      instance.chainId = chainId;
+      instance.borrowApy = "5.46";
+      instance.usdc = _usdc;
+      instance.collateralTokens = await Promise.all(
         _collateralTokens.map(
           async (collateralToken: CollateralToken): Promise<CollateralToken> => {
             const [valueInUsd, maxLtv] = await Promise.all([
-              instance.getTokenUsdValue(collateralToken, "1"),
-              instance.getMaxLtv(collateralToken, _usdc),
+              instance.flashLeverageCore.getTokenUsdValue(collateralToken, "1"),
+              instance.flashLeverageCore.getMaxLtv(collateralToken, _usdc),
             ]);
 
             return {
@@ -44,21 +67,39 @@ export default class FlashLeverage extends Base {
         )
       );
 
-      instance.chainId = chainId;
-      instance.borrowApy = "4.66";
-      instance.collateralTokens = _collateralTokens;
-      instance.usdc = _usdc;
-
       return instance;
     } catch (e) {
       console.log(e);
     }
   }
 
-  DEFAULT_DECIMALS = 18;
-
   /////////////////////////
   // Write Functions
+
+  async swapAndLeverage(
+    userAddress: string,
+    fromToken: Token,
+    amount: string,
+    externalSwapData: ExternalSwapData,
+    collateralToken: CollateralToken,
+    loanToken: Token,
+    internalSwapData: InternalSwapData
+  ) {
+    await this.write("swapAndLeverage", [
+      userAddress,
+      {
+        tokenIn: fromToken.address,
+        amountTokenIn: parseUnits(amount, fromToken.decimals),
+        ...externalSwapData,
+      },
+      {
+        collateralToken: collateralToken.address,
+        loanToken: loanToken.address,
+        amountCollateral: externalSwapData.minCollateralOut,
+        ...internalSwapData,
+      },
+    ]);
+  }
 
   async leverage(
     userAddress: string,
@@ -71,7 +112,7 @@ export default class FlashLeverage extends Base {
       {
         collateralToken: collateralToken.address,
         loanToken: this.usdc.address,
-        amountUserCollateral: parseUnits(userCollateralAmount, collateralToken.decimals),
+        amountCollateral: parseUnits(userCollateralAmount, collateralToken.decimals),
         ...internalSwapData,
       },
     ]);
@@ -83,7 +124,7 @@ export default class FlashLeverage extends Base {
     swapData: any,
     limitOrderData: any
   ) {
-    const txReceipt = await this.write("unleverage", [
+    const txReceipt = await this.simulate("unleverage", [
       leveragePositionId,
       pendleSwap,
       swapData,
@@ -110,11 +151,13 @@ export default class FlashLeverage extends Base {
     const _userLeveragePositions = (await this.read("getUserLeveragePositions", [user])) as Array<{
       collateralToken: string;
       loanToken: string;
-      amountUserCollateral: bigint;
-      amountTotalCollateral: bigint;
+      amountCollateral: bigint;
+      amountLeveragedCollateral: bigint;
       sharesBorrowed: bigint;
       open: boolean;
     }>;
+
+    console.log(_userLeveragePositions);
 
     if (!Array.isArray(_userLeveragePositions)) {
       throw new Error("Invalid positionInfo data received");
@@ -127,83 +170,33 @@ export default class FlashLeverage extends Base {
           (token) => token.address.toLowerCase() === pos.collateralToken.toLowerCase()
         ) as CollateralToken;
 
-        const amountTotalCollateral = formatUnits(
-          pos.amountTotalCollateral,
+        const amountLeveragedCollateral = formatUnits(
+          pos.amountLeveragedCollateral,
           collateralToken.decimals
         );
-        const amountTotalCollateralInUsd = amountTotalCollateral.multipliedBy(
+        const amountLeveragedCollateralInUsd = amountLeveragedCollateral.multipliedBy(
           collateralToken.valueInUsd
         );
-        const amountLoan = await this.getRepayAmount(collateralToken, pos.sharesBorrowed);
+        const amountLoan = await this.flashLeverageCore.getRepayAmount(
+          collateralToken,
+          pos.sharesBorrowed
+        );
 
         return {
           open: pos.open,
           owner: user,
           id: index,
           collateralToken,
-          amountUserCollateral: formatUnits(pos.amountUserCollateral, collateralToken?.decimals),
-          amountTotalCollateral,
+          amountCollateral: formatUnits(pos.amountCollateral, collateralToken?.decimals),
+          amountLeveragedCollateral,
           amountLoan,
           sharesBorrowed: pos.sharesBorrowed,
-          ltv: amountLoan.multipliedBy(100).div(amountTotalCollateralInUsd).toFixed(2),
+          ltv: amountLoan.multipliedBy(100).div(amountLeveragedCollateralInUsd).toFixed(2),
         };
       })
     );
 
     // Filter out null values and return the result
     return positions.filter((pos): pos is LeveragePosition => pos.open);
-  }
-
-  async getTokenUsdValue(token: Token, amount: string) {
-    const tokenUsdValue = await this.read("getTokenUsdValue", [
-      token.address,
-      parseUnits(amount, token.decimals),
-    ]);
-
-    return formatUnits(tokenUsdValue as bigint, this.DEFAULT_DECIMALS);
-  }
-
-  async getMaxLtv(collateralToken: CollateralToken, loanToken: Token) {
-    const maxLtv = await this.read("getMaxLtv", [collateralToken.address, loanToken.address]);
-
-    return formatUnits(maxLtv as bigint, this.DEFAULT_DECIMALS).multipliedBy(100); // in percentage
-  }
-
-  async getLoanAmount(collateralToken: CollateralToken, amount: string | bigint) {
-    if (typeof amount === "string") {
-      amount = parseUnits(amount, collateralToken.decimals);
-    }
-
-    const amountLoan = await this.read("calcLoanAmount", [
-      collateralToken.address,
-      this.usdc.address,
-      amount,
-    ]);
-
-    return String(amountLoan);
-  }
-
-  async getRepayAmount(collateralToken: CollateralToken, sharesBorrowed: bigint) {
-    const amountRepay = await this.read("getRepayAmount", [
-      collateralToken.address,
-      this.usdc.address,
-      sharesBorrowed,
-    ]);
-
-    return formatUnits(amountRepay as bigint, this.usdc.decimals);
-  }
-
-  calcLoanAmount(collateralToken: CollateralToken, amountCollateral: string) {
-    const amountCollateralInUsd = BigNumber(amountCollateral).multipliedBy(
-      collateralToken.valueInUsd
-    );
-
-    const numerator = amountCollateralInUsd.multipliedBy(100);
-    const denominator = BigNumber(100).minus(collateralToken.maxLtv);
-
-    return parseUnits(
-      String(numerator.dividedBy(denominator).minus(amountCollateralInUsd)),
-      this.usdc.decimals
-    );
   }
 }

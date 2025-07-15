@@ -8,8 +8,8 @@ import {
   InternalSwapData,
   Token,
 } from "../types";
-import { useAccount, useChainId } from "wagmi";
-import { calcLeverageApy, calcLtv, calcMaxLeverage } from "../utils";
+import { useAccount } from "wagmi";
+import { calcLeverageApy, calcMaxLeverage } from "../utils";
 import ActionBtn from "../components/ActionBtn";
 import ERC20 from "../contract-hooks/ERC20";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
@@ -26,14 +26,11 @@ import {
   getInternalSwapData,
 } from "../utils/swapAggregator";
 import { displayTokenAmount } from "../utils/displayTokenAmounts";
-import LeverageWrapper from "../contract-hooks/LeverageWrapper";
 
 const Leverage = ({
-  flashLeverage,
-  leverageWrapper,
+  flashLeverage
 }: {
-  flashLeverage: FlashLeverage;
-  leverageWrapper: LeverageWrapper;
+  flashLeverage: FlashLeverage
 }) => {
   const [collateralToken, setCollateralToken] = useState<CollateralToken>();
   const [fromToken, setFromToken] = useState<Token>();
@@ -150,7 +147,7 @@ const Leverage = ({
           );
         } else {
           const _externalSwapData = await getExternalSwapData(
-            leverageWrapper.address,
+            flashLeverage.address,
             fromToken,
             amountCollateral,
             collateralToken
@@ -181,18 +178,10 @@ const Leverage = ({
   const updateUserCollateralAllowance = async () => {
     if (!address || !collateralToken || !fromToken) return;
 
-    let allowance;
-    if (fromToken == collateralToken) {
-      allowance = await new ERC20(fromToken).allowance(
-        address,
-        flashLeverage.address
-      );
-    } else {
-      allowance = await new ERC20(fromToken).allowance(
-        address,
-        leverageWrapper.address
-      );
-    }
+    let allowance = await new ERC20(fromToken).allowance(
+      address,
+      flashLeverage.address
+    );
 
     setUserFromTokenAllowance(allowance);
   };
@@ -209,17 +198,11 @@ const Leverage = ({
   async function handleApprove() {
     if (!address || !collateralToken || !fromToken) return;
 
-    if (collateralToken.address == fromToken.address) {
-      await new ERC20(fromToken).approve(
-        flashLeverage.address,
-        amountCollateral
-      );
-    } else {
-      await new ERC20(fromToken).approve(
-        leverageWrapper.address,
-        amountCollateral
-      );
-    }
+    await new ERC20(fromToken).approve(
+      flashLeverage.address,
+      amountCollateral
+    );
+
     setUserFromTokenAllowance(BigNumber(amountCollateral));
   }
 
@@ -244,7 +227,8 @@ const Leverage = ({
       if (!externalSwapData) return;
 
       try {
-        await leverageWrapper.leverage(
+        await flashLeverage.swapAndLeverage(
+          address,
           fromToken,
           amountCollateral,
           externalSwapData,
@@ -353,11 +337,10 @@ const Leverage = ({
           <div className="sticky top-2 h-fit lg:block">
             <section className="rounded-sm p-0 grid h-fit grid-cols-1 sm:grid-cols-[3fr_2fr] lg:grid-cols-1">
               <APYInfo
-                title={`${
-                  collateralToken.isPT
-                    ? "Max Leveraged APY"
-                    : "Max Leveraged APY"
-                } (${collateralToken.symbol})`}
+                title={`${collateralToken.isPT
+                  ? "Max Leveraged APY"
+                  : "Max Leveraged APY"
+                  } (${collateralToken.symbol})`}
                 description="Loop your staked stable's for max leveraged yield"
                 apy={`${!collateralToken.isPT ? "~" : ""} ${calcLeverageApy(
                   collateralToken.apy,

@@ -62,7 +62,10 @@ export async function getInternalSwapData(
   amountCollateral: string | bigint
 ) {
   // Need to do this calculation in client itself
-  const amountLoan = await flashLeverage.getLoanAmount(collateralToken, amountCollateral);
+  const amountLoan = await flashLeverage.flashLeverageCore.getLoanAmount(
+    collateralToken,
+    amountCollateral
+  );
 
   const params = {
     receiver: flashLeverage.address,
@@ -91,14 +94,14 @@ export async function getInternalSwapData(
 export async function getInternalReswapData(
   flashLeverage: FlashLeverage,
   collateralToken: CollateralToken,
-  amountTotalCollateral: BigNumber
+  amountLeveragedCollateral: BigNumber
 ) {
   const params = {
     receiver: flashLeverage.address,
     slippage: 0.01, // 1%
     tokenIn: collateralToken.address,
     tokenOut: flashLeverage.usdc.address,
-    amountIn: String(parseUnits(String(amountTotalCollateral), collateralToken.decimals)),
+    amountIn: String(parseUnits(String(amountLeveragedCollateral), collateralToken.decimals)),
     enableAggregator: true,
   };
 

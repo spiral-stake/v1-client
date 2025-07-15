@@ -33,8 +33,8 @@ export interface LeveragePosition {
   owner: string;
   id: number; // user => LeveragePosition[index]
   collateralToken: CollateralToken;
-  amountUserCollateral: BigNumber;
-  amountTotalCollateral: BigNumber;
+  amountCollateral: BigNumber;
+  amountLeveragedCollateral: BigNumber;
   sharesBorrowed: bigint;
   amountLoan: BigNumber;
   ltv: string;
