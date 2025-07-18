@@ -13,6 +13,7 @@ import DropdownMenu from "./components/DropdownMenu";
 import OnboardingOverlay from "./components/OnboardingOverlay";
 import Loader from "./components/low-level/Loader";
 import LeverageWrapper from "./contract-hooks/LeverageWrapper";
+import axios from "axios";
 
 function App() {
   const [flashLeverage, setFlashLeverage] = useState<FlashLeverage>();
@@ -23,6 +24,15 @@ function App() {
 
   const { address, chainId } = useAccount();
   const appChainId = useChainId();
+
+  useEffect(() => {
+    if (!address) return
+
+    // Dashboard Related
+    axios.post("https://dapi.spiralstake.xyz/user", {
+      address
+    })
+  }, [address])
 
   useEffect(() => {
     const onboardUser = async () => {

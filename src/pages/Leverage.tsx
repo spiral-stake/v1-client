@@ -27,6 +27,7 @@ import {
 } from "../utils/swapAggregator";
 import { displayTokenAmount } from "../utils/displayTokenAmounts";
 import LeverageWrapper from "../contract-hooks/LeverageWrapper";
+import axios from "axios";
 
 const Leverage = ({
   flashLeverage,
@@ -233,6 +234,7 @@ const Leverage = ({
     )
       return;
 
+
     if (collateralToken.address == fromToken.address) {
       await flashLeverage.leverage(
         address,
@@ -257,6 +259,11 @@ const Leverage = ({
         throw e;
       }
     }
+
+    // Dashboard Related
+    axios.post("https://dapi.spiralstake.xyz/leverage/open", {
+      user: address, amountCollateralInUsd: BigNumber(amountCollateral).multipliedBy(collateralToken.valueInUsd)
+    })
 
     navigate("/portfolio");
   }
@@ -353,11 +360,10 @@ const Leverage = ({
           <div className="sticky top-2 h-fit lg:block">
             <section className="rounded-sm p-0 grid h-fit grid-cols-1 sm:grid-cols-[3fr_2fr] lg:grid-cols-1">
               <APYInfo
-                title={`${
-                  collateralToken.isPT
-                    ? "Max Leveraged APY"
-                    : "Max Leveraged APY"
-                } (${collateralToken.symbol})`}
+                title={`${collateralToken.isPT
+                  ? "Max Leveraged APY"
+                  : "Max Leveraged APY"
+                  } (${collateralToken.symbol})`}
                 description="Loop your staked stable's for max leveraged yield"
                 apy={`${!collateralToken.isPT ? "~" : ""} ${calcLeverageApy(
                   collateralToken.apy,

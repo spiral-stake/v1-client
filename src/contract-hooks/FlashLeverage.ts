@@ -94,6 +94,8 @@ export default class FlashLeverage extends Base {
       (log) => log.address.toLowerCase() === this.address.toLowerCase()
     );
 
+    if (!log) return;
+
     const { amountReturned } = decodeEventLog({
       abi: this.abi,
       eventName: "LeveragePositionClosed",
