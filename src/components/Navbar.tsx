@@ -52,7 +52,7 @@ const Navbar = ({ showDropdown, positionManager }: { showDropdown: (bool: boolea
               <div className=" relative overflow-hidden">
                 <img className="w-8 h-8 rounded-full" src={chainConfig[appChainId].logo} alt="" />
               </div>
-              <span className="hidden md:inline-flex font-semibold text-sm">Base</span>
+              <span className="hidden md:inline-flex font-semibold text-sm">Mainnet</span>
               {/* <div>
                   <img src={dropdown} alt="" className="h-3 w-3" /> 
                 </div> */}

@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import { CollateralToken, Token } from "../types";
 
 interface CollateralTokensObject {
@@ -13,20 +12,17 @@ interface TokenData {
 }
 
 export const readCollateralTokens = async (chainId: number): Promise<CollateralToken[]> => {
-  const [addressesModule, tokenDataModule] = await Promise.all([
+  const [addressesModule] = await Promise.all([
     import(`../addresses/${chainId}.json`) as Promise<{
       default: { collateralTokens: CollateralTokensObject };
     }>,
-    import(`../token-data/${chainId}.json`) as Promise<{ default: TokenData }>,
   ]);
 
   const { collateralTokens } = addressesModule.default;
-  const tokenData = tokenDataModule.default;
 
   return Object.keys(collateralTokens).map((tokenAddress) => {
     return {
       ...collateralTokens[tokenAddress],
-      ...tokenData[tokenAddress],
     };
   });
 };
@@ -51,7 +47,6 @@ export const readToken = async (chainId: number, symbol: string): Promise<Token>
     import(`../addresses/${chainId}.json`) as Promise<{
       default: Record<string, Token>;
     }>,
-    import(`../token-data/${chainId}.json`) as Promise<{ default: any }>,
   ]);
 
   const token = addressesModule.default[symbol];
@@ -67,18 +62,15 @@ export const readCollateralToken = async (
   chainId: number,
   tokenAddress: string
 ): Promise<CollateralToken> => {
-  const [addressesModule, tokenDataModule] = await Promise.all([
+  const [addressesModule] = await Promise.all([
     import(`../addresses/${chainId}.json`) as Promise<{
       default: { collateralTokens: CollateralTokensObject };
     }>,
-    import(`../token-data/${chainId}.json`) as Promise<{ default: TokenData }>,
   ]);
 
   const { collateralTokens } = addressesModule.default;
-  const tokenData = tokenDataModule.default;
 
   return {
     ...collateralTokens[tokenAddress],
-    ...tokenData[tokenAddress],
   };
 };

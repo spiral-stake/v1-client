@@ -11,6 +11,13 @@
         "name": "Resolv USD",
         "symbol": "USR"
       },
+      "loanToken": {
+        "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "name": "Circle USD",
+        "symbol": "USDC",
+        "decimals": 6,
+        "valueInUsd": 1
+      },
       "pendleMarket": "0x715509bde846104cf2ccebf6fdf7ef1bb874bc45"
     }
   },
@@ -21,6 +28,6 @@
     "decimals": 6,
     "valueInUsd": 1
   },
-  "flashLeverageAddress": "0x5BF44482782c84720079157b4be03dd71C8d3Ee8",
-  "leverageWrapperAddress": "0x0a25b983F98D5161fEB85cB0307ad0c0470f92D1"
+  "flashLeverageCoreAddress": "0x6460Ee63C1C745277FD44247359F107c199D3455",
+  "flashLeverageAddress": "0x0f684A824448878384923B55884b85017a186467"
 }

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import Loader from "../components/low-level/Loader";
 import PageTitle from "../components/low-level/PageTitle";
-import { LeveragePosition, Position, Token } from "../types";
+import { LeveragePosition, Position } from "../types";
 import { useAccount, useChainId } from "wagmi";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
-import LeveragePositionCard from "../components/low-level/LeveragePositionCard";
+import LeveragePositionCard from "../components/LeveragePositionCard";
 
 const Portfolio = ({
     flashLeverage,
@@ -21,7 +21,7 @@ const Portfolio = ({
     useEffect(() => {
         const timer = setTimeout(() => {
             setShowLoader(false);
-        }, 2500); // 2.5 seconds
+        }, 1500); // 1.5 seconds
 
         return () => clearTimeout(timer);
     }, []);

@@ -1,0 +1,55 @@
+{
+  "collateralTokens": {
+    "0x2CA5f2C4300450D53214B00546795c1c07B89acB": {
+      "address": "0x2CA5f2C4300450D53214B00546795c1c07B89acB",
+      "decimals": 18,
+      "name": "PT slvlUSD 25SEP2025",
+      "symbol": "PT-slvlUSD",
+      "loanToken": {
+        "address": "0x7C1156E515aA1A2E851674120074968C905aAF37",
+        "name": "Levels USD",
+        "symbol": "lvlUSD",
+        "decimals": 18,
+        "valueInUsd": 1
+      },
+      "pendleMarket": "0xC88FF954d42d3e11D43B62523B3357847C29377c"
+    },
+    "0x23E60d1488525bf4685f53b3aa8E676c30321066": {
+      "address": "0x23E60d1488525bf4685f53b3aa8E676c30321066",
+      "decimals": 18,
+      "name": "PT wstUSR Resolv 25SEP2025",
+      "symbol": "PT-wstUSR",
+      "loanToken": {
+        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "name": "Circle USD",
+        "symbol": "USDC",
+        "decimals": 6,
+        "valueInUsd": 1
+      },
+      "pendleMarket": "0x09fA04Aac9c6d1c6131352EE950CD67ecC6d4fB9"
+    },
+    "0xFfEc096c087C13Cc268497B89A613cACE4DF9A48": {
+      "address": "0xFfEc096c087C13Cc268497B89A613cACE4DF9A48",
+      "decimals": 18,
+      "name": "PT-USDS-14AUG2025",
+      "symbol": "PT-USDS",
+      "loanToken": {
+        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+        "name": "DAI Stablecoin",
+        "symbol": "DAI",
+        "decimals": 18,
+        "valueInUsd": 1
+      },
+      "pendleMarket": "0xdacE1121e10500e9e29d071F01593fD76B000f08"
+    }
+  },
+  "USDC": {
+    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "name": "Circle USD",
+    "symbol": "USDC",
+    "decimals": 6,
+    "valueInUsd": 1
+  },
+  "flashLeverageCoreAddress": "0xdb88CFC18875e3eD6797de31dfAae31F942231F2",
+  "flashLeverageAddress": "0xE3e7A4B35574Ce4b9Bc661cD93e8804Da548932a"
+}

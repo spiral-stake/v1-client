@@ -12,12 +12,10 @@ import Navbar from "./components/Navbar";
 import DropdownMenu from "./components/DropdownMenu";
 import OnboardingOverlay from "./components/OnboardingOverlay";
 import Loader from "./components/low-level/Loader";
-import LeverageWrapper from "./contract-hooks/LeverageWrapper";
 import axios from "axios";
 
 function App() {
   const [flashLeverage, setFlashLeverage] = useState<FlashLeverage>();
-  const [leverageWrapper, setLeverageWrapper] = useState<LeverageWrapper>()
   const [onboarding, setOnboarding] = useState(false);
   const [dropdown, setDropDown] = useState(false);
   const [overlay, setOverlay] = useState<React.ReactNode>();
@@ -49,7 +47,7 @@ function App() {
       }
     };
 
-    onboardUser();
+    // onboardUser();
   }, [address, chainId, appChainId, flashLeverage]);
 
   useEffect(() => {
@@ -57,10 +55,8 @@ function App() {
      * @dev on appChainId change, reset the collateralTokens and positionManager according to the chain
      */
     async function handleChainChange() {
-      const [_flashLeverage, _leverageWrapper] = await Promise.all([FlashLeverage.createInstance(appChainId), LeverageWrapper.createInstance(appChainId)]);
-
+      const [_flashLeverage] = await Promise.all([FlashLeverage.createInstance(appChainId)]);
       setFlashLeverage(_flashLeverage);
-      setLeverageWrapper(_leverageWrapper);
     }
 
     handleChainChange();
@@ -77,11 +73,11 @@ function App() {
         <DropdownMenu showDropdown={showDropdown} />
       )}
 
-      {flashLeverage && leverageWrapper ? (
+      {flashLeverage ? (
         <main className="px-4 lg:px-16">
           <Routes>
             <Route path="/products" element={<Products flashLeverage={flashLeverage} />} />
-            <Route path="/leverage/:address" element={<Leverage flashLeverage={flashLeverage} leverageWrapper={leverageWrapper} />} />
+            <Route path="/leverage/:address" element={<Leverage flashLeverage={flashLeverage} />} />
             <Route path="/portfolio" element={<Portfolio flashLeverage={flashLeverage} />} />
             <Route path="*" element={<Navigate to={"/products"} />} />
           </Routes>
