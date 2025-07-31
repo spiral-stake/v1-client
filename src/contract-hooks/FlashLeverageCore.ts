@@ -1,6 +1,6 @@
 import { Token, CollateralToken } from "../types/index";
 import { Base } from "./Base.ts";
-import { abi as FLASH_LEVERAGE_ABI } from "../abi/FlashLeverageCore.sol/FlashLeverageCore.json";
+import { abi as FLASH_LEVERAGE_CORE_ABI } from "../abi/FlashLeverageCore.sol/FlashLeverageCore.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
 import { readToken } from "../config/contractsData.ts";
 import BigNumber from "bignumber.js";
@@ -18,7 +18,7 @@ export default class FlashLeverageCore extends Base {
   DEFAULT_DECIMALS = 18;
 
   constructor(flashLeverageAddress: string) {
-    super(flashLeverageAddress, FLASH_LEVERAGE_ABI);
+    super(flashLeverageAddress, FLASH_LEVERAGE_CORE_ABI);
   }
 
   static async createInstance(chainId: number) {
@@ -40,13 +40,19 @@ export default class FlashLeverageCore extends Base {
   /////////////////////////
   // Read Functions
 
-  async getTokenUsdValue(token: Token, amount: string) {
-    const tokenUsdValue = await this.read("getTokenUsdValue", [
+  async getTokenUsdValue(token: CollateralToken, amount: string) {
+    const tokenUsdValue = await this.read("getCollateralValueInLoanToken", [
       token.address,
-      parseUnits(amount, token.decimals),
+      token.loanToken.address,
+      parseUnits(amount, this.DEFAULT_DECIMALS),
     ]);
 
     return formatUnits(tokenUsdValue as bigint, this.DEFAULT_DECIMALS);
+  }
+
+  async getSafeLtv(collateralToken: CollateralToken, loanToken: Token) {
+    const safeLtv = await this.read("getSafeLtv", [collateralToken.address, loanToken.address]);
+    return formatUnits(safeLtv as bigint, this.DEFAULT_DECIMALS).multipliedBy(100); // in percentage
   }
 
   async getMaxLtv(collateralToken: CollateralToken, loanToken: Token) {
@@ -54,14 +60,19 @@ export default class FlashLeverageCore extends Base {
     return formatUnits(maxLtv as bigint, this.DEFAULT_DECIMALS).multipliedBy(100); // in percentage
   }
 
-  async getLoanAmount(collateralToken: CollateralToken, amount: string | bigint) {
+  async getLiqLtv(collateralToken: CollateralToken, loanToken: Token) {
+    const maxLtv = await this.read("getLiqLtv", [collateralToken.address, loanToken.address]);
+    return formatUnits(maxLtv as bigint, this.DEFAULT_DECIMALS).multipliedBy(100); // in percentage
+  }
+
+  async getLoanAmount(collateralToken: CollateralToken, amount: string | bigint | BigInt) {
     if (typeof amount === "string") {
       amount = parseUnits(amount, collateralToken.decimals);
     }
 
-    const amountLoan = await this.read("calcLoanAmount", [
+    const amountLoan = await this.read("calcFlashLoanAmount", [
       collateralToken.address,
-      this.usdc.address,
+      collateralToken.loanToken.address,
       amount,
     ]);
 
@@ -71,11 +82,11 @@ export default class FlashLeverageCore extends Base {
   async getRepayAmount(collateralToken: CollateralToken, sharesBorrowed: bigint) {
     const amountRepay = await this.read("getSharesToAsset", [
       collateralToken.address,
-      this.usdc.address,
+      collateralToken.loanToken.address,
       sharesBorrowed,
     ]);
 
-    return formatUnits(amountRepay as bigint, this.usdc.decimals);
+    return formatUnits(amountRepay as bigint, collateralToken.loanToken.decimals);
   }
 
   // calcLoanAmount(collateralToken: CollateralToken, amountCollateral: string) {

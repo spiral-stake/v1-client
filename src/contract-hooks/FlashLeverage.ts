@@ -1,22 +1,19 @@
 import { Token } from "./../types/index";
 import { decodeEventLog } from "viem";
-import {
-  CollateralToken,
-  ExternalSwapData,
-  InternalSwapData,
-  LeveragePosition,
-} from "../types/index";
+import { CollateralToken, InternalSwapData, LeveragePosition } from "../types/index";
 import { Base } from "./Base.ts";
+import { abi as FLASH_LEVERAGE_CORE_ABI } from "../abi/FlashLeverageCore.sol/FlashLeverageCore.json";
 import { abi as FLASH_LEVERAGE_ABI } from "../abi/FlashLeverage.sol/FlashLeverage.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
 import { readCollateralTokens, readToken } from "../config/contractsData.ts";
 import BigNumber from "bignumber.js";
 import FlashLeverageCore from "./FlashLeverageCore.ts";
+import { getImpliedApy } from "../api-services/pendle.ts";
+import { getBorrowApy } from "../api-services/morpho.ts";
 
 export default class FlashLeverage extends Base {
   public chainId: number = 0;
   public collateralTokens: CollateralToken[] = []; // Supported Collateral Tokens to borrow against
-  public borrowApy: string = "";
   public usdc: Token = {
     address: "",
     name: "",
@@ -30,7 +27,7 @@ export default class FlashLeverage extends Base {
   DEFAULT_DECIMALS = 18;
 
   constructor(flashLeverageAddress: string) {
-    super(flashLeverageAddress, FLASH_LEVERAGE_ABI);
+    super(flashLeverageAddress, [...FLASH_LEVERAGE_ABI, ...FLASH_LEVERAGE_CORE_ABI]);
   }
 
   static async createInstance(chainId: number) {
@@ -48,20 +45,27 @@ export default class FlashLeverage extends Base {
 
       instance.flashLeverageCore = flashLeverageCore;
       instance.chainId = chainId;
-      instance.borrowApy = "5.46";
       instance.usdc = _usdc;
       instance.collateralTokens = await Promise.all(
         _collateralTokens.map(
           async (collateralToken: CollateralToken): Promise<CollateralToken> => {
-            const [valueInUsd, maxLtv] = await Promise.all([
+            const [valueInUsd, safeLtv, maxLtv, liqLtv, impliedApy, borrowApy] = await Promise.all([
               instance.flashLeverageCore.getTokenUsdValue(collateralToken, "1"),
-              instance.flashLeverageCore.getMaxLtv(collateralToken, _usdc),
+              instance.flashLeverageCore.getSafeLtv(collateralToken, collateralToken.loanToken),
+              instance.flashLeverageCore.getMaxLtv(collateralToken, collateralToken.loanToken),
+              instance.flashLeverageCore.getLiqLtv(collateralToken, collateralToken.loanToken),
+              getImpliedApy(chainId, collateralToken),
+              getBorrowApy(chainId, collateralToken),
             ]);
 
             return {
               ...collateralToken,
               valueInUsd,
+              impliedApy,
+              borrowApy,
+              safeLtv: safeLtv.toFixed(2),
               maxLtv: maxLtv.toFixed(2),
+              liqLtv: liqLtv.toFixed(2),
             };
           }
         )
@@ -80,9 +84,9 @@ export default class FlashLeverage extends Base {
     userAddress: string,
     fromToken: Token,
     amount: string,
-    externalSwapData: ExternalSwapData,
+    externalSwapData: InternalSwapData,
     collateralToken: CollateralToken,
-    loanToken: Token,
+
     internalSwapData: InternalSwapData
   ) {
     await this.write("swapAndLeverage", [
@@ -94,8 +98,8 @@ export default class FlashLeverage extends Base {
       },
       {
         collateralToken: collateralToken.address,
-        loanToken: loanToken.address,
-        amountCollateral: externalSwapData.minCollateralOut,
+        loanToken: collateralToken.loanToken.address,
+        amountCollateral: externalSwapData.minOut,
         ...internalSwapData,
       },
     ]);
@@ -103,7 +107,7 @@ export default class FlashLeverage extends Base {
 
   async leverage(
     userAddress: string,
-    collateralToken: Token,
+    collateralToken: CollateralToken,
     userCollateralAmount: string,
     internalSwapData: InternalSwapData
   ) {
@@ -111,7 +115,7 @@ export default class FlashLeverage extends Base {
       userAddress,
       {
         collateralToken: collateralToken.address,
-        loanToken: this.usdc.address,
+        loanToken: collateralToken.loanToken.address,
         amountCollateral: parseUnits(userCollateralAmount, collateralToken.decimals),
         ...internalSwapData,
       },
@@ -119,14 +123,16 @@ export default class FlashLeverage extends Base {
   }
 
   async unleverage(
-    leveragePositionId: number,
+    leveragePosition: LeveragePosition,
     pendleSwap: string,
+    tokenRedeemSy: string,
     swapData: any,
     limitOrderData: any
   ) {
-    const txReceipt = await this.simulate("unleverage", [
-      leveragePositionId,
+    const txReceipt = await this.write("unleverage", [
+      leveragePosition.id,
       pendleSwap,
+      tokenRedeemSy,
       swapData,
       limitOrderData,
     ]);
@@ -135,13 +141,15 @@ export default class FlashLeverage extends Base {
       (log) => log.address.toLowerCase() === this.address.toLowerCase()
     );
 
+    if (!log) return;
+
     const { amountReturned } = decodeEventLog({
       abi: this.abi,
       eventName: "LeveragePositionClosed",
       topics: log.topics,
     }).args as { amountReturned: bigint };
 
-    return formatUnits(amountReturned, this.usdc.decimals);
+    return formatUnits(amountReturned, leveragePosition.collateralToken.loanToken.decimals);
   }
 
   /////////////////////////
@@ -149,15 +157,14 @@ export default class FlashLeverage extends Base {
 
   async getUserLeveragePositions(user: string): Promise<LeveragePosition[]> {
     const _userLeveragePositions = (await this.read("getUserLeveragePositions", [user])) as Array<{
+      open: boolean;
       collateralToken: string;
       loanToken: string;
+      collateralTokenUsdValue: bigint;
       amountCollateral: bigint;
       amountLeveragedCollateral: bigint;
       sharesBorrowed: bigint;
-      open: boolean;
     }>;
-
-    console.log(_userLeveragePositions);
 
     if (!Array.isArray(_userLeveragePositions)) {
       throw new Error("Invalid positionInfo data received");

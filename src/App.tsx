@@ -37,7 +37,7 @@ function App() {
       }
     };
 
-    onboardUser();
+    // onboardUser();
   }, [address, chainId, appChainId, flashLeverage]);
 
   useEffect(() => {

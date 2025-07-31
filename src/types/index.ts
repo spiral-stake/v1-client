@@ -10,11 +10,14 @@ export interface Token {
 }
 
 export interface CollateralToken extends Token {
-  isPT: string;
-  apy: string;
+  impliedApy: string;
+  borrowApy: string;
+  safeLtv: string;
   maxLtv: string;
-  underlyingToken: Token;
+  liqLtv: string;
+  morphoMarketId: string;
   pendleMarket: string;
+  loanToken: Token;
 }
 
 export interface Position {
@@ -43,12 +46,18 @@ export interface LeveragePosition {
 export interface InternalSwapData {
   approxParams: any;
   pendleSwap: string;
+  tokenMintSy: string;
   swapData: any;
   limitOrderData: any;
+  minOut: BigInt;
 }
 
-export interface ExternalSwapData extends InternalSwapData {
-  minCollateralOut: bigint;
+export interface InternalReswapData {
+  pendleSwap: string;
+  tokenRedeemSy: string;
+  swapData: any;
+  limitOrderData: any;
+  minOut: BigInt;
 }
 
 export type SwapData = { amountOut: string; priceImpact: number };

@@ -1,11 +1,11 @@
+import { InternalReswapData } from "../types/index";
 import axios from "axios";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
-import { CollateralToken, ExternalSwapData, SwapData, Token } from "../types";
-import { parseUnits } from "./formatUnits";
+import { CollateralToken, InternalSwapData, Token } from "../types";
+import { parseUnits } from "../utils/formatUnits";
 import BigNumber from "bignumber.js";
 
-const HOSTED_SDK_URL = "https://api-v2.pendle.finance/core/";
-export const LIMIT_ORDER_URL = "https://api-v2.pendle.finance/limit-order/";
+const HOSTED_SDK_URL = "https://api-v2.pendle.finance/core";
 
 type MethodReturnType<Data> = {
   tx: {
@@ -26,41 +26,47 @@ export async function callSDK<Data>(path: string, params: Record<string, any> = 
 }
 
 export async function getExternalSwapData(
-  leverageWrapperAddress: string,
+  chainId: number,
+  flashLeverageAddress: string,
   fromToken: Token,
   amount: string,
   collateralToken: CollateralToken
-): Promise<ExternalSwapData> {
+): Promise<InternalSwapData> {
+  if (chainId == 31337) chainId = 1;
+
   const params = {
-    receiver: leverageWrapperAddress,
-    slippage: 0.01, // 1%
+    receiver: flashLeverageAddress,
+    slippage: 0.005, // 1%
     tokenIn: fromToken.address,
     tokenOut: collateralToken.address,
     amountIn: parseUnits(amount, fromToken.decimals),
     enableAggregator: true,
+    aggregators: "kyberswap, odos, okx, paraswap",
   };
 
-  console.log(params, "external swap");
-
-  const res = await callSDK<SwapData>(
-    `v1/sdk/${8453}/markets/${collateralToken.pendleMarket}/swap`,
+  const res = await callSDK<InternalSwapData>(
+    `/v2/sdk/${chainId}/markets/${collateralToken.pendleMarket}/swap`,
     params
   );
 
   return {
-    minCollateralOut: BigInt(res.data.amountOut),
     approxParams: res.contractCallParams[3],
     pendleSwap: res.contractCallParams[4].pendleSwap,
+    tokenMintSy: res.contractCallParams[4].tokenMintSy,
+    minOut: BigInt(res.contractCallParams[2]),
     swapData: res.contractCallParams[4].swapData,
     limitOrderData: res.contractCallParams[5],
   };
 }
 
 export async function getInternalSwapData(
+  chainId: number,
   flashLeverage: FlashLeverage,
   collateralToken: CollateralToken,
-  amountCollateral: string | bigint
-) {
+  amountCollateral: string | bigint | BigInt
+): Promise<InternalSwapData> {
+  if (chainId == 31337) chainId = 1;
+
   // Need to do this calculation in client itself
   const amountLoan = await flashLeverage.flashLeverageCore.getLoanAmount(
     collateralToken,
@@ -68,52 +74,57 @@ export async function getInternalSwapData(
   );
 
   const params = {
-    receiver: flashLeverage.address,
-    slippage: 0.01, // 1%
-    tokenIn: flashLeverage.usdc.address,
+    receiver: flashLeverage.flashLeverageCore.address,
+    slippage: 0.005, // 1%
+    tokenIn: collateralToken.loanToken.address,
     tokenOut: collateralToken.address,
     amountIn: amountLoan,
     enableAggregator: true,
+    aggregators: "kyberswap, odos, okx, paraswap",
   };
 
-  console.log(params, "internal swap");
-
-  const res = await callSDK<SwapData>(
-    `v1/sdk/${8453}/markets/${collateralToken.pendleMarket}/swap`,
+  const res = await callSDK<InternalSwapData>(
+    `/v2/sdk/${chainId}/markets/${collateralToken.pendleMarket}/swap`,
     params
   );
 
   return {
     approxParams: res.contractCallParams[3],
     pendleSwap: res.contractCallParams[4].pendleSwap,
+    tokenMintSy: res.contractCallParams[4].tokenMintSy,
     swapData: res.contractCallParams[4].swapData,
     limitOrderData: res.contractCallParams[5],
+    minOut: BigInt(res.contractCallParams[2]),
   };
 }
 
 export async function getInternalReswapData(
+  chainId: number,
   flashLeverage: FlashLeverage,
   collateralToken: CollateralToken,
   amountLeveragedCollateral: BigNumber
-) {
+): Promise<InternalReswapData> {
+  if (chainId == 31337) chainId = 1;
+
   const params = {
-    receiver: flashLeverage.address,
-    slippage: 0.01, // 1%
+    receiver: flashLeverage.flashLeverageCore.address,
+    slippage: 0.005, // 1%
     tokenIn: collateralToken.address,
-    tokenOut: flashLeverage.usdc.address,
+    tokenOut: collateralToken.loanToken.address,
     amountIn: String(parseUnits(String(amountLeveragedCollateral), collateralToken.decimals)),
     enableAggregator: true,
+    aggregators: "odos, okx, paraswap",
   };
 
-  console.log(params);
-
-  const res = await callSDK<SwapData>(
-    `v1/sdk/${8453}/markets/${collateralToken.pendleMarket}/swap`,
+  const res = await callSDK<InternalSwapData>(
+    `/v2/sdk/${chainId}/markets/${collateralToken.pendleMarket}/swap`,
     params
   );
 
   return {
+    minOut: res.contractCallParams[3].minTokenOut,
     pendleSwap: res.contractCallParams[3].pendleSwap,
+    tokenRedeemSy: res.contractCallParams[3].tokenRedeemSy,
     swapData: res.contractCallParams[3].swapData,
     limitOrderData: res.contractCallParams[4],
   };

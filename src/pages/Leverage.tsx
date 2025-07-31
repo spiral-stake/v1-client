@@ -4,11 +4,10 @@ import LTVSlider from "../components/LTVSlider";
 import BigNumber from "bignumber.js";
 import {
   CollateralToken,
-  ExternalSwapData,
   InternalSwapData,
   Token,
 } from "../types";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import { calcLeverageApy, calcMaxLeverage } from "../utils";
 import ActionBtn from "../components/ActionBtn";
 import ERC20 from "../contract-hooks/ERC20";
@@ -24,7 +23,7 @@ import closeIcon from "../assets/icons/close.svg";
 import {
   getExternalSwapData,
   getInternalSwapData,
-} from "../utils/swapAggregator";
+} from "../api-services/swapAggregator";
 import { displayTokenAmount } from "../utils/displayTokenAmounts";
 
 const Leverage = ({
@@ -51,11 +50,12 @@ const Leverage = ({
     disabled: false,
     error: "",
   });
-  const [externalSwapData, setExternalSwapData] = useState<ExternalSwapData>(); // Only used by leverageWrapper
-  const [internalSwapData, setInternalSwapData] = useState<InternalSwapData>();
+  const [externalSwapData, setExternalSwapData] = useState<InternalSwapData>(); // Only used by leverageWrapper
+  const [internalSwapData, setSwapData] = useState<InternalSwapData>();
 
   const { address: collateralTokenAddress } = useParams();
 
+  const appChainId = useChainId();
   const { chainId, address } = useAccount();
   const navigate = useNavigate();
 
@@ -67,7 +67,7 @@ const Leverage = ({
 
       setCollateralToken({ ...collateralToken });
       setFromToken({ ...flashLeverage.usdc });
-      setDesiredLtv(collateralToken.maxLtv);
+      setDesiredLtv(collateralToken.safeLtv);
     }
 
     initialize();
@@ -80,6 +80,7 @@ const Leverage = ({
       const _userFromTokenBalance = await new ERC20(fromToken).balanceOf(
         address
       );
+
       setUserFromTokenBalance(_userFromTokenBalance);
     };
     getFromTokenBalance();
@@ -110,15 +111,15 @@ const Leverage = ({
           disabled: true,
           error: "Amount exceeds your available balance",
         }));
-      } else if (BigNumber(amountCollateral).isGreaterThan(100)) {
-        return setActionBtn((prev) => ({
-          ...prev,
-          disabled: true,
-          error: `Deposit amount is capped at ${displayTokenAmount(
-            BigNumber(100),
-            collateralToken
-          )}`,
-        }));
+        // } else if (BigNumber(amountCollateral).isGreaterThan(100)) {
+        //   return setActionBtn((prev) => ({
+        //     ...prev,
+        //     disabled: true,
+        //     error: `Deposit amount is capped at ${displayTokenAmount(
+        //       BigNumber(100),
+        //       collateralToken
+        //     )}`,
+        //   }));
       } else {
         return setActionBtn((prev) => ({
           ...prev,
@@ -138,8 +139,9 @@ const Leverage = ({
     const fetchSwapData = async () => {
       if (showSummary) {
         if (collateralToken.address === fromToken.address) {
-          setInternalSwapData(
+          setSwapData(
             await getInternalSwapData(
+              appChainId,
               flashLeverage,
               collateralToken,
               amountCollateral
@@ -147,22 +149,24 @@ const Leverage = ({
           );
         } else {
           const _externalSwapData = await getExternalSwapData(
+            appChainId,
             flashLeverage.address,
             fromToken,
             amountCollateral,
             collateralToken
           );
-          setInternalSwapData(
+          setSwapData(
             await getInternalSwapData(
+              appChainId,
               flashLeverage,
               collateralToken,
-              _externalSwapData.minCollateralOut
+              _externalSwapData.minOut
             )
           );
           setExternalSwapData(_externalSwapData);
         }
       } else {
-        setInternalSwapData(undefined);
+        setSwapData(undefined);
       }
     };
 
@@ -216,30 +220,29 @@ const Leverage = ({
     )
       return;
 
-    if (collateralToken.address == fromToken.address) {
-      await flashLeverage.leverage(
-        address,
-        fromToken,
-        amountCollateral,
-        internalSwapData
-      );
-    } else {
-      if (!externalSwapData) return;
+    try {
+      if (collateralToken.address == fromToken.address) {
+        await flashLeverage.leverage(
+          address,
+          fromToken as CollateralToken,
+          amountCollateral,
+          internalSwapData
+        );
+      } else {
+        if (!externalSwapData) return;
 
-      try {
         await flashLeverage.swapAndLeverage(
           address,
           fromToken,
           amountCollateral,
           externalSwapData,
           collateralToken,
-          flashLeverage.usdc,
           internalSwapData
         );
-      } catch (e) {
-        setShowSummary(false);
-        throw e;
       }
+    } catch (e) {
+      setShowSummary(false);
+      throw e;
     }
 
     navigate("/portfolio");
@@ -316,6 +319,7 @@ const Leverage = ({
 
                 <LTVSlider
                   maxLtv={collateralToken.maxLtv}
+                  liqLtv={collateralToken.liqLtv}
                   ltv={desiredLtv}
                   handleLtvSlider={handleLtvSlider}
                 />
@@ -337,20 +341,17 @@ const Leverage = ({
           <div className="sticky top-2 h-fit lg:block">
             <section className="rounded-sm p-0 grid h-fit grid-cols-1 sm:grid-cols-[3fr_2fr] lg:grid-cols-1">
               <APYInfo
-                title={`${collateralToken.isPT
-                  ? "Max Leveraged APY"
-                  : "Max Leveraged APY"
-                  } (${collateralToken.symbol})`}
+                title={`Max Leveraged APY (${collateralToken.symbol})`}
                 description="Loop your staked stable's for max leveraged yield"
-                apy={`${!collateralToken.isPT ? "~" : ""} ${calcLeverageApy(
-                  collateralToken.apy,
-                  flashLeverage.borrowApy,
+                apy={`~ ${calcLeverageApy(
+                  collateralToken.impliedApy,
+                  collateralToken.borrowApy,
                   desiredLtv
                 )}`}
                 apyBreakdown={
                   <LeverageBreakdown
-                    collateralTokenApy={collateralToken.apy}
-                    borrowApy={flashLeverage.borrowApy}
+                    collateralTokenApy={collateralToken.impliedApy}
+                    borrowApy={collateralToken.borrowApy}
                     maxLeverage={maxLeverage}
                   />
                 }

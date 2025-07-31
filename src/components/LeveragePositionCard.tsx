@@ -1,25 +1,28 @@
-import { displayTokenAmount } from "../../utils/displayTokenAmounts";
+import { displayTokenAmount } from "../utils/displayTokenAmounts";
 import { Link } from "react-router-dom";
-import { LeveragePosition } from "../../types";
-import { calcLeverageApy, calcMaxLeverage } from "../../utils";
-import FlashLeverage from "../../contract-hooks/FlashLeverage";
-import ActionBtn from "../ActionBtn";
-import { useAccount } from "wagmi";
-import { getInternalReswapData } from "../../utils/swapAggregator";
-import { handleAsync } from "../../utils/handleAsyncFunction";
+import { LeveragePosition } from "../types";
+import { calcLeverageApy, calcMaxLeverage } from "../utils";
+import FlashLeverage from "../contract-hooks/FlashLeverage";
+import ActionBtn from "./ActionBtn";
+import { useAccount, useChainId } from "wagmi";
+import { getInternalReswapData } from "../api-services/swapAggregator";
+import { handleAsync } from "../utils/handleAsyncFunction";
 import { useState } from "react";
-import { toastSuccess } from "../../utils/toastWrapper";
+import { toastSuccess } from "../utils/toastWrapper";
+import BigNumber from "bignumber.js";
 
 const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeveragePosition }: { flashLeverage: FlashLeverage, leveragePosition: LeveragePosition, deleteLeveragePosition: (positionId: number) => void }) => {
     const { chainId } = useAccount();
     const [loading, setLoading] = useState<boolean>(false);
 
+    const appChainId = useChainId();
+
     const handleCloseLeveragePosition = async () => {
-        const { pendleSwap, swapData, limitOrderData } = await getInternalReswapData(flashLeverage, leveragePosition.collateralToken, leveragePosition.amountLeveragedCollateral)
-        const amountReturned = await flashLeverage.unleverage(leveragePosition.id, pendleSwap, swapData, limitOrderData);
+        const { pendleSwap, tokenRedeemSy, swapData, limitOrderData } = await getInternalReswapData(appChainId, flashLeverage, leveragePosition.collateralToken, leveragePosition.amountLeveragedCollateral)
+        const amountReturned = await flashLeverage.unleverage(leveragePosition, pendleSwap, tokenRedeemSy, swapData, limitOrderData);
 
         deleteLeveragePosition(leveragePosition.id);
-        toastSuccess("Position Closed", `Received ${displayTokenAmount(amountReturned, flashLeverage.usdc)}`);
+        toastSuccess("Position Closed", `Received ${displayTokenAmount(amountReturned as BigNumber, leveragePosition.collateralToken.loanToken)}`);
     }
 
     return (
@@ -57,7 +60,7 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
 
                 <div className="col-span-1 h-16 flex flex-col items-end justify-center">
                     {/* Needs to change, this is obsolete, need to calc for the apy and borrow apy of his positions */}
-                    {calcLeverageApy(leveragePosition.collateralToken.apy, flashLeverage.borrowApy, leveragePosition.ltv)}%
+                    {calcLeverageApy(leveragePosition.collateralToken.impliedApy, leveragePosition.collateralToken.borrowApy, leveragePosition.ltv)}%
                     <div className="text-xs lg:hidden">Max APY</div>
                 </div>
 

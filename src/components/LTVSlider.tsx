@@ -4,11 +4,13 @@ import { HoverInfo } from "./low-level/HoverInfo";
 
 const LTVSlider = ({
   maxLtv,
+  liqLtv,
   ltv,
   handleLtvSlider,
 }: {
-  maxLtv: string;
   ltv: string;
+  maxLtv: string;
+  liqLtv: string;
   handleLtvSlider: (e: any) => void;
 }) => {
   return (
@@ -18,9 +20,9 @@ const LTVSlider = ({
         <div className="flex flex-col gap-1">
           <div className="text-xl font-semibold items-center flex justify-between">
             <div className="flex flex-row items-center gap-2">
-                <h4 className="hidden lg:inline-block">Safe Loan to Value (LTV)</h4>
-                <h4 className="lg:hidden">Safe LTV</h4>
-            <HoverInfo content="Ratio of the collateral value to the borrowed value" />
+              <h4 className="hidden lg:inline-block">Safe Loan to Value (LTV)</h4>
+              <h4 className="lg:hidden">Safe LTV</h4>
+              <HoverInfo content="Ratio of the collateral value to the borrowed value" />
             </div>
             <h4>~{ltv || "0.00"}%</h4>
           </div>
@@ -31,7 +33,7 @@ const LTVSlider = ({
               <span>
                 liquidation.{" "}
                 <span className="text-gray-300">
-                  {BigNumber(ltv).plus(5).toFixed(2)}%
+                  {liqLtv}%
                 </span>
               </span>
             </div>

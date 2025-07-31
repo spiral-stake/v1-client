@@ -19,13 +19,12 @@ export class Base {
     this.abi = abi;
   }
 
-  async read<T = unknown>(functionName: string, args: any[] = [], chainId?: number): Promise<T> {
+  async read<T = unknown>(functionName: string, args: any[] = []): Promise<T> {
     const res = await readContract(config, {
       abi: this.abi,
       address: this.address,
       functionName,
       args,
-      chainId: chainId as 2522 | undefined,
     });
 
     // await wait(2);
@@ -33,18 +32,17 @@ export class Base {
     return res as T;
   }
 
-  async simulate(functionName: string, args: any[] = [], value: bigint = 0n, chainId?: number) {
+  async simulate(functionName: string, args: any[] = [], value: bigint = 0n) {
+    const account = ((await connector?.getAccounts()) as string[])?.[0] as `0x${string}`;
+
     return (
       await simulateContract(config, {
         abi: this.abi,
         address: this.address,
         functionName: functionName,
         args,
-        account:
-          (await connector?.getAccounts?.())?.[0] ||
-          ("0x08675879B01177a9Bc80A7FC58c032cFA2Bb7742" as `0x${string}`),
+        account,
         value,
-        chainId: chainId as 2522 | undefined,
       })
     ).result;
   }
@@ -56,7 +54,7 @@ export class Base {
       functionName,
       args,
       value,
-      // __mode: "prepared", // Needs to be uncommented on local
+      __mode: "prepared", // Needs to be uncommented on local
     });
 
     // await wait(4);

@@ -24,12 +24,12 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               >
                 {/* Token Image Badge */}
                 <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-white bg-opacity-80">
-                  <img className="w-11" src={collateralToken.image} alt={collateralToken.symbol} />
+                  <img className="w-11" src={collateralToken.image} alt={collateralToken.symbol.slice(3)} />
                 </div>
 
                 {/* Token Symbol */}
                 <h3 className="text-gray-200 text-lg font-semibold mb-10">
-                  {collateralToken.symbol}
+                  {collateralToken.symbol.slice(3)}
                 </h3>
 
                 {/* Interest Rate Display */}
@@ -39,16 +39,16 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   </p>
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-bold text-gray-200">
-                      {calcLeverageApy(collateralToken.apy, flashLeverage.borrowApy, collateralToken.maxLtv)}
+                      {calcLeverageApy(collateralToken.impliedApy, collateralToken.borrowApy, collateralToken.maxLtv)}
                     </span>
                     <span className="text-gray-400 text-sm">APY</span>
                   </div>
                 </div>
 
-                {/* Know More Button */}
+
                 <Link to={`/leverage/${collateralToken.address}`}>
                   <button className="w-full bg-black py-3 px-6 rounded-lg font-medium hover:bg-gray-800 transition-colors">
-                    Know more
+                    Deposit
                   </button>
                 </Link>
               </div>

@@ -91,7 +91,7 @@ const DropdownMenu = ({
               />
             </div>
             <div className="flex-1 justify-start text-white text-sm font-normal font-['Outfit']">
-              Base
+              ETH Mainnet
             </div>
             {/* <div className="w-7 h-4 relative -rotate-90 overflow-hidden">
               <img src={arrowIcon} alt="" />

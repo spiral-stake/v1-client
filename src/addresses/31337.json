@@ -1,26 +1,61 @@
 {
   "collateralTokens": {
-    "0xa6f0a4d18b6f6ddd408936e81b7b3a8befa18e77": {
-      "address": "0xa6f0a4d18b6f6ddd408936e81b7b3a8befa18e77",
+    "0x2CA5f2C4300450D53214B00546795c1c07B89acB": {
+      "address": "0x2CA5f2C4300450D53214B00546795c1c07B89acB",
       "decimals": 18,
-      "name": "PT Resolv USD 25SEP2025",
-      "symbol": "PT-USR",
-      "underlyingToken": {
-        "address": "0x35e5db674d8e93a03d814fa0ada70731efe8a4b9",
+      "name": "PT slvlUSD 25SEP2025",
+      "symbol": "PT-slvlUSD",
+      "image": "https://storage.googleapis.com/prod-pendle-bucket-a/images/uploads/b5250df6-85e7-4220-b097-1918fc4c3810.svg",
+      "loanToken": {
+        "address": "0x7C1156E515aA1A2E851674120074968C905aAF37",
+        "name": "Levels USD",
+        "symbol": "lvlUSD",
         "decimals": 18,
-        "name": "Resolv USD",
-        "symbol": "USR"
+        "valueInUsd": 1
       },
-      "pendleMarket": "0x715509bde846104cf2ccebf6fdf7ef1bb874bc45"
+      "morphoMarketId": "0x8ebcaf72c7cd75e8c621ec77ec343b3152c48908c4a6e217da82fe6af23c1928",
+      "pendleMarket": "0xC88FF954d42d3e11D43B62523B3357847C29377c"
+    },
+    "0x23E60d1488525bf4685f53b3aa8E676c30321066": {
+      "address": "0x23E60d1488525bf4685f53b3aa8E676c30321066",
+      "decimals": 18,
+      "name": "PT wstUSR Resolv 25SEP2025",
+      "symbol": "PT-wstUSR",
+      "image": "https://storage.googleapis.com/prod-pendle-bucket-a/images/uploads/dd1ac5b4-5e05-4ff5-8ec2-e3f17d4f4578.svg",
+      "loanToken": {
+        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "name": "Circle USD",
+        "symbol": "USDC",
+        "decimals": 6,
+        "valueInUsd": 1
+      },
+      "morphoMarketId": "0xeec6c7e2ddb7578f2a7d86fc11cf9da005df34452ad9b9189c51266216f5d71b",
+      "pendleMarket": "0x09fA04Aac9c6d1c6131352EE950CD67ecC6d4fB9"
+    },
+    "0xFfEc096c087C13Cc268497B89A613cACE4DF9A48": {
+      "address": "0xFfEc096c087C13Cc268497B89A613cACE4DF9A48",
+      "decimals": 18,
+      "name": "PT-USDS-14AUG2025",
+      "symbol": "PT-USDS",
+      "image": "https://storage.googleapis.com/prod-pendle-bucket-a/images/uploads/47e9f2ec-f261-4267-8e99-a257db28b871.svg",
+      "loanToken": {
+        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+        "name": "DAI Stablecoin",
+        "symbol": "DAI",
+        "decimals": 18,
+        "valueInUsd": 1
+      },
+      "morphoMarketId": "0xa458018cf1a6e77ebbcc40ba5776ac7990e523b7cc5d0c1e740a4bbc13190d8f",
+      "pendleMarket": "0xdacE1121e10500e9e29d071F01593fD76B000f08"
     }
   },
   "USDC": {
-    "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "name": "Circle USD",
     "symbol": "USDC",
     "decimals": 6,
     "valueInUsd": 1
   },
-  "flashLeverageCoreAddress": "0x15d45863b408f791b9ee9DD5735c2312388f6000",
-  "flashLeverageAddress": "0x3755597297F409198ad7821473d6EAf1dBC9e44f"
+  "flashLeverageCoreAddress": "0x818eA3862861e82586A4D6E1A78A1a657FC615aa",
+  "flashLeverageAddress": "0xaA19aff541ed6eBF528f919592576baB138370DC"
 }
