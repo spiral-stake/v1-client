@@ -5,6 +5,7 @@ import {
   getAccount,
   waitForTransactionReceipt,
   getBalance,
+  getPublicClient,
 } from "wagmi/actions";
 import { wagmiConfig as config } from "../config/wagmiConfig.ts";
 import { formatUnits } from "../utils/formatUnits.ts";
@@ -48,13 +49,22 @@ export class Base {
   }
 
   async write(functionName: string, args: any[] = [], value: bigint = 0n) {
+    const { maxFeePerGas, maxPriorityFeePerGas } = await getPublicClient(
+      config
+    ).estimateFeesPerGas();
+
+    console.log(maxFeePerGas);
+    console.log(maxPriorityFeePerGas);
+
     const hash = await writeContract(config, {
       abi: this.abi,
       address: this.address,
       functionName,
       args,
       value,
-      __mode: "prepared", // Needs to be uncommented on local
+      maxFeePerGas: maxFeePerGas,
+      maxPriorityFeePerGas: maxPriorityFeePerGas,
+      // __mode: "prepared", // Needs to be uncommented on local
     });
 
     // await wait(4);

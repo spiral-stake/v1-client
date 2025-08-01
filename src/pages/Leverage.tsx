@@ -349,7 +349,18 @@ const Leverage = ({
             <section className="rounded-sm p-0 grid h-fit grid-cols-1 sm:grid-cols-[3fr_2fr] lg:grid-cols-1">
               <APYInfo
                 title={`Max Leveraged APY (${collateralToken.symbol})`}
-                description="Loop your staked stable's for max leveraged yield"
+                description={`Maturity: ${collateralToken.name.slice(
+                  collateralToken.name.length - 9,
+                  collateralToken.name.length - 7
+                )}
+                  ${collateralToken.name.slice(
+                  collateralToken.name.length - 7,
+                  collateralToken.name.length - 4
+                )}
+                  ${collateralToken.name.slice(
+                  collateralToken.name.length - 4,
+                  collateralToken.name.length
+                )}`}
                 apy={`~ ${calcLeverageApy(
                   collateralToken.impliedApy,
                   collateralToken.borrowApy,

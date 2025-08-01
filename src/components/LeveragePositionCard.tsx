@@ -36,7 +36,9 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
                         <div className="inline-flex flex-col justify-center items-start">
                             <div className="inline-flex justify-center items-center gap-2">
                                 <div className="text-lg font-semibold">
+
                                     {leveragePosition.collateralToken.symbol}
+                                    {` (${leveragePosition.collateralToken.name.slice(leveragePosition.collateralToken.name.length - 9, leveragePosition.collateralToken.name.length)})`}
                                 </div>
                             </div>
                         </div>
