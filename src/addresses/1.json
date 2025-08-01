@@ -47,6 +47,22 @@
       },
       "morphoMarketId": "0xa458018cf1a6e77ebbcc40ba5776ac7990e523b7cc5d0c1e740a4bbc13190d8f",
       "pendleMarket": "0xdacE1121e10500e9e29d071F01593fD76B000f08"
+    },
+    "0xB10DA2F9147f9cf2B8826877Cd0c95c18A0f42dc": {
+      "address": "0xB10DA2F9147f9cf2B8826877Cd0c95c18A0f42dc",
+      "decimals": 18,
+      "name": "PT-cUSDO-20NOV2025",
+      "symbol": "PT-cUSDO",
+      "image": "https://storage.googleapis.com/prod-pendle-bucket-a/images/uploads/dbfc332b-a252-4a99-9e85-75e2fbcdd73e.svg",
+      "loanToken": {
+        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "name": "Circle USD",
+        "symbol": "USDC",
+        "decimals": 6,
+        "valueInUsd": 1
+      },
+      "morphoMarketId": "0x8a71a66ac828c2b6d4f8accce5859aba0822b502f3833bec4aff09479affffdb",
+      "pendleMarket": "0x3F53eb4c57c7E7118BE8566bCd503EA502639581"
     }
   },
   "USDC": {

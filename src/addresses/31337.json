@@ -1,5 +1,21 @@
 {
   "collateralTokens": {
+    "0xB10DA2F9147f9cf2B8826877Cd0c95c18A0f42dc": {
+      "address": "0xB10DA2F9147f9cf2B8826877Cd0c95c18A0f42dc",
+      "decimals": 18,
+      "name": "PT-cUSDO-20NOV2025",
+      "symbol": "PT-cUSDO",
+      "image": "https://storage.googleapis.com/prod-pendle-bucket-a/images/uploads/dbfc332b-a252-4a99-9e85-75e2fbcdd73e.svg",
+      "loanToken": {
+        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "name": "Circle USD",
+        "symbol": "USDC",
+        "decimals": 6,
+        "valueInUsd": 1
+      },
+      "morphoMarketId": "0x8a71a66ac828c2b6d4f8accce5859aba0822b502f3833bec4aff09479affffdb",
+      "pendleMarket": "0x3F53eb4c57c7E7118BE8566bCd503EA502639581"
+    },
     "0x2CA5f2C4300450D53214B00546795c1c07B89acB": {
       "address": "0x2CA5f2C4300450D53214B00546795c1c07B89acB",
       "decimals": 18,
@@ -56,6 +72,6 @@
     "decimals": 6,
     "valueInUsd": 1
   },
-  "flashLeverageCoreAddress": "0x818eA3862861e82586A4D6E1A78A1a657FC615aa",
-  "flashLeverageAddress": "0xaA19aff541ed6eBF528f919592576baB138370DC"
+  "flashLeverageCoreAddress": "0xf0014CBe67b3aB638bdaA2e2Cb1B531935829E50",
+  "flashLeverageAddress": "0xD0725945859175dabd070855bC3F1c37a3aF605F"
 }
