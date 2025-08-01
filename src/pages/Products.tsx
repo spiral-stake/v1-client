@@ -36,7 +36,7 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               </h3>
 
               {/* Interest Rate Display */}
-              <div className="mb-20">
+              <div className="mb-5">
                 <p className="text-gray-300 text-sm mb-1">Max Leveraged</p>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-bold text-gray-200">
@@ -50,9 +50,9 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 </div>
               </div>
 
-              <div className="mb-10">
+              <div className="mb-20">
                 <p className="text-gray-300 text-sm mb-1">Maturity</p>
-                <p className="">
+                <p className="text-sm">
                   {collateralToken.name.slice(
                     collateralToken.name.length - 9,
                     collateralToken.name.length - 7
