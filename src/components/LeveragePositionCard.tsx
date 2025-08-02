@@ -10,6 +10,7 @@ import { handleAsync } from "../utils/handleAsyncFunction";
 import { useState } from "react";
 import { toastSuccess } from "../utils/toastWrapper";
 import BigNumber from "bignumber.js";
+import axios from "axios";
 
 const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeveragePosition }: { flashLeverage: FlashLeverage, leveragePosition: LeveragePosition, deleteLeveragePosition: (positionId: number) => void }) => {
     const { chainId } = useAccount();
@@ -20,6 +21,10 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
     const handleCloseLeveragePosition = async () => {
         const { pendleSwap, tokenRedeemSy, swapData, limitOrderData } = await getInternalReswapData(appChainId, flashLeverage, leveragePosition.collateralToken, leveragePosition.amountLeveragedCollateral)
         const amountReturned = await flashLeverage.unleverage(leveragePosition, pendleSwap, tokenRedeemSy, swapData, limitOrderData);
+
+        axios.put("https://dapi.spiralstake.xyz/leverage/close", {
+            user: leveragePosition.owner.toLowerCase(), positionId: leveragePosition.id
+        })
 
         deleteLeveragePosition(leveragePosition.id);
         toastSuccess("Position Closed", `Received ${displayTokenAmount(amountReturned as BigNumber, leveragePosition.collateralToken.loanToken)}`);

@@ -89,7 +89,7 @@ export default class FlashLeverage extends Base {
 
     internalSwapData: InternalSwapData
   ) {
-    await this.write("swapAndLeverage", [
+    const txReceipt = await this.write("swapAndLeverage", [
       userAddress,
       {
         tokenIn: fromToken.address,
@@ -103,6 +103,12 @@ export default class FlashLeverage extends Base {
         ...internalSwapData,
       },
     ]);
+
+    const { positionId } = this.decodeEvent(txReceipt, "LeveragePositionOpened") as {
+      positionId: bigint;
+    };
+
+    return Number(positionId);
   }
 
   async leverage(
@@ -111,7 +117,7 @@ export default class FlashLeverage extends Base {
     userCollateralAmount: string,
     internalSwapData: InternalSwapData
   ) {
-    await this.write("leverage", [
+    const txReceipt = await this.write("leverage", [
       userAddress,
       {
         collateralToken: collateralToken.address,
@@ -120,6 +126,12 @@ export default class FlashLeverage extends Base {
         ...internalSwapData,
       },
     ]);
+
+    const { positionId } = this.decodeEvent(txReceipt, "LeveragePositionOpened") as {
+      positionId: bigint;
+    };
+
+    return Number(positionId);
   }
 
   async unleverage(
@@ -137,17 +149,9 @@ export default class FlashLeverage extends Base {
       limitOrderData,
     ]);
 
-    const log = txReceipt.logs.find(
-      (log) => log.address.toLowerCase() === this.address.toLowerCase()
-    );
-
-    if (!log) return;
-
-    const { amountReturned } = decodeEventLog({
-      abi: this.abi,
-      eventName: "LeveragePositionClosed",
-      topics: log.topics,
-    }).args as { amountReturned: bigint };
+    const { amountReturned } = this.decodeEvent(txReceipt, "LeveragePositionClosed") as {
+      amountReturned: bigint;
+    };
 
     return formatUnits(amountReturned, leveragePosition.collateralToken.loanToken.decimals);
   }

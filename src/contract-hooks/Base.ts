@@ -9,6 +9,7 @@ import {
 } from "wagmi/actions";
 import { wagmiConfig as config } from "../config/wagmiConfig.ts";
 import { formatUnits } from "../utils/formatUnits.ts";
+import { decodeEventLog } from "viem";
 const { connector } = getAccount(config);
 
 export class Base {
@@ -53,9 +54,6 @@ export class Base {
       config
     ).estimateFeesPerGas();
 
-    console.log(maxFeePerGas);
-    console.log(maxPriorityFeePerGas);
-
     const hash = await writeContract(config, {
       abi: this.abi,
       address: this.address,
@@ -79,4 +77,18 @@ export class Base {
 
     return formatUnits(value, 18);
   }
+
+  decodeEvent = (txReceipt: any, eventName: string) => {
+    const log = txReceipt.logs.find(
+      (log: any) => log.address.toLowerCase() === this.address.toLowerCase()
+    );
+
+    if (!log) return;
+
+    return decodeEventLog({
+      abi: this.abi,
+      eventName,
+      topics: log.topics,
+    }).args;
+  };
 }

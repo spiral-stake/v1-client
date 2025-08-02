@@ -28,7 +28,7 @@ function App() {
 
     // Dashboard Related
     axios.post("https://dapi.spiralstake.xyz/user", {
-      address
+      address: address.toLowerCase()
     })
   }, [address])
 

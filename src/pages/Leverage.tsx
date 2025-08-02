@@ -220,10 +220,11 @@ const Leverage = ({
     )
       return;
 
+    let positionId;
 
     try {
       if (collateralToken.address == fromToken.address) {
-        await flashLeverage.leverage(
+        positionId = await flashLeverage.leverage(
           address,
           fromToken as CollateralToken,
           amountCollateral,
@@ -232,7 +233,7 @@ const Leverage = ({
       } else {
         if (!externalSwapData) return;
 
-        await flashLeverage.swapAndLeverage(
+        positionId = await flashLeverage.swapAndLeverage(
           address,
           fromToken,
           amountCollateral,
@@ -249,7 +250,7 @@ const Leverage = ({
 
     // Dashboard Related
     axios.post("https://dapi.spiralstake.xyz/leverage/open", {
-      user: address, amountCollateralInUsd: BigNumber(amountCollateral).multipliedBy(collateralToken.valueInUsd)
+      user: address.toLowerCase(), positionId, amountCollateralInUsd: BigNumber(amountCollateral).multipliedBy(collateralToken.valueInUsd)
     })
 
     navigate("/portfolio");

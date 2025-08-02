@@ -72,6 +72,6 @@
     "decimals": 6,
     "valueInUsd": 1
   },
-  "flashLeverageCoreAddress": "0xf0014CBe67b3aB638bdaA2e2Cb1B531935829E50",
-  "flashLeverageAddress": "0xD0725945859175dabd070855bC3F1c37a3aF605F"
+  "flashLeverageCoreAddress": "0xD0725945859175dabd070855bC3F1c37a3aF605F",
+  "flashLeverageAddress": "0x31De30e2621D5AECd951F2661e2D03CDA27e2e83"
 }
