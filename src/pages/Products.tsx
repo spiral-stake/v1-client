@@ -43,7 +43,7 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                     {calcLeverageApy(
                       collateralToken.impliedApy,
                       collateralToken.borrowApy,
-                      collateralToken.maxLtv
+                      collateralToken.safeLtv
                     )}
                   </span>
                   <span className="text-gray-400 text-sm">APY</span>
