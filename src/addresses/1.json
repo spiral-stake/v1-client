@@ -32,22 +32,6 @@
       "morphoMarketId": "0xeec6c7e2ddb7578f2a7d86fc11cf9da005df34452ad9b9189c51266216f5d71b",
       "pendleMarket": "0x09fA04Aac9c6d1c6131352EE950CD67ecC6d4fB9"
     },
-    "0xFfEc096c087C13Cc268497B89A613cACE4DF9A48": {
-      "address": "0xFfEc096c087C13Cc268497B89A613cACE4DF9A48",
-      "decimals": 18,
-      "name": "PT-USDS-14AUG2025",
-      "symbol": "PT-USDS",
-      "image": "https://storage.googleapis.com/prod-pendle-bucket-a/images/uploads/47e9f2ec-f261-4267-8e99-a257db28b871.svg",
-      "loanToken": {
-        "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-        "name": "DAI Stablecoin",
-        "symbol": "DAI",
-        "decimals": 18,
-        "valueInUsd": 1
-      },
-      "morphoMarketId": "0xa458018cf1a6e77ebbcc40ba5776ac7990e523b7cc5d0c1e740a4bbc13190d8f",
-      "pendleMarket": "0xdacE1121e10500e9e29d071F01593fD76B000f08"
-    },
     "0xB10DA2F9147f9cf2B8826877Cd0c95c18A0f42dc": {
       "address": "0xB10DA2F9147f9cf2B8826877Cd0c95c18A0f42dc",
       "decimals": 18,
