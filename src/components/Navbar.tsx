@@ -4,9 +4,8 @@ import { chainConfig } from "../config/chainConfig";
 import logo from "../assets/logo.svg"
 import menuIcon from "../assets/icons/menu.svg"
 import ConnectWalletBtn from "./ConnectWalletBtn";
-import PositionManager from "../contract-hooks/PositionManager";
 
-const Navbar = ({ showDropdown, positionManager }: { showDropdown: (bool: boolean) => void, positionManager?: PositionManager }) => {
+const Navbar = ({ showDropdown }: { showDropdown: (bool: boolean) => void }) => {
 
   const appChainId = useChainId();
 
@@ -34,9 +33,6 @@ const Navbar = ({ showDropdown, positionManager }: { showDropdown: (bool: boolea
             <Link to={"/products"}>
               <div className="cursor-pointer text-center ">Products</div>
             </Link>
-            {positionManager && <Link to={"/borrow"}>
-              <div className="cursor-pointer text-center ">Borrow</div>
-            </Link>}
             <Link to={"/portfolio"}>
               <div className="cursor-pointer text-center ">Portfolio</div>
             </Link>

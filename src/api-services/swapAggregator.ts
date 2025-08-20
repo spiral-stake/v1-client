@@ -36,12 +36,12 @@ export async function getExternalSwapData(
 
   const params = {
     receiver: flashLeverageAddress,
-    slippage: 0.005, // 1%
+    slippage: 0.001, // 0.1%
     tokenIn: fromToken.address,
     tokenOut: collateralToken.address,
     amountIn: parseUnits(amount, fromToken.decimals),
     enableAggregator: true,
-    aggregators: "kyberswap, odos, okx, paraswap",
+    aggregators: "odos, okx, paraswap",
   };
 
   const res = await callSDK<InternalSwapData>(
@@ -63,24 +63,26 @@ export async function getInternalSwapData(
   chainId: number,
   flashLeverage: FlashLeverage,
   collateralToken: CollateralToken,
+  desiredLtv: string,
   amountCollateral: string | bigint | BigInt
 ): Promise<InternalSwapData> {
   if (chainId == 31337) chainId = 1;
 
   // Need to do this calculation in client itself
-  const amountLoan = await flashLeverage.flashLeverageCore.getLoanAmount(
+  const amountLoan = await flashLeverage.flashLeverageCore.calcLeverageFlashLoan(
+    desiredLtv,
     collateralToken,
     amountCollateral
   );
 
   const params = {
     receiver: flashLeverage.flashLeverageCore.address,
-    slippage: 0.005, // 1%
+    slippage: 0.001, // 0.1%
     tokenIn: collateralToken.loanToken.address,
     tokenOut: collateralToken.address,
     amountIn: amountLoan,
     enableAggregator: true,
-    aggregators: "kyberswap, odos, okx, paraswap",
+    aggregators: "odos, okx, paraswap",
   };
 
   const res = await callSDK<InternalSwapData>(
@@ -108,7 +110,7 @@ export async function getInternalReswapData(
 
   const params = {
     receiver: flashLeverage.flashLeverageCore.address,
-    slippage: 0.005, // 1%
+    slippage: 0.001, // 0.1%
     tokenIn: collateralToken.address,
     tokenOut: collateralToken.loanToken.address,
     amountIn: String(parseUnits(String(amountLeveragedCollateral), collateralToken.decimals)),

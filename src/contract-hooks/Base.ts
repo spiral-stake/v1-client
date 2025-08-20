@@ -37,19 +37,19 @@ export class Base {
   async simulate(functionName: string, args: any[] = [], value: bigint = 0n) {
     const account = ((await connector?.getAccounts()) as string[])?.[0] as `0x${string}`;
 
-    return (
-      await simulateContract(config, {
-        abi: this.abi,
-        address: this.address,
-        functionName: functionName,
-        args,
-        account,
-        value,
-      })
-    ).result;
+    return await simulateContract(config, {
+      abi: this.abi,
+      address: this.address,
+      functionName: functionName,
+      args,
+      account,
+      value,
+    });
   }
 
   async write(functionName: string, args: any[] = [], value: bigint = 0n) {
+    await this.simulate(functionName, args, value);
+
     const { maxFeePerGas, maxPriorityFeePerGas } = await getPublicClient(
       config
     ).estimateFeesPerGas();
@@ -62,10 +62,7 @@ export class Base {
       value,
       maxFeePerGas: maxFeePerGas,
       maxPriorityFeePerGas: maxPriorityFeePerGas,
-      // __mode: "prepared", // Needs to be uncommented on local
     });
-
-    // await wait(4);
 
     return waitForTransactionReceipt(config, { hash, confirmations: 1 });
   }

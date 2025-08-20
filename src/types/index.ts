@@ -5,7 +5,6 @@ export interface Token {
   name: string;
   symbol: string;
   decimals: number;
-  image: string;
   valueInUsd: BigNumber;
 }
 
@@ -20,17 +19,6 @@ export interface CollateralToken extends Token {
   loanToken: Token;
 }
 
-export interface Position {
-  id: number;
-  owner: string;
-  collateralToken: Token;
-  collateralDeposited: BigNumber;
-  stblUSDMinted: BigNumber;
-  collateralValueInUsd: BigNumber;
-  ltv?: BigNumber;
-  borrowApy: BigNumber;
-}
-
 export interface LeveragePosition {
   open: boolean;
   owner: string;
@@ -40,7 +28,9 @@ export interface LeveragePosition {
   amountLeveragedCollateral: BigNumber;
   sharesBorrowed: bigint;
   amountLoan: BigNumber;
+  amountYield: BigNumber;
   ltv: string;
+  impliedApy: string;
 }
 
 export interface InternalSwapData {
@@ -59,6 +49,10 @@ export interface InternalReswapData {
   limitOrderData: any;
   minOut: BigInt;
 }
+
+/////////////////
+// Miscellaneous
+////////////////
 
 export type SwapData = { amountOut: string; priceImpact: number };
 export type AddLiquidityData = { amountLpOut: string; amountYtOut: string; priceImpact: number };

@@ -1,5 +1,3 @@
-import BigNumber from "bignumber.js";
-import PositionManager from "../../contract-hooks/PositionManager";
 import { HoverInfo } from "./low-level/HoverInfo";
 
 const LTVSlider = ({
@@ -41,22 +39,22 @@ const LTVSlider = ({
         </div>
 
         {/* Slider */}
-        {/* <div className="px-2.5">
-                <input
-                    type="range"
-                    min="0"
-                    max={maxLtv}
-                    step="0.01"
-                    value={ltv || "0.00"}
-                    onChange={handleLtvSlider}
-                    className="w-full"
-                />
-                <div className="flex justify-between mt-2 text-xs text-gray-400">
-                    <span>Conservative</span>
-                    <span className="text-white">Moderate</span>
-                    <span className="text-red-500">Aggressive</span>
-                </div>
-            </div> */}
+        <div className="px-2.5">
+          <input
+            type="range"
+            min="0"
+            max={maxLtv}
+            step="0.01"
+            value={ltv || "0.00"}
+            onChange={handleLtvSlider}
+            className="w-full"
+          />
+          <div className="flex justify-between mt-2 text-xs text-gray-400">
+            <span>Conservative</span>
+            <span className="text-white">Moderate</span>
+            <span className="text-red-500">Aggressive</span>
+          </div>
+        </div>
       </div>
     </section>
   );

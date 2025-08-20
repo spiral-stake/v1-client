@@ -1,11 +1,10 @@
 import { Token } from "./../types/index";
-import { decodeEventLog } from "viem";
 import { CollateralToken, InternalSwapData, LeveragePosition } from "../types/index";
 import { Base } from "./Base.ts";
 import { abi as FLASH_LEVERAGE_CORE_ABI } from "../abi/FlashLeverageCore.sol/FlashLeverageCore.json";
 import { abi as FLASH_LEVERAGE_ABI } from "../abi/FlashLeverage.sol/FlashLeverage.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
-import { readCollateralTokens, readToken } from "../config/contractsData.ts";
+import { readCollateralTokens, readToken } from "../api-services/contractsData.ts";
 import BigNumber from "bignumber.js";
 import FlashLeverageCore from "./FlashLeverageCore.ts";
 import { getImpliedApy } from "../api-services/pendle.ts";
@@ -19,15 +18,16 @@ export default class FlashLeverage extends Base {
     name: "",
     symbol: "",
     decimals: 0,
-    image: "",
     valueInUsd: BigNumber(0),
   };
 
   flashLeverageCore: FlashLeverageCore;
-  DEFAULT_DECIMALS = 18;
+  STANDARD_DECIMALS = 18;
+  PERCENT_DECIMALS = 16;
 
   constructor(flashLeverageAddress: string) {
     super(flashLeverageAddress, [...FLASH_LEVERAGE_ABI, ...FLASH_LEVERAGE_CORE_ABI]);
+    this.flashLeverageCore = new FlashLeverageCore(""); // To avoid warning
   }
 
   static async createInstance(chainId: number) {
@@ -49,9 +49,8 @@ export default class FlashLeverage extends Base {
       instance.collateralTokens = await Promise.all(
         _collateralTokens.map(
           async (collateralToken: CollateralToken): Promise<CollateralToken> => {
-            const [valueInUsd, safeLtv, maxLtv, liqLtv, impliedApy, borrowApy] = await Promise.all([
+            const [valueInUsd, maxLtv, liqLtv, impliedApy, borrowApy] = await Promise.all([
               instance.flashLeverageCore.getTokenUsdValue(collateralToken, "1"),
-              instance.flashLeverageCore.getSafeLtv(collateralToken, collateralToken.loanToken),
               instance.flashLeverageCore.getMaxLtv(collateralToken, collateralToken.loanToken),
               instance.flashLeverageCore.getLiqLtv(collateralToken, collateralToken.loanToken),
               getImpliedApy(chainId, collateralToken),
@@ -63,7 +62,7 @@ export default class FlashLeverage extends Base {
               valueInUsd,
               impliedApy,
               borrowApy,
-              safeLtv: safeLtv.toFixed(2),
+              safeLtv: maxLtv.minus(1).toFixed(2),
               maxLtv: maxLtv.toFixed(2),
               liqLtv: liqLtv.toFixed(2),
             };
@@ -82,21 +81,24 @@ export default class FlashLeverage extends Base {
 
   async swapAndLeverage(
     userAddress: string,
+    desiredLtv: string,
     fromToken: Token,
     amount: string,
     externalSwapData: InternalSwapData,
     collateralToken: CollateralToken,
-
-    internalSwapData: InternalSwapData
+    internalSwapData: InternalSwapData,
+    impliedApy: string
   ) {
     const txReceipt = await this.write("swapAndLeverage", [
       userAddress,
+      parseUnits(impliedApy, this.PERCENT_DECIMALS),
       {
         tokenIn: fromToken.address,
         amountTokenIn: parseUnits(amount, fromToken.decimals),
         ...externalSwapData,
       },
       {
+        desiredLtv: parseUnits(desiredLtv, this.PERCENT_DECIMALS),
         collateralToken: collateralToken.address,
         loanToken: collateralToken.loanToken.address,
         amountCollateral: externalSwapData.minOut,
@@ -113,13 +115,17 @@ export default class FlashLeverage extends Base {
 
   async leverage(
     userAddress: string,
+    desiredLtv: string,
     collateralToken: CollateralToken,
     userCollateralAmount: string,
-    internalSwapData: InternalSwapData
+    internalSwapData: InternalSwapData,
+    impliedApy: string
   ) {
     const txReceipt = await this.write("leverage", [
       userAddress,
+      parseUnits(impliedApy, this.PERCENT_DECIMALS),
       {
+        desiredLtv: parseUnits(desiredLtv, this.PERCENT_DECIMALS),
         collateralToken: collateralToken.address,
         loanToken: collateralToken.loanToken.address,
         amountCollateral: parseUnits(userCollateralAmount, collateralToken.decimals),
@@ -164,10 +170,13 @@ export default class FlashLeverage extends Base {
       open: boolean;
       collateralToken: string;
       loanToken: string;
+      desiredLtv: bigint;
       collateralTokenUsdValue: bigint;
       amountCollateral: bigint;
       amountLeveragedCollateral: bigint;
       sharesBorrowed: bigint;
+      positionValueInLoanToken: bigint;
+      impliedApy: bigint;
     }>;
 
     if (!Array.isArray(_userLeveragePositions)) {
@@ -181,17 +190,30 @@ export default class FlashLeverage extends Base {
           (token) => token.address.toLowerCase() === pos.collateralToken.toLowerCase()
         ) as CollateralToken;
 
+        const coreLeveragePosition = (await this.flashLeverageCore.getUserCoreLeveragePosition(
+          user,
+          collateralToken,
+          collateralToken.loanToken,
+          pos.desiredLtv
+        )) as { amountCollateral: bigint; sharesBorrowed: bigint };
+
         const amountLeveragedCollateral = formatUnits(
-          pos.amountLeveragedCollateral,
+          coreLeveragePosition.amountCollateral,
           collateralToken.decimals
         );
         const amountLeveragedCollateralInUsd = amountLeveragedCollateral.multipliedBy(
           collateralToken.valueInUsd
         );
-        const amountLoan = await this.flashLeverageCore.getRepayAmount(
-          collateralToken,
-          pos.sharesBorrowed
-        );
+
+        const [amountLoan, amountYield] = await Promise.all([
+          this.flashLeverageCore.calcUnleverageFlashLoan(
+            collateralToken,
+            coreLeveragePosition.sharesBorrowed
+          ),
+          this.getPositionYieldInLoanToken(user, index),
+        ]);
+
+        console.log(pos.impliedApy);
 
         return {
           open: pos.open,
@@ -201,13 +223,20 @@ export default class FlashLeverage extends Base {
           amountCollateral: formatUnits(pos.amountCollateral, collateralToken?.decimals),
           amountLeveragedCollateral,
           amountLoan,
+          amountYield,
           sharesBorrowed: pos.sharesBorrowed,
           ltv: amountLoan.multipliedBy(100).div(amountLeveragedCollateralInUsd).toFixed(2),
+          impliedApy: formatUnits(pos.impliedApy, this.PERCENT_DECIMALS).toFixed(2),
         };
       })
     );
 
     // Filter out null values and return the result
     return positions.filter((pos): pos is LeveragePosition => pos.open);
+  }
+
+  async getPositionYieldInLoanToken(user: string, positionId: number) {
+    const amountYield = await this.read("getPositionYieldInLoanToken", [user, positionId]);
+    return formatUnits(amountYield as bigint, this.STANDARD_DECIMALS);
   }
 }

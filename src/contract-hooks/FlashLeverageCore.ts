@@ -2,7 +2,7 @@ import { Token, CollateralToken } from "../types/index";
 import { Base } from "./Base.ts";
 import { abi as FLASH_LEVERAGE_CORE_ABI } from "../abi/FlashLeverageCore.sol/FlashLeverageCore.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
-import { readToken } from "../config/contractsData.ts";
+import { readToken } from "../api-services/contractsData.ts";
 import BigNumber from "bignumber.js";
 
 export default class FlashLeverageCore extends Base {
@@ -11,11 +11,11 @@ export default class FlashLeverageCore extends Base {
     name: "",
     symbol: "",
     decimals: 0,
-    image: "",
     valueInUsd: BigNumber(0),
   };
 
-  DEFAULT_DECIMALS = 18;
+  STANDARD_DECIMALS = 18;
+  PERCENT_DECIMALS = 16;
 
   constructor(flashLeverageAddress: string) {
     super(flashLeverageAddress, FLASH_LEVERAGE_CORE_ABI);
@@ -44,33 +44,47 @@ export default class FlashLeverageCore extends Base {
     const tokenUsdValue = await this.read("getCollateralValueInLoanToken", [
       token.address,
       token.loanToken.address,
-      parseUnits(amount, this.DEFAULT_DECIMALS),
+      parseUnits(amount, this.STANDARD_DECIMALS),
     ]);
 
-    return formatUnits(tokenUsdValue as bigint, this.DEFAULT_DECIMALS);
+    return formatUnits(tokenUsdValue as bigint, this.STANDARD_DECIMALS);
   }
 
-  async getSafeLtv(collateralToken: CollateralToken, loanToken: Token) {
-    const safeLtv = await this.read("getSafeLtv", [collateralToken.address, loanToken.address]);
-    return formatUnits(safeLtv as bigint, this.DEFAULT_DECIMALS).multipliedBy(100); // in percentage
+  async getUserCoreLeveragePosition(
+    user: string,
+    collateralToken: CollateralToken,
+    loanToken: Token,
+    desiredLtv: bigint
+  ) {
+    return this.read("getUserCoreLeveragePosition", [
+      user,
+      desiredLtv,
+      collateralToken.address,
+      loanToken.address,
+    ]);
   }
 
   async getMaxLtv(collateralToken: CollateralToken, loanToken: Token) {
     const maxLtv = await this.read("getMaxLtv", [collateralToken.address, loanToken.address]);
-    return formatUnits(maxLtv as bigint, this.DEFAULT_DECIMALS).multipliedBy(100); // in percentage
+    return formatUnits(maxLtv as bigint, this.STANDARD_DECIMALS).multipliedBy(100); // in percentage
   }
 
   async getLiqLtv(collateralToken: CollateralToken, loanToken: Token) {
     const maxLtv = await this.read("getLiqLtv", [collateralToken.address, loanToken.address]);
-    return formatUnits(maxLtv as bigint, this.DEFAULT_DECIMALS).multipliedBy(100); // in percentage
+    return formatUnits(maxLtv as bigint, this.STANDARD_DECIMALS).multipliedBy(100); // in percentage
   }
 
-  async getLoanAmount(collateralToken: CollateralToken, amount: string | bigint | BigInt) {
+  async calcLeverageFlashLoan(
+    desiredLtv: string,
+    collateralToken: CollateralToken,
+    amount: string | bigint | BigInt
+  ) {
     if (typeof amount === "string") {
       amount = parseUnits(amount, collateralToken.decimals);
     }
 
-    const amountLoan = await this.read("calcFlashLoanAmount", [
+    const amountLoan = await this.read("calcLeverageFlashLoan", [
+      parseUnits(desiredLtv, this.PERCENT_DECIMALS),
       collateralToken.address,
       collateralToken.loanToken.address,
       amount,
@@ -79,8 +93,8 @@ export default class FlashLeverageCore extends Base {
     return String(amountLoan);
   }
 
-  async getRepayAmount(collateralToken: CollateralToken, sharesBorrowed: bigint) {
-    const amountRepay = await this.read("getSharesToAsset", [
+  async calcUnleverageFlashLoan(collateralToken: CollateralToken, sharesBorrowed: bigint) {
+    const amountRepay = await this.read("calcUnleverageFlashLoan", [
       collateralToken.address,
       collateralToken.loanToken.address,
       sharesBorrowed,
@@ -88,18 +102,4 @@ export default class FlashLeverageCore extends Base {
 
     return formatUnits(amountRepay as bigint, collateralToken.loanToken.decimals);
   }
-
-  // calcLoanAmount(collateralToken: CollateralToken, amountCollateral: string) {
-  //   const amountCollateralInUsd = BigNumber(amountCollateral).multipliedBy(
-  //     collateralToken.valueInUsd
-  //   );
-
-  //   const numerator = amountCollateralInUsd.multipliedBy(100);
-  //   const denominator = BigNumber(100).minus(collateralToken.maxLtv);
-
-  //   return parseUnits(
-  //     String(numerator.dividedBy(denominator).minus(amountCollateralInUsd)),
-  //     this.usdc.decimals
-  //   );
-  // }
 }

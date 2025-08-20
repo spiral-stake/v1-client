@@ -25,14 +25,14 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-white bg-opacity-80">
                 <img
                   className="w-11"
-                  src={collateralToken.image}
-                  alt={collateralToken.symbol.slice(3)}
+                  src={`/tokens/${collateralToken.symbol}.svg`}
+                  alt={collateralToken.symbol.split("-")[1]}
                 />
               </div>
 
               {/* Token Symbol */}
               <h3 className="text-gray-200 text-lg font-semibold mb-10">
-                {collateralToken.symbol.slice(3)}
+                {collateralToken.symbol.split("-")[1]}
               </h3>
 
               {/* Interest Rate Display */}

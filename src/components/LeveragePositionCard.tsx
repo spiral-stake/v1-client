@@ -22,9 +22,11 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
         const { pendleSwap, tokenRedeemSy, swapData, limitOrderData } = await getInternalReswapData(appChainId, flashLeverage, leveragePosition.collateralToken, leveragePosition.amountLeveragedCollateral)
         const amountReturned = await flashLeverage.unleverage(leveragePosition, pendleSwap, tokenRedeemSy, swapData, limitOrderData);
 
-        axios.put("https://dapi.spiralstake.xyz/leverage/close", {
-            user: leveragePosition.owner.toLowerCase(), positionId: leveragePosition.id
-        })
+        if (chainId !== 31337) {
+            axios.put("https://dapi.spiralstake.xyz/leverage/close", {
+                user: leveragePosition.owner.toLowerCase(), positionId: leveragePosition.id
+            })
+        }
 
         deleteLeveragePosition(leveragePosition.id);
         toastSuccess("Position Closed", `Received ${displayTokenAmount(amountReturned as BigNumber, leveragePosition.collateralToken.loanToken)}`);
@@ -42,8 +44,8 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
                             <div className="inline-flex justify-center items-center gap-2">
                                 <div className="text-lg font-semibold">
 
-                                    {leveragePosition.collateralToken.symbol}
-                                    {` (${leveragePosition.collateralToken.name.slice(leveragePosition.collateralToken.name.length - 9, leveragePosition.collateralToken.name.length)})`}
+                                    {`${leveragePosition.collateralToken.symbol.split("-")[0]}-${leveragePosition.collateralToken.symbol.split("-")[1]} (${leveragePosition.collateralToken.symbol.split("-")[2]})`}
+
                                 </div>
                             </div>
                         </div>
@@ -56,7 +58,7 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
 
 
                 <div className="col-span-1 h-16 flex flex-col items-end justify-center truncate">
-                    <div>{displayTokenAmount(leveragePosition.amountCollateral, leveragePosition.collateralToken)}</div>
+                    <div>{`${displayTokenAmount(leveragePosition.amountCollateral)} ${leveragePosition.collateralToken.symbol.split("-")[0]}-${leveragePosition.collateralToken.symbol.split("-")[1]}`}</div>
                     <div className="text-xs">${displayTokenAmount(leveragePosition.amountCollateral.multipliedBy(leveragePosition.collateralToken.valueInUsd))}</div>
                 </div>
 
@@ -67,8 +69,9 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
 
                 <div className="col-span-1 h-16 flex flex-col items-end justify-center">
                     {/* Needs to change, this is obsolete, need to calc for the apy and borrow apy of his positions */}
-                    {calcLeverageApy(leveragePosition.collateralToken.impliedApy, leveragePosition.collateralToken.borrowApy, leveragePosition.ltv)}%
+                    {calcLeverageApy(leveragePosition.impliedApy, leveragePosition.collateralToken.borrowApy, leveragePosition.ltv)}%
                     <div className="text-xs lg:hidden">Max APY</div>
+                    <div className="text-xs">${displayTokenAmount(leveragePosition.amountYield)}</div>
                 </div>
 
                 <div className="col-span-1 h-16 flex flex-col items-end justify-center">

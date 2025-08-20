@@ -1,5 +1,5 @@
 import { Base } from "./Base";
-import { abi as TOKEN_ABI } from "../abi/ERC20.sol/ERC20.json";
+import { abi as TOKEN_ABI } from "../abi/IERC20.sol/IERC20.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
 import { Token } from "../types/index.ts";
 

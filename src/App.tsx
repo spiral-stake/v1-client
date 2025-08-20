@@ -24,7 +24,7 @@ function App() {
   const appChainId = useChainId();
 
   useEffect(() => {
-    if (!address) return
+    if (!address || chainId === 31337) return
 
     // Dashboard Related
     axios.post("https://dapi.spiralstake.xyz/user", {

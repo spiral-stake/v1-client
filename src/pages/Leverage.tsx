@@ -144,6 +144,7 @@ const Leverage = ({
               appChainId,
               flashLeverage,
               collateralToken,
+              desiredLtv,
               amountCollateral
             )
           );
@@ -160,6 +161,7 @@ const Leverage = ({
               appChainId,
               flashLeverage,
               collateralToken,
+              desiredLtv,
               _externalSwapData.minOut
             )
           );
@@ -226,20 +228,24 @@ const Leverage = ({
       if (collateralToken.address == fromToken.address) {
         positionId = await flashLeverage.leverage(
           address,
+          desiredLtv,
           fromToken as CollateralToken,
           amountCollateral,
-          internalSwapData
+          internalSwapData,
+          collateralToken.impliedApy
         );
       } else {
         if (!externalSwapData) return;
 
         positionId = await flashLeverage.swapAndLeverage(
           address,
+          desiredLtv,
           fromToken,
           amountCollateral,
           externalSwapData,
           collateralToken,
-          internalSwapData
+          internalSwapData,
+          collateralToken.impliedApy
         );
 
       }
@@ -249,9 +255,12 @@ const Leverage = ({
     }
 
     // Dashboard Related
-    axios.post("https://dapi.spiralstake.xyz/leverage/open", {
-      user: address.toLowerCase(), positionId, amountCollateralInUsd: BigNumber(amountCollateral).multipliedBy(collateralToken.valueInUsd)
-    })
+    if (chainId !== 31337) {
+      axios.post("https://dapi.spiralstake.xyz/leverage/open", {
+        user: address.toLowerCase(), positionId, amountCollateralInUsd: BigNumber(amountCollateral).multipliedBy(collateralToken.valueInUsd)
+      })
+
+    }
 
     navigate("/portfolio");
   }
@@ -269,7 +278,7 @@ const Leverage = ({
       <div className="pb-16">
         <div className="py-10 pt-14 lg:py-16">
           <PageTitle
-            title={`Auto Loop \u00A0 ⟳ \u00A0 ${collateralToken.symbol}`}
+            title={`Auto Loop \u00A0 ⟳ \u00A0 ${collateralToken.symbol.split("-")[0]}-${collateralToken.symbol.split("-")[1]} (${collateralToken.symbol.split("-")[2]})`}
             subheading={`Seamlessly Leverage in one click, with our cost-efficient Auto-looping`}
           />
         </div>{" "}
@@ -349,7 +358,7 @@ const Leverage = ({
           <div className="sticky top-2 h-fit lg:block">
             <section className="rounded-sm p-0 grid h-fit grid-cols-1 sm:grid-cols-[3fr_2fr] lg:grid-cols-1">
               <APYInfo
-                title={`Max Leveraged APY (${collateralToken.symbol})`}
+                title={`Max Leveraged APY`}
                 description={`Maturity: ${collateralToken.name.slice(
                   collateralToken.name.length - 9,
                   collateralToken.name.length - 7
