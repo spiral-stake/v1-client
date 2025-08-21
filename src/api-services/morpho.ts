@@ -12,13 +12,13 @@ export const getBorrowApy = async (chainId: number, collateralToken: CollateralT
         chainId: ${chainId}
       ) {
         state {
-          borrowApy
+          avgBorrowApy
         }
       }
     }
   `;
 
   const { data } = (await axios.post("https://api.morpho.org/graphql", { query })).data;
-  const borrowApy = data.marketByUniqueKey.state.borrowApy;
+  const borrowApy = data.marketByUniqueKey.state.avgBorrowApy;
   return BigNumber(borrowApy * 100).toFixed(2);
 };
