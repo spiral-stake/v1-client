@@ -86,12 +86,10 @@ export default class FlashLeverage extends Base {
     amount: string,
     externalSwapData: InternalSwapData,
     collateralToken: CollateralToken,
-    internalSwapData: InternalSwapData,
-    impliedApy: string
+    internalSwapData: InternalSwapData
   ) {
     const txReceipt = await this.write("swapAndLeverage", [
       userAddress,
-      parseUnits(impliedApy, this.PERCENT_DECIMALS),
       {
         tokenIn: fromToken.address,
         amountTokenIn: parseUnits(amount, fromToken.decimals),
@@ -118,12 +116,10 @@ export default class FlashLeverage extends Base {
     desiredLtv: string,
     collateralToken: CollateralToken,
     userCollateralAmount: string,
-    internalSwapData: InternalSwapData,
-    impliedApy: string
+    internalSwapData: InternalSwapData
   ) {
     const txReceipt = await this.write("leverage", [
       userAddress,
-      parseUnits(impliedApy, this.PERCENT_DECIMALS),
       {
         desiredLtv: parseUnits(desiredLtv, this.PERCENT_DECIMALS),
         collateralToken: collateralToken.address,
@@ -176,7 +172,7 @@ export default class FlashLeverage extends Base {
       amountLeveragedCollateral: bigint;
       sharesBorrowed: bigint;
       positionValueInLoanToken: bigint;
-      impliedApy: bigint;
+      amountCollateralInLoanToken: bigint;
     }>;
 
     if (!Array.isArray(_userLeveragePositions)) {
@@ -213,8 +209,6 @@ export default class FlashLeverage extends Base {
           this.getPositionYieldInLoanToken(user, index),
         ]);
 
-        console.log(pos.impliedApy);
-
         return {
           open: pos.open,
           owner: user,
@@ -226,7 +220,10 @@ export default class FlashLeverage extends Base {
           amountYield,
           sharesBorrowed: pos.sharesBorrowed,
           ltv: amountLoan.multipliedBy(100).div(amountLeveragedCollateralInUsd).toFixed(2),
-          impliedApy: formatUnits(pos.impliedApy, this.PERCENT_DECIMALS).toFixed(2),
+          amountCollateralInLoanToken: formatUnits(
+            pos.amountCollateralInLoanToken,
+            collateralToken.decimals
+          ),
         };
       })
     );

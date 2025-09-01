@@ -11,6 +11,7 @@ import { useState } from "react";
 import { toastSuccess } from "../utils/toastWrapper";
 import BigNumber from "bignumber.js";
 import axios from "axios";
+import { formatUnits } from "../utils/formatUnits";
 
 const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeveragePosition }: { flashLeverage: FlashLeverage, leveragePosition: LeveragePosition, deleteLeveragePosition: (positionId: number) => void }) => {
     const { chainId } = useAccount();
@@ -20,6 +21,15 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
 
     const handleCloseLeveragePosition = async () => {
         const { pendleSwap, tokenRedeemSy, swapData, limitOrderData } = await getInternalReswapData(appChainId, flashLeverage, leveragePosition.collateralToken, leveragePosition.amountLeveragedCollateral)
+        const amountReturnedSimulated = (await flashLeverage.simulate("unleverage", [leveragePosition.id,
+            pendleSwap,
+            tokenRedeemSy,
+            swapData,
+            limitOrderData])).result;
+
+        console.log(formatUnits(amountReturnedSimulated, leveragePosition.collateralToken.loanToken.decimals).minus(leveragePosition.amountCollateralInLoanToken).toString());
+
+
         const amountReturned = await flashLeverage.unleverage(leveragePosition, pendleSwap, tokenRedeemSy, swapData, limitOrderData);
 
         if (chainId !== 31337) {
@@ -69,7 +79,7 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
 
                 <div className="col-span-1 h-16 flex flex-col items-end justify-center">
                     {/* Needs to change, this is obsolete, need to calc for the apy and borrow apy of his positions */}
-                    {calcLeverageApy(leveragePosition.impliedApy, leveragePosition.collateralToken.borrowApy, leveragePosition.ltv)}%
+                    {calcLeverageApy(leveragePosition.collateralToken.impliedApy, leveragePosition.collateralToken.borrowApy, leveragePosition.ltv)}%
                     <div className="text-xs lg:hidden">Max APY</div>
                     <div className="text-xs">${displayTokenAmount(leveragePosition.amountYield)}</div>
                 </div>

@@ -231,8 +231,7 @@ const Leverage = ({
           desiredLtv,
           fromToken as CollateralToken,
           amountCollateral,
-          internalSwapData,
-          collateralToken.impliedApy
+          internalSwapData
         );
       } else {
         if (!externalSwapData) return;
@@ -244,8 +243,7 @@ const Leverage = ({
           amountCollateral,
           externalSwapData,
           collateralToken,
-          internalSwapData,
-          collateralToken.impliedApy
+          internalSwapData
         );
 
       }

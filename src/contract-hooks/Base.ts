@@ -48,21 +48,13 @@ export class Base {
   }
 
   async write(functionName: string, args: any[] = [], value: bigint = 0n) {
-    await this.simulate(functionName, args, value);
-
     const { maxFeePerGas, maxPriorityFeePerGas } = await getPublicClient(
       config
     ).estimateFeesPerGas();
 
-    const hash = await writeContract(config, {
-      abi: this.abi,
-      address: this.address,
-      functionName,
-      args,
-      value,
-      maxFeePerGas: maxFeePerGas,
-      maxPriorityFeePerGas: maxPriorityFeePerGas,
-    });
+    const { request } = await this.simulate(functionName, args, value);
+
+    const hash = await writeContract(config, { ...request, maxFeePerGas, maxPriorityFeePerGas });
 
     return waitForTransactionReceipt(config, { hash, confirmations: 1 });
   }

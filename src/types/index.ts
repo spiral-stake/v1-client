@@ -30,7 +30,7 @@ export interface LeveragePosition {
   amountLoan: BigNumber;
   amountYield: BigNumber;
   ltv: string;
-  impliedApy: string;
+  amountCollateralInLoanToken: BigNumber;
 }
 
 export interface InternalSwapData {
