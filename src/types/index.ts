@@ -37,17 +37,17 @@ export interface InternalSwapData {
   approxParams: any;
   pendleSwap: string;
   tokenMintSy: string;
+  minPtOut: bigint;
   swapData: any;
   limitOrderData: any;
-  minOut: BigInt;
 }
 
 export interface InternalReswapData {
   pendleSwap: string;
   tokenRedeemSy: string;
+  minTokenOut: bigint;
   swapData: any;
   limitOrderData: any;
-  minOut: BigInt;
 }
 
 /////////////////

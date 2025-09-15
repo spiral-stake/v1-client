@@ -99,7 +99,7 @@ export default class FlashLeverage extends Base {
         desiredLtv: parseUnits(desiredLtv, this.PERCENT_DECIMALS),
         collateralToken: collateralToken.address,
         loanToken: collateralToken.loanToken.address,
-        amountCollateral: externalSwapData.minOut,
+        amountCollateral: externalSwapData.minPtOut,
         ...internalSwapData,
       },
     ]);
@@ -137,25 +137,32 @@ export default class FlashLeverage extends Base {
   }
 
   async unleverage(
+    userAddress: string,
     leveragePosition: LeveragePosition,
     pendleSwap: string,
     tokenRedeemSy: string,
+    minTokenOut: bigint,
     swapData: any,
     limitOrderData: any
   ) {
     const txReceipt = await this.write("unleverage", [
+      userAddress,
       leveragePosition.id,
       pendleSwap,
       tokenRedeemSy,
+      minTokenOut,
       swapData,
       limitOrderData,
     ]);
 
-    const { amountReturned } = this.decodeEvent(txReceipt, "LeveragePositionClosed") as {
-      amountReturned: bigint;
+    const { amountReturnedInLoanToken } = this.decodeEvent(txReceipt, "LeveragePositionClosed") as {
+      amountReturnedInLoanToken: bigint;
     };
 
-    return formatUnits(amountReturned, leveragePosition.collateralToken.loanToken.decimals);
+    return formatUnits(
+      amountReturnedInLoanToken,
+      leveragePosition.collateralToken.loanToken.decimals
+    );
   }
 
   /////////////////////////
@@ -201,12 +208,11 @@ export default class FlashLeverage extends Base {
           collateralToken.valueInUsd
         );
 
-        const [amountLoan, amountYield] = await Promise.all([
+        const [amountLoan] = await Promise.all([
           this.flashLeverageCore.calcUnleverageFlashLoan(
             collateralToken,
             coreLeveragePosition.sharesBorrowed
           ),
-          this.getPositionYieldInLoanToken(user, index),
         ]);
 
         return {
@@ -217,7 +223,6 @@ export default class FlashLeverage extends Base {
           amountCollateral: formatUnits(pos.amountCollateral, collateralToken?.decimals),
           amountLeveragedCollateral,
           amountLoan,
-          amountYield,
           sharesBorrowed: pos.sharesBorrowed,
           ltv: amountLoan.multipliedBy(100).div(amountLeveragedCollateralInUsd).toFixed(2),
           amountCollateralInLoanToken: formatUnits(

@@ -53,7 +53,7 @@ export async function getExternalSwapData(
     approxParams: res.contractCallParams[3],
     pendleSwap: res.contractCallParams[4].pendleSwap,
     tokenMintSy: res.contractCallParams[4].tokenMintSy,
-    minOut: BigInt(res.contractCallParams[2]),
+    minPtOut: BigInt(res.contractCallParams[2]),
     swapData: res.contractCallParams[4].swapData,
     limitOrderData: res.contractCallParams[5],
   };
@@ -85,7 +85,7 @@ export async function getInternalSwapData(
     aggregators: "odos, okx, paraswap",
   };
 
-  const res = await callSDK<InternalSwapData>(
+  const res = await callSDK(
     `/v2/sdk/${chainId}/markets/${collateralToken.pendleMarket}/swap`,
     params
   );
@@ -94,9 +94,9 @@ export async function getInternalSwapData(
     approxParams: res.contractCallParams[3],
     pendleSwap: res.contractCallParams[4].pendleSwap,
     tokenMintSy: res.contractCallParams[4].tokenMintSy,
+    minPtOut: BigInt(res.contractCallParams[2]),
     swapData: res.contractCallParams[4].swapData,
     limitOrderData: res.contractCallParams[5],
-    minOut: BigInt(res.contractCallParams[2]),
   };
 }
 
@@ -118,15 +118,15 @@ export async function getInternalReswapData(
     aggregators: "odos, okx, paraswap",
   };
 
-  const res = await callSDK<InternalSwapData>(
+  const res = await callSDK(
     `/v2/sdk/${chainId}/markets/${collateralToken.pendleMarket}/swap`,
     params
   );
 
   return {
-    minOut: res.contractCallParams[3].minTokenOut,
     pendleSwap: res.contractCallParams[3].pendleSwap,
     tokenRedeemSy: res.contractCallParams[3].tokenRedeemSy,
+    minTokenOut: BigInt(res.contractCallParams[3].minTokenOut),
     swapData: res.contractCallParams[3].swapData,
     limitOrderData: res.contractCallParams[4],
   };

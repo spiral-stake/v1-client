@@ -14,23 +14,33 @@ import axios from "axios";
 import { formatUnits } from "../utils/formatUnits";
 
 const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeveragePosition }: { flashLeverage: FlashLeverage, leveragePosition: LeveragePosition, deleteLeveragePosition: (positionId: number) => void }) => {
-    const { chainId } = useAccount();
+    const { address, chainId } = useAccount();
     const [loading, setLoading] = useState<boolean>(false);
 
     const appChainId = useChainId();
 
     const handleCloseLeveragePosition = async () => {
-        const { pendleSwap, tokenRedeemSy, swapData, limitOrderData } = await getInternalReswapData(appChainId, flashLeverage, leveragePosition.collateralToken, leveragePosition.amountLeveragedCollateral)
-        const amountReturnedSimulated = (await flashLeverage.simulate("unleverage", [leveragePosition.id,
+        const { pendleSwap, tokenRedeemSy, minTokenOut, swapData, limitOrderData } = await getInternalReswapData(appChainId, flashLeverage, leveragePosition.collateralToken, leveragePosition.amountLeveragedCollateral)
+
+
+        const amountReturnedSimulated = (await flashLeverage.simulate("unleverage", [
+            address as string,
+            leveragePosition.id,
             pendleSwap,
             tokenRedeemSy,
+            minTokenOut,
             swapData,
-            limitOrderData])).result;
+            limitOrderData
+        ])).result as bigint;
 
-        console.log(formatUnits(amountReturnedSimulated, leveragePosition.collateralToken.loanToken.decimals).minus(leveragePosition.amountCollateralInLoanToken).toString());
+        console.log(
+            formatUnits(
+                amountReturnedSimulated,
+                leveragePosition.collateralToken.loanToken.decimals
+            ).minus(leveragePosition.amountCollateralInLoanToken).toString()
+        );
 
-
-        const amountReturned = await flashLeverage.unleverage(leveragePosition, pendleSwap, tokenRedeemSy, swapData, limitOrderData);
+        const amountReturned = await flashLeverage.unleverage(address as string, leveragePosition, pendleSwap, tokenRedeemSy, minTokenOut, swapData, limitOrderData);
 
         if (chainId !== 31337) {
             axios.put("https://dapi.spiralstake.xyz/leverage/close", {
@@ -81,7 +91,7 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
                     {/* Needs to change, this is obsolete, need to calc for the apy and borrow apy of his positions */}
                     {calcLeverageApy(leveragePosition.collateralToken.impliedApy, leveragePosition.collateralToken.borrowApy, leveragePosition.ltv)}%
                     <div className="text-xs lg:hidden">Max APY</div>
-                    <div className="text-xs">${displayTokenAmount(leveragePosition.amountYield)}</div>
+                    {/* <div className="text-xs">${displayTokenAmount(leveragePosition.amountYield)}</div> */}
                 </div>
 
                 <div className="col-span-1 h-16 flex flex-col items-end justify-center">

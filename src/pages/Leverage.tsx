@@ -162,7 +162,7 @@ const Leverage = ({
               flashLeverage,
               collateralToken,
               desiredLtv,
-              _externalSwapData.minOut
+              _externalSwapData.minPtOut
             )
           );
           setExternalSwapData(_externalSwapData);
