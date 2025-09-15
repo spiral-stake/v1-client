@@ -27,21 +27,6 @@ export const readCollateralTokens = async (chainId: number): Promise<CollateralT
   });
 };
 
-export const readStblUSD = async (chainId: number): Promise<Token> => {
-  const [addressesModule] = await Promise.all([
-    import(`../addresses/${chainId}.json`) as Promise<{
-      default: { stblUSD: Token };
-    }>,
-    import(`../token-data/${chainId}.json`) as Promise<{ default: TokenData }>,
-  ]);
-
-  const { stblUSD } = addressesModule.default;
-
-  return {
-    ...stblUSD,
-  };
-};
-
 export const readToken = async (chainId: number, symbol: string): Promise<Token> => {
   const [addressesModule] = await Promise.all([
     import(`../addresses/${chainId}.json`) as Promise<{

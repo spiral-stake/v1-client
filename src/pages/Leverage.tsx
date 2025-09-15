@@ -13,7 +13,7 @@ import ActionBtn from "../components/ActionBtn";
 import ERC20 from "../contract-hooks/ERC20";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import TokenAmount from "../components/TokenAmount";
-import APYInfo from "../components/sections/InfoSection";
+import APYInfo from "../components/InfoSection";
 import LeverageBreakdown from "../components/LeverageBreakdown";
 import Action from "../components/Action";
 import { useNavigate, useParams } from "react-router-dom";

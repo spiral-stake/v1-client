@@ -1,4 +1,4 @@
-import { HoverInfo } from "../low-level/HoverInfo";
+import { HoverInfo } from "./low-level/HoverInfo";
 
 const APYInfo = ({ title, apy, apyBreakdown, description }: { title: string, apy: string, apyBreakdown?: JSX.Element | React.ReactElement, description: string }) => {
     return (

@@ -31,7 +31,7 @@ const LeveragePositionCard = ({ flashLeverage, leveragePosition, deleteLeverageP
             minTokenOut,
             swapData,
             limitOrderData
-        ])).result as bigint;
+        ])).result;
 
         console.log(
             formatUnits(
