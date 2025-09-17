@@ -27,10 +27,7 @@ const ProductCard = ({
   };
 
   return (
-    <div
-      onClick={handleClick}
-      className="group flex flex-col cursor-pointer w-full border-[1px] border-white border-opacity-[6%] gap-[16px] bg-white p-[16px]  rounded-xl bg-opacity-[4%] hover:bg-opacity-[10%] transition-all duration-300"
-    >
+    <div className="group flex flex-col cursor-default w-full border-[1px] border-white border-opacity-[6%] gap-[16px] bg-white p-[16px]  rounded-xl bg-opacity-[4%] hover:bg-opacity-[10%] transition-all duration-300">
       {/* first part */}
       <div className="flex justify-between items-center pb-[16px] border-b-[1px] border-white border-opacity-[6%]">
         <div className="flex items-center gap-2">
@@ -40,7 +37,7 @@ const ProductCard = ({
           <div className="flex flex-col gap-[4px]">
             <div className="flex gap-[8px] items-center">
               <p className="text-[16px] font-semibold">{name}</p>
-              <img src={infoIcon} alt="" className="w-[16px]" />
+              {/* <img src={infoIcon} alt="" className="w-[16px]" /> */}
             </div>
             <div>
               <p className="text-[14px] text-[#CCCCCC]">{maturity}</p>
@@ -71,7 +68,10 @@ const ProductCard = ({
         </div>
       </div>
       {/* third part */}
-      <div className="flex justify-center items-center p-[8.5px] bg-white bg-opacity-[8%] rounded-xl group-hover:bg-white">
+      <div
+        onClick={handleClick}
+        className="flex cursor-pointer justify-center items-center p-[8.5px] bg-white bg-opacity-[8%] rounded-xl group-hover:bg-white"
+      >
         <p className="text-[12px] text-[#CCCCCC] group-hover:text-gray-950">
           Deposit
         </p>

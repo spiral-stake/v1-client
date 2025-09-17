@@ -16,6 +16,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import SectionOverlay from "../components/low-level/SectionOverlay";
 import lockIcon from "../assets/icons/lock-svgrepo-com.svg";
 import closeIcon from "../assets/icons/close.svg";
+import setting from "../assets/icons/setting.svg";
 import {
   getExternalSwapData,
   getInternalSwapData,
@@ -28,8 +29,13 @@ import pencil from "../assets/icons/pencil.svg";
 import infoIcon from "../assets/icons/infoIcon.svg";
 import wallet from "../assets/icons/wallet.svg";
 import arrowDown from "../assets/icons/arrowDown.svg";
+import NewTokenAmount from "../components/new-components/newTokenAmount";
+import LeverageRange from "../components/new-components/leverageRange";
+import Overlay from "../components/low-level/Overlay";
+import ReviewOverlay from "../components/new-components/reviewOverlay";
 
 const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
+  const [showLTV, setShowLTV] = useState(false);
   const [collateralToken, setCollateralToken] = useState<CollateralToken>();
   const [fromToken, setFromToken] = useState<Token>();
   const [amountCollateral, setAmountCollateral] = useState("");
@@ -273,12 +279,14 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     fromToken && (
       <div className="flex gap-[32px] pb-16 pt-[48px]">
         <div className="flex flex-col w-full gap-[32px]">
-          <Link to={"/test"}>
+          <Link to={"/products"}>
             <div className="flex gap-[4px]">
               <img src={arrowBack} alt="" />
               <p>back</p>
             </div>
           </Link>
+
+          {/* title and subtitle */}
           <div className="">
             <ProductTitle
               icon={`/tokens/${collateralToken.symbol}.svg`}
@@ -292,32 +300,49 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               } for maximized returns on your idle holdings.`}
             />
           </div>
+
+          {/* deposit info */}
           <div className="flex gap-[13px] items-center">
             <div className="pr-[60px]">
-              <p className="text-[20px] text-[#E4E4E4]">
-                {collateralToken.impliedApy}%
+              <p className="text-[20px] text-[#E4E4E4] min-w-[70px]">
+                {calcLeverageApy(
+                  collateralToken.impliedApy,
+                  collateralToken.borrowApy,
+                  desiredLtv
+                )}
+                %
               </p>
               <p className="text-[14px] text-[#8E8E8E]">Max APY</p>
             </div>
             <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
             <div className="pr-[60px]">
-              <p className="text-[20px] text-[#E4E4E4]">
-                {collateralToken.safeLtv}
+              <p className="text-[20px] text-[#E4E4E4] min-w-[70px]">
+                {maxLeverage}x
+              </p>
+              <p className="text-[14px] text-[#8E8E8E]">Leverage</p>
+            </div>
+            <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
+            <div className="pr-[60px]">
+              <p className="text-[20px] text-[#E4E4E4] min-w-[70px]">
+                {desiredLtv}%
               </p>
               <p className="text-[14px] text-[#8E8E8E]">Safe LTV</p>
             </div>
             <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
             <div>
-              <p className="text-[20px] text-[#E4E4E4]">
-                {collateralToken.liqLtv}
+              <p className="text-[20px] text-[#E4E4E4] min-w-[70px]">
+                {collateralToken.liqLtv}%
               </p>
               <p className="text-[14px] text-[#8E8E8E]">Liquidation LTV</p>
             </div>
           </div>
+
+          {/* chart */}
           <div>
             <img src={chart} alt="" />
           </div>
         </div>
+
         {/* deposit part */}
         <div className="bg-white flex flex-col w-full h-fit items-center gap-[24px] bg-opacity-[2%] rounded-xl p-[32px]">
           <div className="flex w-full justify-between items-center">
@@ -331,49 +356,97 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             </div>
             <div className="flex flex-col gap-[4px] items-end">
               <div className="flex items-center gap-[8px]">
-                <p className="text-[24px] text-[#E4E4E4] font-semibold">7.4x</p>
-                <img src={pencil} alt="" className="w-[36px]"/>
-              </div>
-              <div className="flex items-center gap-[8px] text-[#8B8B8B]">
-                <p className="text-[16px] ">Leverage</p>
-                <img src={infoIcon} alt="" className="w-[13.3px]"/>
+                <img
+                  src={setting}
+                  alt=""
+                  className="w-[36px] cursor-pointer"
+                  onClick={() => setShowLTV(!showLTV)}
+                />
+                {showLTV && (
+                  <div className="absolute  top-[215px] z-50 right-[97px]">
+                    <LeverageRange
+                      setShowLTV={setShowLTV}
+                      maxLeverage={maxLeverage}
+                      maxLtv={collateralToken.maxLtv}
+                      ltv={desiredLtv}
+                      handleLtvSlider={handleLtvSlider}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
-          <div className="flex flex-col w-full bg-white border-[1px] border-white border-opacity-[14%] bg-opacity-[4%] rounded-xl p-[16px]">
-            <div className="flex items-center justify-between gap-4 text-[16px]">
-              <div className="">
-                <input type="text" className="outline-none bg-transparent" />
-              </div>
-              <div className="flex gap-[2px] items-center border-white border-[1px] rounded-xl p-[11px] border-opacity-[10%]">
-                <img src={`/tokens/${collateralToken.symbol}.svg`} alt="" className="w-[20px]"/>
-                <p>{flashLeverage.usdc.symbol}</p>
-                <img src={arrowDown} alt="" className="w-[20px]"/>
-              </div>
-            </div>
-            <div className="text-[14px] text-[#8E8E8E] font-semibold">$0.00</div>
-          </div>
-          <div className="flex w-full justify-between items-center text-[14px]">
-            <div className="flex items-center gap-[6px]">
-              <img src={wallet} alt="" />
-              <p className="text-[#8E8E8E]">12000 USDC</p>
-            </div>
-            <div>
-              <p>MAX</p>
-            </div>
-          </div>
-          <div className="flex justify-center items-center rounded-xl w-full bg-white bg-opacity-[8%] p-[10px]">
+
+          <NewTokenAmount
+            tokens={[flashLeverage.usdc, collateralToken]}
+            selectedToken={fromToken}
+            handleTokenChange={handleFromTokenChange}
+            amount={amountCollateral}
+            handleAmountChange={setAmountCollateral}
+            amountInUsd={BigNumber(amountCollateral).multipliedBy(
+              fromToken.valueInUsd
+            )}
+            error={actionBtn.error}
+            balance={userFromTokenBalance}
+            setAmountToMax={setAmountToMax}
+          />
+
+          {/* deposit button */}
+          {/* <div className="flex justify-center items-center rounded-xl w-full bg-white bg-opacity-[8%] p-[10px]">
             <p className="text-[14px]">Deposit USDC</p>
-          </div>
+          </div> */}
+
+          {/* old deposit button */}
+          <ActionBtn
+            btnLoading={false}
+            text={actionBtn.text}
+            disabled={actionBtn.disabled}
+            expectedChainId={Number(chainId)}
+            onClick={actionBtn.onClick}
+          />
+
+          {/* deposit summary */}
           <div className="flex text-[16px] w-full justify-between text-[#8E8E8E]">
             <div className="flex items-center gap-[8px] w-fit">
               <p>Deposit amount</p>
-              <img src={infoIcon} alt="" className="w-[16px]"/>
+              <img src={infoIcon} alt="" className="w-[16px]" />
             </div>
             <div className="w-fit">
               <p>0 USDC ($0)</p>
             </div>
           </div>
+
+          {/* review section */}
+          {showSummary && (
+            <Overlay
+              overlay={
+                <div className="flex flex-col gap-[16px] z-50 backdrop-blur-2xl">
+                  <ReviewOverlay
+                    token={fromToken}
+                    handleApprove={handleApprove}
+                    completed={userFromTokenAllowance?.gte(
+                      BigNumber(amountCollateral)
+                    )}
+                    setShowSummary={setShowSummary}
+                    amountCollateral={amountCollateral}
+                    collateralToken={collateralToken}
+                  />
+                  <div>
+                    <Action
+                      text="Deposit"
+                      token={fromToken}
+                      amountToken={amountCollateral}
+                      actionHandler={handleLeverage}
+                      disabled={
+                        userFromTokenAllowance.lt(amountCollateral) ||
+                        !internalSwapData
+                      }
+                    />
+                  </div>
+                </div>
+              }
+            />
+          )}
         </div>
       </div>
     )
