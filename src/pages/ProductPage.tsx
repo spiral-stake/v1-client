@@ -1,0 +1,456 @@
+import { useEffect, useState } from "react";
+import PageTitle from "../components/low-level/PageTitle";
+import LTVSlider from "../components/LTVSlider";
+import BigNumber from "bignumber.js";
+import { CollateralToken, InternalSwapData, Token } from "../types";
+import { useAccount, useChainId } from "wagmi";
+import { calcLeverageApy, calcMaxLeverage } from "../utils";
+import ActionBtn from "../components/ActionBtn";
+import ERC20 from "../contract-hooks/ERC20";
+import FlashLeverage from "../contract-hooks/FlashLeverage";
+import TokenAmount from "../components/TokenAmount";
+import APYInfo from "../components/InfoSection";
+import LeverageBreakdown from "../components/LeverageBreakdown";
+import Action from "../components/Action";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import SectionOverlay from "../components/low-level/SectionOverlay";
+import lockIcon from "../assets/icons/lock-svgrepo-com.svg";
+import closeIcon from "../assets/icons/close.svg";
+import setting from "../assets/icons/setting.svg";
+import {
+  getExternalSwapData,
+  getInternalSwapData,
+} from "../api-services/swapAggregator";
+import axios from "axios";
+import arrowBack from "../assets/icons/arrowBack.svg";
+import ProductTitle from "../components/new-components/productTitle";
+import chart from "../assets/Chart.svg";
+import pencil from "../assets/icons/pencil.svg";
+import infoIcon from "../assets/icons/infoIcon.svg";
+import wallet from "../assets/icons/wallet.svg";
+import arrowDown from "../assets/icons/arrowDown.svg";
+import NewTokenAmount from "../components/new-components/newTokenAmount";
+import LeverageRange from "../components/new-components/leverageRange";
+import Overlay from "../components/low-level/Overlay";
+import ReviewOverlay from "../components/new-components/reviewOverlay";
+
+const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
+  const [showLTV, setShowLTV] = useState(false);
+  const [collateralToken, setCollateralToken] = useState<CollateralToken>();
+  const [fromToken, setFromToken] = useState<Token>();
+  const [amountCollateral, setAmountCollateral] = useState("");
+  const [desiredLtv, setDesiredLtv] = useState("");
+  const [maxLeverage, setMaxLeverage] = useState("");
+  const [showSummary, setShowSummary] = useState(false);
+  const [userFromTokenBalance, setUserFromTokenBalance] = useState<BigNumber>(
+    BigNumber(0)
+  );
+  const [userFromTokenAllowance, setUserFromTokenAllowance] =
+    useState<BigNumber>(BigNumber(0));
+  const [actionBtn, setActionBtn] = useState({
+    text: "Leverage",
+    onClick: () => {
+      setShowSummary(true);
+    },
+    disabled: false,
+    error: "",
+  });
+  const [externalSwapData, setExternalSwapData] = useState<InternalSwapData>(); // Only used by leverageWrapper
+  const [internalSwapData, setSwapData] = useState<InternalSwapData>();
+
+  const { address: collateralTokenAddress } = useParams();
+
+  const appChainId = useChainId();
+  const { chainId, address } = useAccount();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function initialize() {
+      const collateralToken = flashLeverage.collateralTokens.find(
+        (collateralToken) => collateralToken.address === collateralTokenAddress
+      ) as CollateralToken;
+
+      setCollateralToken({ ...collateralToken });
+      setFromToken({ ...flashLeverage.usdc });
+      setDesiredLtv(collateralToken.safeLtv);
+    }
+
+    initialize();
+  }, []);
+
+  useEffect(() => {
+    if (!fromToken || !address) return;
+
+    const getFromTokenBalance = async () => {
+      const _userFromTokenBalance = await new ERC20(fromToken).balanceOf(
+        address
+      );
+
+      setUserFromTokenBalance(_userFromTokenBalance);
+    };
+    getFromTokenBalance();
+  }, [fromToken, address]);
+
+  useEffect(() => {
+    setMaxLeverage(calcMaxLeverage(desiredLtv));
+  }, [desiredLtv]);
+
+  useEffect(() => {
+    updateUserCollateralBalance();
+    updateUserCollateralAllowance();
+  }, [address, fromToken]);
+
+  useEffect(() => {
+    const updateActionBtn = async () => {
+      if (amountCollateral == "" || BigNumber(amountCollateral).isZero()) {
+        return setActionBtn((prev) => ({
+          ...prev,
+          disabled: true,
+          error: "",
+        }));
+      } else if (
+        BigNumber(amountCollateral).isGreaterThan(userFromTokenBalance)
+      ) {
+        return setActionBtn((prev) => ({
+          ...prev,
+          disabled: true,
+          error: "Amount exceeds your available balance",
+        }));
+        // } else if (BigNumber(amountCollateral).isGreaterThan(100)) {
+        //   return setActionBtn((prev) => ({
+        //     ...prev,
+        //     disabled: true,
+        //     error: `Deposit amount is capped at ${displayTokenAmount(
+        //       BigNumber(100),
+        //       collateralToken
+        //     )}`,
+        //   }));
+      } else {
+        return setActionBtn((prev) => ({
+          ...prev,
+          text: "Leverage",
+          disabled: false,
+          error: "",
+        }));
+      }
+    };
+
+    updateActionBtn();
+  }, [amountCollateral, userFromTokenBalance]);
+
+  useEffect(() => {
+    if (!collateralToken || !fromToken) return;
+
+    const fetchSwapData = async () => {
+      if (showSummary) {
+        if (collateralToken.address === fromToken.address) {
+          setSwapData(
+            await getInternalSwapData(
+              appChainId,
+              flashLeverage,
+              collateralToken,
+              desiredLtv,
+              amountCollateral
+            )
+          );
+        } else {
+          const _externalSwapData = await getExternalSwapData(
+            appChainId,
+            flashLeverage.address,
+            fromToken,
+            amountCollateral,
+            collateralToken
+          );
+          setSwapData(
+            await getInternalSwapData(
+              appChainId,
+              flashLeverage,
+              collateralToken,
+              desiredLtv,
+              _externalSwapData.minPtOut
+            )
+          );
+          setExternalSwapData(_externalSwapData);
+        }
+      } else {
+        setSwapData(undefined);
+      }
+    };
+
+    fetchSwapData();
+  }, [showSummary]);
+
+  const updateUserCollateralBalance = async () => {
+    if (!address || !fromToken) return;
+    const balance = await new ERC20(fromToken).balanceOf(address);
+    setUserFromTokenBalance(balance);
+  };
+
+  const updateUserCollateralAllowance = async () => {
+    if (!address || !collateralToken || !fromToken) return;
+
+    let allowance = await new ERC20(fromToken).allowance(
+      address,
+      flashLeverage.address
+    );
+
+    setUserFromTokenAllowance(allowance);
+  };
+
+  const handleFromTokenChange = (token: Token) => {
+    setFromToken(token);
+    setAmountCollateral("");
+  };
+
+  const handleLtvSlider = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDesiredLtv(BigNumber(e.target.value).toFixed(2));
+  };
+
+  async function handleApprove() {
+    if (!address || !collateralToken || !fromToken) return;
+
+    await new ERC20(fromToken).approve(flashLeverage.address, amountCollateral);
+
+    setUserFromTokenAllowance(BigNumber(amountCollateral));
+  }
+
+  async function handleLeverage() {
+    if (
+      !flashLeverage ||
+      !fromToken ||
+      !address ||
+      !collateralToken ||
+      !internalSwapData
+    )
+      return;
+
+    let positionId;
+
+    try {
+      if (collateralToken.address == fromToken.address) {
+        positionId = await flashLeverage.leverage(
+          address,
+          desiredLtv,
+          fromToken as CollateralToken,
+          amountCollateral,
+          internalSwapData
+        );
+      } else {
+        if (!externalSwapData) return;
+
+        positionId = await flashLeverage.swapAndLeverage(
+          address,
+          desiredLtv,
+          fromToken,
+          amountCollateral,
+          externalSwapData,
+          collateralToken,
+          internalSwapData
+        );
+      }
+    } catch (e) {
+      setShowSummary(false);
+      throw e;
+    }
+
+    // Dashboard Related
+    if (chainId !== 31337) {
+      axios.post("https://dapi.spiralstake.xyz/leverage/open", {
+        user: address.toLowerCase(),
+        positionId,
+        amountCollateralInUsd: BigNumber(amountCollateral).multipliedBy(
+          collateralToken.valueInUsd
+        ),
+      });
+    }
+
+    navigate("/portfolio");
+  }
+
+  const setAmountToMax = () => {
+    const truncated = (
+      Math.floor(userFromTokenBalance.toNumber() * 100) / 100
+    ).toFixed(2);
+    setAmountCollateral(truncated);
+  };
+
+  return (
+    collateralToken &&
+    fromToken && (
+      <div className="flex gap-[32px] pb-16 pt-[48px]">
+        <div className="flex flex-col w-full gap-[32px]">
+          <Link to={"/products"}>
+            <div className="flex gap-[4px]">
+              <img src={arrowBack} alt="" />
+              <p>back</p>
+            </div>
+          </Link>
+
+          {/* title and subtitle */}
+          <div className="">
+            <ProductTitle
+              icon={`/tokens/${collateralToken.symbol}.svg`}
+              title={`${collateralToken.symbol.split("-")[0]}-${
+                collateralToken.symbol.split("-")[1]
+              } `}
+              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${
+                collateralToken.symbol.split("-")[0]
+              }-${
+                collateralToken.symbol.split("-")[1]
+              } for maximized returns on your idle holdings.`}
+            />
+          </div>
+
+          {/* deposit info */}
+          <div className="flex gap-[13px] items-center">
+            <div className="pr-[60px]">
+              <p className="text-[20px] text-[#E4E4E4] min-w-[70px]">
+                {calcLeverageApy(
+                  collateralToken.impliedApy,
+                  collateralToken.borrowApy,
+                  desiredLtv
+                )}
+                %
+              </p>
+              <p className="text-[14px] text-[#8E8E8E]">Max APY</p>
+            </div>
+            <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
+            <div className="pr-[60px]">
+              <p className="text-[20px] text-[#E4E4E4] min-w-[70px]">
+                {maxLeverage}x
+              </p>
+              <p className="text-[14px] text-[#8E8E8E]">Leverage</p>
+            </div>
+            <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
+            <div className="pr-[60px]">
+              <p className="text-[20px] text-[#E4E4E4] min-w-[70px]">
+                {desiredLtv}%
+              </p>
+              <p className="text-[14px] text-[#8E8E8E]">Safe LTV</p>
+            </div>
+            <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
+            <div>
+              <p className="text-[20px] text-[#E4E4E4] min-w-[70px]">
+                {collateralToken.liqLtv}%
+              </p>
+              <p className="text-[14px] text-[#8E8E8E]">Liquidation LTV</p>
+            </div>
+          </div>
+
+          {/* chart */}
+          <div>
+            <img src={chart} alt="" />
+          </div>
+        </div>
+
+        {/* deposit part */}
+        <div className="bg-white flex flex-col w-full h-fit items-center gap-[24px] bg-opacity-[2%] rounded-xl p-[32px]">
+          <div className="flex w-full justify-between items-center">
+            <div className="flex flex-col gap-[4px]">
+              <p className="text-[24px] text-[#E4E4E4] font-semibold">
+                Deposit
+              </p>
+              <p className="text-[16px] text-[#8B8B8B]">
+                Deposit assets, earn max yield
+              </p>
+            </div>
+            <div className="flex flex-col gap-[4px] items-end">
+              <div className="flex items-center gap-[8px]">
+                <img
+                  src={setting}
+                  alt=""
+                  className="w-[36px] cursor-pointer"
+                  onClick={() => setShowLTV(!showLTV)}
+                />
+                {showLTV && (
+                  <div className="absolute  top-[215px] z-50 right-[97px]">
+                    <LeverageRange
+                      setShowLTV={setShowLTV}
+                      maxLeverage={maxLeverage}
+                      maxLtv={collateralToken.maxLtv}
+                      ltv={desiredLtv}
+                      handleLtvSlider={handleLtvSlider}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <NewTokenAmount
+            tokens={[flashLeverage.usdc, collateralToken]}
+            selectedToken={fromToken}
+            handleTokenChange={handleFromTokenChange}
+            amount={amountCollateral}
+            handleAmountChange={setAmountCollateral}
+            amountInUsd={BigNumber(amountCollateral).multipliedBy(
+              fromToken.valueInUsd
+            )}
+            error={actionBtn.error}
+            balance={userFromTokenBalance}
+            setAmountToMax={setAmountToMax}
+          />
+
+          {/* deposit button */}
+          {/* <div className="flex justify-center items-center rounded-xl w-full bg-white bg-opacity-[8%] p-[10px]">
+            <p className="text-[14px]">Deposit USDC</p>
+          </div> */}
+
+          {/* old deposit button */}
+          <ActionBtn
+            btnLoading={false}
+            text={actionBtn.text}
+            disabled={actionBtn.disabled}
+            expectedChainId={Number(chainId)}
+            onClick={actionBtn.onClick}
+          />
+
+          {/* deposit summary */}
+          <div className="flex text-[16px] w-full justify-between text-[#8E8E8E]">
+            <div className="flex items-center gap-[8px] w-fit">
+              <p>Deposit amount</p>
+              <img src={infoIcon} alt="" className="w-[16px]" />
+            </div>
+            <div className="w-fit">
+              <p>0 USDC ($0)</p>
+            </div>
+          </div>
+
+          {/* review section */}
+          {showSummary && (
+            <Overlay
+              overlay={
+                <div className="flex flex-col gap-[16px] z-50 backdrop-blur-2xl">
+                  <ReviewOverlay
+                    token={fromToken}
+                    handleApprove={handleApprove}
+                    completed={userFromTokenAllowance?.gte(
+                      BigNumber(amountCollateral)
+                    )}
+                    setShowSummary={setShowSummary}
+                    amountCollateral={amountCollateral}
+                    collateralToken={collateralToken}
+                  />
+                  <div>
+                    <Action
+                      text="Deposit"
+                      token={fromToken}
+                      amountToken={amountCollateral}
+                      actionHandler={handleLeverage}
+                      disabled={
+                        userFromTokenAllowance.lt(amountCollateral) ||
+                        !internalSwapData
+                      }
+                    />
+                  </div>
+                </div>
+              }
+            />
+          )}
+        </div>
+      </div>
+    )
+  );
+};
+
+export default ProductPage;

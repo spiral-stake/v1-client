@@ -9,7 +9,8 @@ input:-webkit-autofill:active {
   -webkit-background-clip: text;
   -webkit-text-fill-color: #ffffff;
   transition: background-color 5000s ease-in-out 0s;
-  box-shadow: inset 0 0 20px 20px #23232329;
+  /* box-shadow: inset 0 0 20px 20px #23232329; */
+  box-shadow: inset 0 0 20px 20px #ffffff;
 }
 
 .app {
@@ -21,3 +22,27 @@ input:-webkit-autofill:active {
 .circle-gradient {
   background: linear-gradient(180deg, #01152a 1.93%, #03050d 28.18%);
 }
+
+.All:hover{
+    background: linear-gradient(90deg,rgba(242, 217, 103, 0.1),rgba(153, 153, 153, 0.1));
+}
+
+.All:focus{
+  background: linear-gradient(90deg,rgba(242, 217, 103, 0.1),rgba(153, 153, 153, 0.1));
+  border: 1px;
+  border-color: rgba(255, 255, 255, 0.96);
+}
+
+.High:hover{
+   background: linear-gradient(90deg,rgba(255, 60, 60, 0.1),rgba(153, 153, 153, 0.1));
+}
+
+.Medium:hover{
+  background: linear-gradient(90deg,rgba(242, 217, 103, 0.1),rgba(153, 153, 153, 0.1));
+}
+
+.Low:hover{
+   background: linear-gradient(90deg,rgba(63, 255, 20, 0.1),rgba(153, 153, 153, 0.1));
+}
+
+
