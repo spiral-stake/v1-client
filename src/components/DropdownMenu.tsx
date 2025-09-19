@@ -52,7 +52,7 @@ const DropdownMenu = ({
         <div className="w-full" onClick={() => showDropdown(false)}>
           <Link
             target="blank"
-            to="https://spiral-stake.gitbook.io/spiral-stake-docs"
+            to="https://docs.spiralstake.xyz"
           >
             <div className="self-stretch pt-2 pb-4 border-b border-gray-200 border-opacity-10 flex flex-col justify-center items-start gap-3">
               <div className="self-stretch inline-flex justify-between items-center">

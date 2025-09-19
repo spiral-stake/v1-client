@@ -17,6 +17,12 @@ export interface CollateralToken extends Token {
   morphoMarketId: string;
   pendleMarket: string;
   loanToken: Token;
+  info: TokenInfo;
+}
+
+export interface TokenInfo {
+  underlyingCollateral: string;
+  yieldSource: string;
 }
 
 export interface LeveragePosition {

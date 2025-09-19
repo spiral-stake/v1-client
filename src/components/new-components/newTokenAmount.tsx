@@ -5,6 +5,7 @@ import { displayTokenAmount } from "../../utils/displayTokenAmounts";
 import DropdownIcon from "../low-level/DropDownIcon";
 import Input from "../low-level/Input.tsx";
 import wallet from "../../assets/icons/wallet.svg";
+import truncateStr from "../../utils/truncateStr.ts";
 
 const NewTokenAmount = ({
   tokens,
@@ -50,7 +51,7 @@ const NewTokenAmount = ({
     >
       {/* input area box   */}
 
-      <div className="flex flex-col gap-[16px] border-[1px] border-white border-opacity-[14%] bg-white bg-opacity-[4%] p-[16px] rounded-[20px]">
+      <div className="flex flex-col border-[1px] border-white border-opacity-[14%] bg-white bg-opacity-[4%] p-[16px] rounded-[20px]">
         <div className="flex items-center justify-between">
           <Input
             name="amountCollateral"
@@ -63,13 +64,12 @@ const NewTokenAmount = ({
           <div className="relative transition-all duration-300" ref={ref}>
             <div
               onClick={() => setIsOpen(!isOpen)}
-              className={`cursor-pointer flex w-full gap-[8px] items-center ${
-                isOpen ? "rounded-b-none border-b-0" : ""
-              } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
+              className={`cursor-pointer flex w-full gap-[8px] items-center ${isOpen ? "rounded-b-none border-b-0" : ""
+                } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
             >
               {/* Need to add Symbol */}
-              <div className="w-[80px]">
-                <p className="truncate text-[16px] font-medium">
+              <div className="w-[60px]">
+                <p className="truncate text-[16px] font-normal">
                   {selectedToken.symbol}
                 </p>
               </div>
@@ -101,7 +101,7 @@ const NewTokenAmount = ({
         {/* input amount display */}
         <div
           data-testid="component-AssetInput-inputUsdValue"
-          className="text-[14px] truncate text-[#8E8E8E] font-[500]"
+          className="text-[14px] truncate text-[#8E8E8E] font-normal"
         >
           ${displayTokenAmount(amountInUsd, undefined, 2)}
         </div>
@@ -113,10 +113,10 @@ const NewTokenAmount = ({
       <div className="flex text-[14px] items-center justify-between">
         <div className="flex items-center gap-[4px]">
           <img src={wallet} alt="" />
-          <p className="text-[#8E8E8E]">{balance.toString()} USDC</p>
+          <p className="text-[#8E8E8E]">{displayTokenAmount(balance)} {truncateStr(selectedToken.symbol, 12)}</p>
         </div>
         <div>
-          <p onClick={setAmountToMax}>MAX</p>
+          <p className="cursor-pointer" onClick={setAmountToMax}>MAX</p>
         </div>
       </div>
     </section>

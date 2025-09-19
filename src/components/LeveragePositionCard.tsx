@@ -28,9 +28,12 @@ const LeveragePositionCard = ({
   const appChainId = useChainId();
 
   const handleCloseLeveragePosition = async () => {
+    const slippage = 0.001; // 0.1%
+
     const { pendleSwap, tokenRedeemSy, minTokenOut, swapData, limitOrderData } =
       await getInternalReswapData(
         appChainId,
+        slippage,
         flashLeverage,
         leveragePosition.collateralToken,
         leveragePosition.amountLeveragedCollateral
@@ -157,9 +160,8 @@ const LeveragePositionCard = ({
 
         {/* My position */}
         <div className="col-span-2 h-16 flex flex-col items-start justify-center truncate">
-          <div>{`${displayTokenAmount(leveragePosition.amountCollateral)} ${
-            leveragePosition.collateralToken.symbol.split("-")[0]
-          }-${leveragePosition.collateralToken.symbol.split("-")[1]}`}</div>
+          <div>{`${displayTokenAmount(leveragePosition.amountCollateral)} ${leveragePosition.collateralToken.symbol.split("-")[0]
+            }-${leveragePosition.collateralToken.symbol.split("-")[1]}`}</div>
           <div className="text-xs">
             $
             {displayTokenAmount(

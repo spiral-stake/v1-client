@@ -33,6 +33,8 @@ import NewTokenAmount from "../components/new-components/newTokenAmount";
 import LeverageRange from "../components/new-components/leverageRange";
 import Overlay from "../components/low-level/Overlay";
 import ReviewOverlay from "../components/new-components/reviewOverlay";
+import { HoverInfo } from "../components/low-level/HoverInfo";
+
 
 const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [showLTV, setShowLTV] = useState(false);
@@ -147,6 +149,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           setSwapData(
             await getInternalSwapData(
               appChainId,
+              0.001,
               flashLeverage,
               collateralToken,
               desiredLtv,
@@ -156,6 +159,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
         } else {
           const _externalSwapData = await getExternalSwapData(
             appChainId,
+            0.001,
             flashLeverage.address,
             fromToken,
             amountCollateral,
@@ -164,6 +168,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           setSwapData(
             await getInternalSwapData(
               appChainId,
+              0.001,
               flashLeverage,
               collateralToken,
               desiredLtv,
@@ -280,9 +285,9 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       <div className="flex gap-[32px] pb-16 pt-[48px]">
         <div className="flex flex-col w-full gap-[32px]">
           <Link to={"/products"}>
-            <div className="flex gap-[4px]">
+            <div className="flex gap-[6px] text-[#E4E4E4]">
               <img src={arrowBack} alt="" />
-              <p>back</p>
+              <p>Back</p>
             </div>
           </Link>
 
@@ -290,47 +295,49 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           <div className="">
             <ProductTitle
               icon={`/tokens/${collateralToken.symbol}.svg`}
-              title={`${collateralToken.symbol.split("-")[0]}-${
-                collateralToken.symbol.split("-")[1]
-              } `}
-              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${
-                collateralToken.symbol.split("-")[0]
-              }-${
-                collateralToken.symbol.split("-")[1]
-              } for maximized returns on your idle holdings.`}
+              title={`${collateralToken.symbol.split("-")[0]}-${collateralToken.symbol.split("-")[1]
+                } `}
+              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${collateralToken.symbol.split("-")[0]
+                }-${collateralToken.symbol.split("-")[1]
+                } for maximized returns on your idle holdings.`}
             />
           </div>
 
           {/* deposit info */}
           <div className="flex gap-[13px] items-center">
             <div className="pr-[60px]">
-              <p className="text-[20px] text-[#E4E4E4] min-w-[70px]">
-                {calcLeverageApy(
-                  collateralToken.impliedApy,
-                  collateralToken.borrowApy,
-                  desiredLtv
-                )}
-                %
-              </p>
+              <div className="flex items-center gap-1">
+                <p className="text-[20px] text-[#E4E4E4] font-normal">
+                  {calcLeverageApy(
+                    collateralToken.impliedApy,
+                    collateralToken.borrowApy,
+                    desiredLtv
+                  )}
+                  %
+                </p>
+                <HoverInfo content={<LeverageBreakdown collateralTokenApy={collateralToken.impliedApy}
+                  borrowApy={collateralToken.borrowApy}
+                  maxLeverage={maxLeverage} />} />
+              </div>
               <p className="text-[14px] text-[#8E8E8E]">Max APY</p>
             </div>
             <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
             <div className="pr-[60px]">
-              <p className="text-[20px] text-[#E4E4E4] min-w-[70px]">
+              <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">
                 {maxLeverage}x
               </p>
               <p className="text-[14px] text-[#8E8E8E]">Leverage</p>
             </div>
             <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
             <div className="pr-[60px]">
-              <p className="text-[20px] text-[#E4E4E4] min-w-[70px]">
+              <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">
                 {desiredLtv}%
               </p>
               <p className="text-[14px] text-[#8E8E8E]">Safe LTV</p>
             </div>
-            <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
+            <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%] font-normal"></div>
             <div>
-              <p className="text-[20px] text-[#E4E4E4] min-w-[70px]">
+              <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">
                 {collateralToken.liqLtv}%
               </p>
               <p className="text-[14px] text-[#8E8E8E]">Liquidation LTV</p>
@@ -338,19 +345,19 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           </div>
 
           {/* chart */}
-          <div>
+          {/* <div>
             <img src={chart} alt="" />
-          </div>
+          </div> */}
         </div>
 
         {/* deposit part */}
         <div className="bg-white flex flex-col w-full h-fit items-center gap-[24px] bg-opacity-[2%] rounded-xl p-[32px]">
           <div className="flex w-full justify-between items-center">
-            <div className="flex flex-col gap-[4px]">
-              <p className="text-[24px] text-[#E4E4E4] font-semibold">
+            <div className="flex flex-col">
+              <p className="text-[24px] text-[#FFFFFF] font-normal">
                 Deposit
               </p>
-              <p className="text-[16px] text-[#8B8B8B]">
+              <p className="text-[15px] text-[#8B8B8B]">
                 Deposit assets, earn max yield
               </p>
             </div>
@@ -406,7 +413,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           />
 
           {/* deposit summary */}
-          <div className="flex text-[16px] w-full justify-between text-[#8E8E8E]">
+          {/* <div className="flex text-[16px] w-full justify-between text-[#8E8E8E]">
             <div className="flex items-center gap-[8px] w-fit">
               <p>Deposit amount</p>
               <img src={infoIcon} alt="" className="w-[16px]" />
@@ -414,7 +421,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             <div className="w-fit">
               <p>0 USDC ($0)</p>
             </div>
-          </div>
+          </div> */}
 
           {/* review section */}
           {showSummary && (
@@ -430,18 +437,18 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                     setShowSummary={setShowSummary}
                     amountCollateral={amountCollateral}
                     collateralToken={collateralToken}
+                    desiredLtv={desiredLtv}
                   />
                   <div>
-                    <Action
-                      text="Deposit"
+                    {userFromTokenAllowance.gte(amountCollateral) && <Action
+                      text={internalSwapData ? "Deposit" : "Fetching Routes..."}
                       token={fromToken}
                       amountToken={amountCollateral}
                       actionHandler={handleLeverage}
                       disabled={
-                        userFromTokenAllowance.lt(amountCollateral) ||
                         !internalSwapData
                       }
-                    />
+                    />}
                   </div>
                 </div>
               }

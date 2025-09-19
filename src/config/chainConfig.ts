@@ -15,7 +15,7 @@ const local: any = defineChain({
       webSocket: ["ws://127.0.0.1:8545"],
     },
   },
-  logo: "/logos/base.svg",
+  logo: "/logos/mainnet.svg",
   api: "http://localhost:5000",
   onboard: {
     amountNative: "1",

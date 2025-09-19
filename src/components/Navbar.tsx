@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useChainId } from "wagmi";
 import { chainConfig } from "../config/chainConfig";
 import logo from "../assets/logo.svg";
@@ -11,6 +11,10 @@ const Navbar = ({
   showDropdown: (bool: boolean) => void;
 }) => {
   const appChainId = useChainId();
+  const location = useLocation();
+
+  const isActive = (path: string) =>
+    location.pathname === path ? "text-white" : "text-[#C3C3C3]";
 
   return (
     <>
@@ -30,7 +34,7 @@ const Navbar = ({
             <Link to={"/products"}>
               <div className="cursor-pointer flex items-center justify-center gap-1">
                 <img src={logo} alt="" className="h-9 w-9" />
-                <span className="hidden md:inline-flex text-xl font-semibold">
+                <span className="hidden md:inline-flex text-xl font-medium">
                   Spiral Stake
                 </span>
               </div>
@@ -38,22 +42,27 @@ const Navbar = ({
           </div>
 
           {/* index */}
-          <div className="hidden lg:flex justify-start text-[16px] font-[400] items-center gap-10">
+          <div className="hidden lg:flex justify-start text-[16px] items-center gap-10">
             <Link to={"/products"}>
-              <div className="cursor-pointer text-center font-[500]">
+              <div
+                className={`cursor-pointer text-center hover:text-white ${isActive(
+                  "/products"
+                )}`}
+              >
                 Products
               </div>
             </Link>
             <Link to={"/portfolio"}>
-              <div className="cursor-pointer text-center text-[#C3C3C3] hover:text-white hover:font-[500]">
+              <div
+                className={`cursor-pointer text-center hover:text-white ${isActive(
+                  "/portfolio"
+                )}`}
+              >
                 Portfolio
               </div>
             </Link>
-            <Link
-              target="blank"
-              to="https://spiral-stake.gitbook.io/spiral-stake-docs"
-            >
-              <div className="cursor-pointer text-center text-[#C3C3C3] hover:text-white hover:font-[500]">
+            <Link target="blank" to="https://docs.spiralstake.xyz">
+              <div className="cursor-pointer text-center text-[#C3C3C3] hover:text-white">
                 Learn
               </div>
             </Link>
@@ -64,28 +73,23 @@ const Navbar = ({
             <div className="rounded-full flex justify-center items-center gap-2 overflow-hidden">
               <div className="cursor-pointer flex justify-start items-center gap-[4px]">
                 <div className=" relative overflow-hidden">
-                  <img
-                    className="w-[20px] h-[20px] rounded-full"
-                    src={chainConfig[appChainId].logo}
-                    alt=""
-                  />
+                  <div className="w-[21px] h-[21px]">
+                    <img
+                      className=""
+                      src={chainConfig[appChainId].logo}
+                      alt=""
+                    />
+                  </div>
                 </div>
                 <span className="hidden md:inline-flex text-[14px] font-[400]">
                   Mainnet
                 </span>
-                {/* <div>
-                  <img src={dropdown} alt="" className="h-3 w-3" /> 
-                </div> */}
               </div>
             </div>
             <div
               data-property-1="Default"
               className="h-8 p-2 rounded-full flex justify-start items-center gap-1.5 overflow-hidden"
-            >
-              {/* <div className="cursor-pointer inline-flex mr-3 flex-col justify-start items-start overflow-hidden">
-                <img src={bell} alt="" />
-              </div> Needs to be uncommented */}
-            </div>
+            ></div>
             <div>
               <ConnectWalletBtn />
             </div>
@@ -97,4 +101,3 @@ const Navbar = ({
 };
 
 export default Navbar;
-<div></div>;

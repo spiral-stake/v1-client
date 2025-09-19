@@ -1,28 +1,26 @@
-import { CollateralToken, Token } from "../types";
+import { CollateralToken, Token, TokenInfo } from "../types";
 
 interface CollateralTokensObject {
   [symbol: string]: CollateralToken;
 }
 
-interface TokenData {
-  [symbol: string]: {
-    image: string;
-    apy: string;
-  };
-}
-
 export const readCollateralTokens = async (chainId: number): Promise<CollateralToken[]> => {
-  const [addressesModule] = await Promise.all([
+  const [addressesModule, tokenInfoModule] = await Promise.all([
     import(`../addresses/${chainId}.json`) as Promise<{
       default: { collateralTokens: CollateralTokensObject };
+    }>,
+    import(`./tokenInfo.json`) as Promise<{
+      default: Record<string, TokenInfo>;
     }>,
   ]);
 
   const { collateralTokens } = addressesModule.default;
+  const tokenInfo = tokenInfoModule.default;
 
   return Object.keys(collateralTokens).map((tokenAddress) => {
     return {
       ...collateralTokens[tokenAddress],
+      info: tokenInfo[tokenAddress],
     };
   });
 };
@@ -47,15 +45,20 @@ export const readCollateralToken = async (
   chainId: number,
   tokenAddress: string
 ): Promise<CollateralToken> => {
-  const [addressesModule] = await Promise.all([
+  const [addressesModule, tokenInfoModule] = await Promise.all([
     import(`../addresses/${chainId}.json`) as Promise<{
       default: { collateralTokens: CollateralTokensObject };
+    }>,
+    import(`./tokenInfo.json`) as Promise<{
+      default: Record<string, TokenInfo>;
     }>,
   ]);
 
   const { collateralTokens } = addressesModule.default;
+  const tokenInfo = tokenInfoModule.default;
 
   return {
     ...collateralTokens[tokenAddress],
+    info: tokenInfo[tokenAddress],
   };
 };

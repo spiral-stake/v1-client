@@ -17,7 +17,7 @@ const PopupNotification = ({
         <img src={icon} alt="" className="w-7 h-7" />
         <div className="flex flex-col">
           <span className="text-base">{title}</span>
-          <span className="text-xs font-light">{text}</span>
+          <span className="text-xs">{text}</span>
         </div>
       </div>
       {link && (

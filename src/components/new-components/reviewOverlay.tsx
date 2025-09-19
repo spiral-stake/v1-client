@@ -5,6 +5,7 @@ import FlashLeverage from "../../contract-hooks/FlashLeverage";
 import ActionBtn from "../ActionBtn";
 import BigNumber from "bignumber.js";
 import Action from "../Action";
+import { calcLeverageApy, calcMaxLeverage } from "../../utils";
 
 const ReviewOverlay = ({
   setShowSummary,
@@ -13,6 +14,7 @@ const ReviewOverlay = ({
   handleApprove,
   token,
   completed,
+  desiredLtv
 }: {
   setShowSummary: React.Dispatch<React.SetStateAction<boolean>>;
   amountCollateral: string;
@@ -20,6 +22,7 @@ const ReviewOverlay = ({
   handleApprove: () => Promise<void>;
   token: Token;
   completed?: boolean;
+  desiredLtv: string
 }) => {
   return (
     <div className="flex flex-col p-[24px] backdrop-blur-2xl bg-white bg-opacity-[8%] rounded-xl gap-[20px] w-[500px] border-[1px] border-white border-opacity-[4%]">
@@ -48,16 +51,17 @@ const ReviewOverlay = ({
               collateralToken.name.length - 7
             )}${" "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 7,
-                    collateralToken.name.length - 4
-                  )}${" "}
+              collateralToken.name.length - 7,
+              collateralToken.name.length - 4
+            )}${" "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 4,
-                    collateralToken.name.length
-                  )}`}
+              collateralToken.name.length - 4,
+              collateralToken.name.length
+            )}`}
           />
-          <ReviewinfoTabs title="Estimated Gas Fee" info="" />
-          <ReviewinfoTabs info=" ~ APY" title="Estimated Yield" />
+          <ReviewinfoTabs title="Leverage" info={`${calcMaxLeverage(desiredLtv)}x`} />
+          <ReviewinfoTabs info={`${calcLeverageApy(collateralToken.impliedApy, collateralToken.borrowApy, desiredLtv)}% APY`} title="Estimated Yield" />
+          <ReviewinfoTabs title="Your LTV" info={`${desiredLtv}%`} />
         </div>
       </div>
       <div className="flex items-center gap-[8px]">
@@ -68,7 +72,7 @@ const ReviewOverlay = ({
           Cancel
         </button>
         <Action
-          text="Confirm deposit"
+          text="Approve"
           token={token}
           amountToken={amountCollateral}
           actionHandler={handleApprove}

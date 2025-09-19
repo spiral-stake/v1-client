@@ -16,7 +16,7 @@ in those cases you can use the static font files for Outfit:
   static/Outfit-ExtraLight.ttf
   static/Outfit-Light.ttf
   static/Outfit-Regular.ttf
-  static/Outfit-Medium.ttf
+  static/Outfit-medium.ttf
   static/Outfit-SemiBold.ttf
   static/Outfit-Bold.ttf
   static/Outfit-ExtraBold.ttf

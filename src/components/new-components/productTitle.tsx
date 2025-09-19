@@ -13,7 +13,7 @@ const ProductTitle = ({
         <img src={icon} alt="" className="w-[36px]" />
         <p>{title}</p>
       </div>
-      <div className="justify-start text-sm mt-2 text-stone-300 font-[Outfit] font-light leading-normal">
+      <div className="justify-start text-[15px] mt-2 text-[#B3B3B3] font-[Outfit] leading-normal">
         {subheading}
       </div>
     </div>

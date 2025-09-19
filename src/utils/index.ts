@@ -18,3 +18,10 @@ export function calcLeverageApy(collateralTokenApy: string, borrowApy: string, d
     .minus(BigNumber(borrowApy).multipliedBy(BigNumber(leverage).minus(1)))
     .toFixed(2);
 }
+
+export function capitalize(str: string) {
+  return str
+    .split(" ")
+    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}

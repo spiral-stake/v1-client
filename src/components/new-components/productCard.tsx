@@ -37,10 +37,10 @@ const ProductCard = ({
           </div>
           <div className="flex flex-col gap-[4px]">
             <div className="flex gap-[8px] items-center">
-              <p className="text-[16px] font-[500]">{name}</p>
+              <p className="text-[16px] font-medium">{name}</p>
               {/* <img src={infoIcon} alt="" className="w-[16px]" /> */}
             </div>
-            <div className="flex items-center text-[14px] text-[#CCCCCC]">
+            <div className="flex items-center text-[13.4px] text-[#CCCCCC]">
               <p>{maturity} ({daysLeft(maturity)} days)</p>
               <p></p>
             </div>
@@ -57,13 +57,13 @@ const ProductCard = ({
       <div className="flex justify-between items-center">
         <div>
           <p className="text-[12px] text-[#CCCCCC]">Yield source</p>
-          <p className="text-[16px] text-[#E4E4E4]">{yieldSource}</p>
+          <p className="text-[16px] text-[#E4E4E4] font-normal">{yieldSource}</p>
         </div>
         <div>
-          <p className="text-[12px] text-[#CCCCCC]">Underlying collateral</p>
+          <p className="text-[12px] text-right text-[#CCCCCC]">Underlying collateral</p>
           <div className="flex justify-end items-center gap-[2px]">
-            <img src={underlyingCollatateralIcon} alt="" className="w-[16px]" />
-            <p className="text-[16px] text-[#E4E4E4]">
+            {/* <img src={underlyingCollatateralIcon} alt="" className="w-[16px]" /> */}
+            <p className="text-[16px] text-[#E4E4E4] font-normal">
               {underlyingCollatateralName}
             </p>
           </div>
@@ -74,7 +74,7 @@ const ProductCard = ({
         onClick={handleClick}
         className="flex cursor-pointer justify-center items-center p-[8.5px] bg-white bg-opacity-[8%] rounded-xl group-hover:bg-white"
       >
-        <p className="text-[12px] text-[#CCCCCC] group-hover:text-gray-950">
+        <p className="text-[12px] text-[#FFFFFF] group-hover:text-gray-950">
           Deposit
         </p>
       </div>

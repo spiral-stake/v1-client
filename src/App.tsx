@@ -48,7 +48,7 @@ function App() {
   const showDropdown = (bool: boolean) => setDropDown(bool);
 
   return (
-    <div className="app font-[Outfit] relative overflow-hidden ">
+    <div className="app font-[Outfit] font-[340] relative overflow-hidden ">
       <Toaster />
       {!dropdown ? (
         <Navbar showDropdown={showDropdown} />

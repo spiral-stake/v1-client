@@ -27,6 +27,7 @@ export async function callSDK<Data>(path: string, params: Record<string, any> = 
 
 export async function getExternalSwapData(
   chainId: number,
+  slippage: number,
   flashLeverageAddress: string,
   fromToken: Token,
   amount: string,
@@ -36,7 +37,7 @@ export async function getExternalSwapData(
 
   const params = {
     receiver: flashLeverageAddress,
-    slippage: 0.001, // 0.1%
+    slippage,
     tokenIn: fromToken.address,
     tokenOut: collateralToken.address,
     amountIn: parseUnits(amount, fromToken.decimals),
@@ -61,6 +62,7 @@ export async function getExternalSwapData(
 
 export async function getInternalSwapData(
   chainId: number,
+  slippage: number,
   flashLeverage: FlashLeverage,
   collateralToken: CollateralToken,
   desiredLtv: string,
@@ -77,7 +79,7 @@ export async function getInternalSwapData(
 
   const params = {
     receiver: flashLeverage.flashLeverageCore.address,
-    slippage: 0.001, // 0.1%
+    slippage,
     tokenIn: collateralToken.loanToken.address,
     tokenOut: collateralToken.address,
     amountIn: amountLoan,
@@ -102,6 +104,7 @@ export async function getInternalSwapData(
 
 export async function getInternalReswapData(
   chainId: number,
+  slippage: number,
   flashLeverage: FlashLeverage,
   collateralToken: CollateralToken,
   amountLeveragedCollateral: BigNumber
@@ -110,7 +113,7 @@ export async function getInternalReswapData(
 
   const params = {
     receiver: flashLeverage.flashLeverageCore.address,
-    slippage: 0.001, // 0.1%
+    slippage,
     tokenIn: collateralToken.address,
     tokenOut: collateralToken.loanToken.address,
     amountIn: String(parseUnits(String(amountLeveragedCollateral), collateralToken.decimals)),

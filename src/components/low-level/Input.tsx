@@ -29,7 +29,7 @@ const Input = ({
       disabled={disabled}
       placeholder={placeholder}
       name={name}
-      className="justify-start text-white text-[16px] font-normal font-['Outfit'] bg-transparent outline-none"
+      className="justify-start text-white flex-grow text-[20px] font-normal font-['Outfit'] bg-transparent outline-none"
     />
   );
 };

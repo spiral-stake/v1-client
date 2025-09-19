@@ -19,7 +19,7 @@ const BtnFull = ({
     <button
       disabled={disabled}
       onClick={onClick}
-      className="flex justify-center items-center border-[1px] border-white border-opacity-[14%] bg-white text-black font-[500] disabled:bg-opacity-[8%] text-sm disabled:font-light min-w-[80px] h-10 disabled:text-white px-2.5 py-2 rounded-full outline-none w-full disabled:bg-neutral-700 disabled:cursor-not-allowed"
+      className="flex justify-center items-center border-[1px] border-white border-opacity-[14%] bg-white text-black font-normal disabled:bg-opacity-[8%] text-sm disabled:font-light min-w-[80px] h-10 disabled:text-white px-2.5 py-2 rounded-full outline-none w-full disabled:bg-neutral-700 disabled:cursor-not-allowed"
     >
       {!btnLoading ? (
         !completed ? (
