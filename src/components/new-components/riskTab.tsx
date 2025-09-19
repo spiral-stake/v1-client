@@ -30,27 +30,29 @@ const RiskTab = ({ risk }: { risk: string }) => {
 
   return (
     <div
-      className={`border-[1px] max-w-[315px] border-white border-opacity-[6%] p-[12px] gap-[8px] rounded-xl cursor-pointer transition-all duration-300 ${risk}`}
+      className={`flex flex-col border-[1px] max-w-[500px] border-white border-opacity-[6%] p-[12px] gap-[12px] rounded-xl cursor-pointer transition-all duration-300 ${risk}`}
     >
       <div className="flex justify-between items-center text-[#E4E4E4]">
-        <div className="flex items-center gap-[2px]">
-          {(() => {
-            switch (risk) {
-              case "All":
-                return <img src={All} alt="" />;
-              case "High":
-                return <img src={High} alt="" />;
-              case "Medium":
-                return <img src={Medium} alt="" />;
-              case "Low":
-                return <img src={Low} alt="" />;
-              default:
-                return <p className="text-[14px] font-semibold">Unknown</p>;
-            }
-          })()}
+        <div className="flex items-center gap-[8px]">
+          <div>
+            {(() => {
+              switch (risk) {
+                case "All":
+                  return <img src={All} alt="" />;
+                case "High":
+                  return <img src={High} alt="" />;
+                case "Medium":
+                  return <img src={Medium} alt="" />;
+                case "Low":
+                  return <img src={Low} alt="" />;
+                default:
+                  return <p className="text-[14px] font-semibold">Unknown</p>;
+              }
+            })()}
+          </div>
           <p className="text-[14px] font-semibold">{risk}</p>
         </div>
-        <div className="text-[12px]">~ {apy} APY</div>
+        <div className="text-[12px]">~ {apy}% APY</div>
       </div>
       <div>
         <div>
