@@ -39,7 +39,7 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   ${collateralToken.name.slice(
                     collateralToken.name.length - 7,
                     collateralToken.name.length - 4
-                  )}${" "}
+                  )},${" "}
                   ${collateralToken.name.slice(
                     collateralToken.name.length - 4,
                     collateralToken.name.length

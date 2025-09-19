@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import infoIcon from "../../assets/icons/infoIcon.svg";
+import { daysLeft } from "../../utils/daysLeft";
 
 const ProductCard = ({
   icon,
@@ -36,11 +37,12 @@ const ProductCard = ({
           </div>
           <div className="flex flex-col gap-[4px]">
             <div className="flex gap-[8px] items-center">
-              <p className="text-[16px] font-semibold">{name}</p>
+              <p className="text-[16px] font-[500]">{name}</p>
               {/* <img src={infoIcon} alt="" className="w-[16px]" /> */}
             </div>
-            <div>
-              <p className="text-[14px] text-[#CCCCCC]">{maturity}</p>
+            <div className="flex items-center text-[14px] text-[#CCCCCC]">
+              <p>{maturity} ({daysLeft(maturity)} days)</p>
+              <p></p>
             </div>
           </div>
         </div>

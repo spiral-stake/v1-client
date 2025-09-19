@@ -1,5 +1,6 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import BtnFull from "./low-level/BtnFull";
+import ConnectBtnFull from "./new-components/connectBtnFull";
 
 const ConnectWalletBtn = () => {
   return (
@@ -16,15 +17,15 @@ const ConnectWalletBtn = () => {
         const connected = ready && account && chain;
 
         if (!connected) {
-          return <BtnFull onClick={openConnectModal} text={"Connect"} />;
+          return <ConnectBtnFull onClick={openConnectModal} text={"Connect"} />;
         }
 
         if (chain.unsupported) {
-          return <BtnFull text={"Wrong Network"} onClick={openChainModal} />;
+          return <ConnectBtnFull text={"Wrong Network"} onClick={openChainModal} />;
         }
 
         return (
-          <BtnFull text={account.displayName} onClick={openAccountModal} />
+          <ConnectBtnFull text={account.displayName} onClick={openAccountModal} />
         );
       }}
     </ConnectButton.Custom>
