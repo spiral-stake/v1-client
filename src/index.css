@@ -21,38 +21,5 @@ body {
 .app {
   min-height: 100vh;
   background: linear-gradient(180deg, #211e53 0%, #0b0a13 100%);
-
-  /* Options */
-  /* background: linear-gradient(180deg, #211e53 0%, #0b0a13 100%); */
-  /* background: linear-gradient(180deg, #01152a 1.93%, #03050d 28.18%); */
-  /* background: linear-gradient(180deg, #462ec6 0%, #0b0a13 100%); */
   color: white;
-}
-
-/* .all:hover {
-  background: linear-gradient(90deg, rgba(242, 217, 103, 0.1), rgba(153, 153, 153, 0.1));
-} */
-
-.all {
-  background: linear-gradient(90deg, rgba(242, 217, 103, 0.1), rgba(153, 153, 153, 0.1));
-  border: 1px;
-  border-color: rgba(255, 255, 255, 0.96);
-}
-
-.high {
-  background: linear-gradient(90deg, rgba(255, 60, 60, 0.1), rgba(153, 153, 153, 0.1));
-  border: 1px;
-  border-color: rgba(255, 255, 255, 0.96);
-}
-
-.medium {
-  background: linear-gradient(90deg, rgba(242, 217, 103, 0.1), rgba(153, 153, 153, 0.1));
-  border: 1px;
-  border-color: rgba(255, 255, 255, 0.96);
-}
-
-.low {
-  background: linear-gradient(90deg, rgba(63, 255, 20, 0.1), rgba(153, 153, 153, 0.1));
-  border: 1px;
-  border-color: rgba(255, 255, 255, 0.96);
 }
