@@ -1,64 +1,60 @@
-import { useEffect, useState } from "react";
-import all from "../../assets/icons/allRisk.svg";
-import high from "../../assets/icons/highRisk.svg";
-import medium from "../../assets/icons/mediumRisk.svg";
-import low from "../../assets/icons/lowRisk.svg";
+import React, { useEffect, useState } from "react";
 import { capitalize } from "../../utils";
 
-const RiskTab = ({ risk }: { risk: string }) => {
-  const [apy, setApy] = useState(0);
-  const [text, setText] = useState("");
+const RiskTab = ({
+  icon,
+  risk,
+  apy,
+  text,
+  setRisk,
+  currentRisk,
+  color,
+}: {
+  icon: string;
+  risk: string;
+  apy: string;
+  text: string;
+  setRisk: React.Dispatch<React.SetStateAction<string>>;
+  currentRisk: string;
+  color: string;
+}) => {
+  const [selected, setSelected] = useState(false);
+  const newcolor = color;
 
   useEffect(() => {
-    if (risk == "all") {
-      setApy(25);
-      setText("A combined view of all strategies across the risk spectrum");
-    } else if (risk == "high") {
-      setApy(55);
-      setText("Stablecoins that have with higher volatility exposure compared to the rest");
-    } else if (risk == "medium") {
-      setApy(35);
-      setText(
-        "Stablecoins backed by DeFi mechanisms like CDPs & funding rate arbitrage"
-      );
-    } else if (risk == "low") {
-      setApy(12);
-      setText(
-        "Stablecoins backed by highly credible collateral such as T-bills"
-      );
-    }
-  });
+    setSelected(currentRisk === risk);
+  }, [currentRisk, risk]);
 
   return (
     <div
-      className={`flex flex-col border-[1px] max-w-[500px] border-white border-opacity-[6%] p-[12px] gap-[10px] rounded-xl cursor-pointer transition-all duration-300 ${risk}`}
+      onClick={() => setRisk(risk)}
+      style={{
+        background: selected
+          ? `linear-gradient(90deg, ${color}, rgba(153,153,153,0.1))`
+          : "transparent",
+        transition: "background 0.3s",
+      }}
+      onMouseEnter={(e) =>
+        (e.currentTarget.style.background = `linear-gradient(90deg, ${color}, rgba(153,153,153,0.1))`)
+      }
+      onMouseLeave={(e) =>
+        (e.currentTarget.style.background = selected
+          ? `linear-gradient(90deg, ${color}, rgba(153,153,153,0.1))`
+          : "transparent")
+      }
+      className={`flex flex-col border-[1px] max-w-[500px] border-white border-opacity-[6%] p-[12px] gap-[10px] rounded-xl cursor-pointer transition-all duration-300 hover:bg-gradient-to-r to-[rgba(153,153,153,0.1)] from-[${color}]`}
     >
       <div className="flex justify-between items-center text-[#E4E4E4]">
         <div className="flex items-center gap-[8px]">
           <div>
-            {(() => {
-              switch (risk) {
-                case "all":
-                  return <img src={all} alt="" />;
-                case "high":
-                  return <img src={high} alt="" />;
-                case "medium":
-                  return <img src={medium} alt="" />;
-                case "low":
-                  return <img src={low} alt="" />;
-                default:
-                  return <p className="text-[14px] font-semibold">Unknown</p>;
-              }
-            })()}
+            <img src={icon} alt="" />
           </div>
           <p className="text-[14px] font-normal">{capitalize(risk)}</p>
         </div>
         <div className="text-[12px]">~ {apy}% APY</div>
       </div>
       <div>
-        <div>
-          <p className="text-[#C8CBD7] text-[12px]">{text}</p>
-        </div>
+        <p className="text-[#C8CBD7] text-[12px]">{text}</p>
       </div>
     </div>
   );
