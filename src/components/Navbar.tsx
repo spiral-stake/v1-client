@@ -29,43 +29,45 @@ const Navbar = ({
         </div>
 
         <div className="flex w-full justify-between items-center">
-          {/* logo part */}
-          <div className="flex justify-start items-center gap-3">
-            <Link to={"/products"}>
-              <div className="cursor-pointer flex items-center justify-center gap-1">
-                <img src={logo} alt="" className="h-9 w-9" />
-                <span className="hidden md:inline-flex text-xl font-medium">
-                  Spiral Stake
-                </span>
-              </div>
-            </Link>
-          </div>
+          <div className="w-[800px] flex items-center justify-between">
+            {/* logo part */}
+            <div className="flex justify-start items-center gap-3">
+              <Link to={"/products"}>
+                <div className="cursor-pointer flex items-center justify-center gap-1">
+                  <img src={logo} alt="" className="h-9 w-9" />
+                  <span className="hidden md:inline-flex text-xl font-medium">
+                    Spiral Stake
+                  </span>
+                </div>
+              </Link>
+            </div>
 
-          {/* index */}
-          <div className="hidden lg:flex justify-start text-[16px] items-center gap-10">
-            <Link to={"/products"}>
-              <div
-                className={`cursor-pointer text-center hover:text-white ${isActive(
-                  "/products"
-                )}`}
-              >
-                Products
-              </div>
-            </Link>
-            <Link to={"/portfolio"}>
-              <div
-                className={`cursor-pointer text-center hover:text-white ${isActive(
-                  "/portfolio"
-                )}`}
-              >
-                Portfolio
-              </div>
-            </Link>
-            <Link target="blank" to="https://docs.spiralstake.xyz">
-              <div className="cursor-pointer text-center text-[#C3C3C3] hover:text-white">
-                Learn
-              </div>
-            </Link>
+            {/* index */}
+            <div className="hidden lg:flex justify-start text-[16px] items-center gap-10">
+              <Link to={"/products"}>
+                <div
+                  className={`cursor-pointer text-center hover:text-white ${isActive(
+                    "/products"
+                  )}`}
+                >
+                  Products
+                </div>
+              </Link>
+              <Link to={"/portfolio"}>
+                <div
+                  className={`cursor-pointer text-center hover:text-white ${isActive(
+                    "/portfolio"
+                  )}`}
+                >
+                  Portfolio
+                </div>
+              </Link>
+              <Link target="blank" to="https://docs.spiralstake.xyz">
+                <div className="cursor-pointer text-center text-[#C3C3C3] hover:text-white">
+                  Learn
+                </div>
+              </Link>
+            </div>
           </div>
 
           {/* chain and login */}

@@ -5,7 +5,7 @@ import { LeveragePosition, Position } from "../types";
 import { useAccount, useChainId } from "wagmi";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import LeveragePositionCard from "../components/LeveragePositionCard";
-import portfolioChart from "../assets/portfolioChart.svg";
+import portfolioChart from "../assets/portfolioChart2.svg";
 
 const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [positions, setPositions] = useState<Position[]>([]);
@@ -16,6 +16,17 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
   const { address } = useAccount();
   const chainId = useChainId();
+
+  const sum = leveragePositions.reduce(
+    (total, current) =>
+      total +
+      Number(
+        current.amountCollateral.multipliedBy(
+          current.collateralToken.valueInUsd
+        )
+      ),
+    0
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -58,8 +69,14 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       ) : leveragePositions.length ? (
         <>
           {/* chart */}
-          <div>
-            <img src={portfolioChart} alt="" className="w-full"/>
+          <div className="w-full flex justify-between p-[24px] gap-[200px] bg-white bg-opacity-[4%] rounded-[20px] border-[1px] border-white border-opacity-[6%]">
+            <div className="flex flex-col">
+              <p className="text-[14px] text-[#B6B6B6]">My positions</p>
+              <p className="text-[24px] font-[500] text-[#E4E4E4]">
+                ${sum.toFixed(2)}
+              </p>
+            </div>
+            <img src={portfolioChart} alt="" className="w-full" />
           </div>
 
           {/* mobile */}
