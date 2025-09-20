@@ -23,6 +23,7 @@ export interface CollateralToken extends Token {
 export interface TokenInfo {
   underlyingCollateral: string;
   yieldSource: string;
+  riskProfile: string;
 }
 
 export interface LeveragePosition {

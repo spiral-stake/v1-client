@@ -29,24 +29,30 @@ body {
   color: white;
 }
 
-.all:hover {
+/* .all:hover {
   background: linear-gradient(90deg, rgba(242, 217, 103, 0.1), rgba(153, 153, 153, 0.1));
-}
+} */
 
-.all:focus {
+.all {
   background: linear-gradient(90deg, rgba(242, 217, 103, 0.1), rgba(153, 153, 153, 0.1));
   border: 1px;
   border-color: rgba(255, 255, 255, 0.96);
 }
 
-.high:hover {
+.high {
   background: linear-gradient(90deg, rgba(255, 60, 60, 0.1), rgba(153, 153, 153, 0.1));
+  border: 1px;
+  border-color: rgba(255, 255, 255, 0.96);
 }
 
-.medium:hover {
+.medium {
   background: linear-gradient(90deg, rgba(242, 217, 103, 0.1), rgba(153, 153, 153, 0.1));
+  border: 1px;
+  border-color: rgba(255, 255, 255, 0.96);
 }
 
-.low:hover {
+.low {
   background: linear-gradient(90deg, rgba(63, 255, 20, 0.1), rgba(153, 153, 153, 0.1));
+  border: 1px;
+  border-color: rgba(255, 255, 255, 0.96);
 }
