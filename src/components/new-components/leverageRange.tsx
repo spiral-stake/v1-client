@@ -1,11 +1,16 @@
+import BtnFull from "../low-level/BtnFull";
+import Slippage from "./slippage";
+
 const LeverageRange = ({
-  setShowLTV,
+  slippage,
+  setSlippage,
   maxLeverage,
   maxLtv,
   ltv,
   handleLtvSlider,
 }: {
-  setShowLTV: React.Dispatch<React.SetStateAction<boolean>>;
+  slippage: number;
+  setSlippage: React.Dispatch<React.SetStateAction<number>>;
   maxLeverage: string;
   ltv: string;
   maxLtv: string;
@@ -39,6 +44,9 @@ const LeverageRange = ({
           <p>Moderate</p>
           <p>Aggressive</p>
         </div>
+      </div>
+      <div>
+        <Slippage slippage={slippage} setSlippage={setSlippage} />
       </div>
     </form>
   );
