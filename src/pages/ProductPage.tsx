@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PageTitle from "../components/low-level/PageTitle";
 import LTVSlider from "../components/LTVSlider";
 import BigNumber from "bignumber.js";
@@ -34,9 +34,11 @@ import LeverageRange from "../components/new-components/leverageRange";
 import Overlay from "../components/low-level/Overlay";
 import ReviewOverlay from "../components/new-components/reviewOverlay";
 import { HoverInfo } from "../components/low-level/HoverInfo";
-
+import { toastSuccess } from "../utils/toastWrapper";
+import InvestmentPlans from "../components/new-components/invetmentPlans";
 
 const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
+  const [slippage, setSlippage] = useState(0.005);
   const [showLTV, setShowLTV] = useState(false);
   const [collateralToken, setCollateralToken] = useState<CollateralToken>();
   const [fromToken, setFromToken] = useState<Token>();
@@ -65,6 +67,8 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const appChainId = useChainId();
   const { chainId, address } = useAccount();
   const navigate = useNavigate();
+
+  const ltvRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function initialize() {
@@ -149,7 +153,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           setSwapData(
             await getInternalSwapData(
               appChainId,
-              0.001,
+              slippage,
               flashLeverage,
               collateralToken,
               desiredLtv,
@@ -159,7 +163,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
         } else {
           const _externalSwapData = await getExternalSwapData(
             appChainId,
-            0.001,
+            slippage,
             flashLeverage.address,
             fromToken,
             amountCollateral,
@@ -168,7 +172,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           setSwapData(
             await getInternalSwapData(
               appChainId,
-              0.001,
+              slippage,
               flashLeverage,
               collateralToken,
               desiredLtv,
@@ -184,6 +188,19 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
     fetchSwapData();
   }, [showSummary]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ltvRef.current && !ltvRef.current.contains(event.target as Node)) {
+        setShowLTV(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const updateUserCollateralBalance = async () => {
     if (!address || !fromToken) return;
@@ -240,6 +257,10 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           amountCollateral,
           internalSwapData
         );
+        toastSuccess(
+          `Deposited ${amountCollateral} USDC succesfully!`,
+          `You’ve deposited ${amountCollateral} USDC into ${collateralToken.symbol}. Your leveraged position is now earning yield.`
+        );
       } else {
         if (!externalSwapData) return;
 
@@ -251,6 +272,10 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           externalSwapData,
           collateralToken,
           internalSwapData
+        );
+        toastSuccess(
+          `Deposited ${amountCollateral} USDC succesfully!`,
+          `You’ve deposited ${amountCollateral} USDC into ${collateralToken.symbol}. Your leveraged position is now earning yield.`
         );
       }
     } catch (e) {
@@ -295,17 +320,23 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           <div className="">
             <ProductTitle
               icon={`/tokens/${collateralToken.symbol}.svg`}
-              title={`${collateralToken.symbol.split("-")[0]}-${collateralToken.symbol.split("-")[1]
-                } `}
-              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${collateralToken.symbol.split("-")[0]
-                }-${collateralToken.symbol.split("-")[1]
-                } for maximized returns on your idle holdings.`}
+              title={`${collateralToken.symbol.split("-")[0]}-${
+                collateralToken.symbol.split("-")[1]
+              } `}
+              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${
+                collateralToken.symbol.split("-")[0]
+              }-${
+                collateralToken.symbol.split("-")[1]
+              } for maximized returns on your idle holdings.`}
             />
           </div>
 
           {/* deposit info */}
-          <div className="flex gap-[13px] items-center">
-            <div className="pr-[60px]">
+          <div
+            className="grid grid-cols-[160px_auto_160px_auto_160px_auto_160px]
+ grid-rows-1 gap-[13px] items-center"
+          >
+            <div className="flex flex-col pr-[60px]">
               <div className="flex items-center gap-1">
                 <p className="text-[20px] text-[#E4E4E4] font-normal">
                   {calcLeverageApy(
@@ -315,9 +346,15 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   )}
                   %
                 </p>
-                <HoverInfo content={<LeverageBreakdown collateralTokenApy={collateralToken.impliedApy}
-                  borrowApy={collateralToken.borrowApy}
-                  maxLeverage={maxLeverage} />} />
+                <HoverInfo
+                  content={
+                    <LeverageBreakdown
+                      collateralTokenApy={collateralToken.impliedApy}
+                      borrowApy={collateralToken.borrowApy}
+                      maxLeverage={maxLeverage}
+                    />
+                  }
+                />
               </div>
               <p className="text-[14px] text-[#8E8E8E]">Max APY</p>
             </div>
@@ -344,25 +381,24 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             </div>
           </div>
 
-          {/* chart */}
-          {/* <div>
-            <img src={chart} alt="" />
-          </div> */}
+        {/* investment plans */}
+        <div>
+          <InvestmentPlans collateralToken={collateralToken} desiredLtv={desiredLtv} flashLeverage={flashLeverage}/>
+        </div>
+
         </div>
 
         {/* deposit part */}
         <div className="bg-white flex flex-col w-full h-fit items-center gap-[24px] bg-opacity-[2%] rounded-xl p-[32px]">
           <div className="flex w-full justify-between items-center">
             <div className="flex flex-col">
-              <p className="text-[24px] text-[#FFFFFF] font-normal">
-                Deposit
-              </p>
+              <p className="text-[24px] text-[#FFFFFF] font-normal">Deposit</p>
               <p className="text-[15px] text-[#8B8B8B]">
                 Deposit assets, earn max yield
               </p>
             </div>
             <div className="flex flex-col gap-[4px] items-end">
-              <div className="flex items-center gap-[8px]">
+              <div ref={ltvRef} className="flex items-center gap-[8px]">
                 <img
                   src={setting}
                   alt=""
@@ -372,7 +408,8 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 {showLTV && (
                   <div className="absolute  top-[215px] z-50 right-[97px]">
                     <LeverageRange
-                      setShowLTV={setShowLTV}
+                      slippage={slippage}
+                      setSlippage={setSlippage}
                       maxLeverage={maxLeverage}
                       maxLtv={collateralToken.maxLtv}
                       ltv={desiredLtv}
@@ -440,15 +477,17 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                     desiredLtv={desiredLtv}
                   />
                   <div>
-                    {userFromTokenAllowance.gte(amountCollateral) && <Action
-                      text={internalSwapData ? "Deposit" : "Fetching Routes..."}
-                      token={fromToken}
-                      amountToken={amountCollateral}
-                      actionHandler={handleLeverage}
-                      disabled={
-                        !internalSwapData
-                      }
-                    />}
+                    {userFromTokenAllowance.gte(amountCollateral) && (
+                      <Action
+                        text={
+                          internalSwapData ? "Deposit" : "Fetching Routes..."
+                        }
+                        token={fromToken}
+                        amountToken={amountCollateral}
+                        actionHandler={handleLeverage}
+                        disabled={!internalSwapData}
+                      />
+                    )}
                   </div>
                 </div>
               }
