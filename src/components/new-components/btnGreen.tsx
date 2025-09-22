@@ -1,6 +1,6 @@
-const BtnGreen = ({text}:{text:string}) => {
+const BtnGreen = ({ text }: { text: string }) => {
   return (
-    <div className=" bg-white w-[66px] bg-opacity-[5%] p-[8px] rounded-[4px]">{text}</div>
+    <div className="bg-white w-fit bg-opacity-[5%] p-[8px] rounded-[4px]">{text}</div>
   );
 };
 

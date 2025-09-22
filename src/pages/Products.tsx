@@ -34,7 +34,7 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           />
           <RiskTab
             risk="high"
-            apy="55"
+
             icon={highRisk}
             text="Involves stablecoin’s with higher volatility exposure."
             setRisk={setRisk}
@@ -43,7 +43,7 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           />
           <RiskTab
             risk="medium"
-            apy="35"
+
             icon={mediumRisk}
             text="Stablecoins backed by DeFi mechanisms like CDPs & funding rate arbitrage"
             setRisk={setRisk}
@@ -52,7 +52,7 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           />
           <RiskTab
             risk="low"
-            apy="12"
+
             icon={lowRisk}
             text="Stablecoins backed by highly credible collateral such as T-bills"
             setRisk={setRisk}
@@ -86,13 +86,13 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   collateralToken.name.length - 7
                 )}${" "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 7,
-                    collateralToken.name.length - 4
-                  )}${", "}
+                  collateralToken.name.length - 7,
+                  collateralToken.name.length - 4
+                )}${", "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 4,
-                    collateralToken.name.length
-                  )}`}
+                  collateralToken.name.length - 4,
+                  collateralToken.name.length
+                )}`}
                 underlyingCollatateralIcon={`/tokens/${collateralToken.symbol}.svg`}
                 underlyingCollatateralName={
                   collateralToken.info.underlyingCollateral

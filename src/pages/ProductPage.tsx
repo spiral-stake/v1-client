@@ -82,7 +82,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     }
 
     initialize();
-  }, []);
+  }, [collateralTokenAddress]);
 
   useEffect(() => {
     if (!fromToken || !address) return;
@@ -320,14 +320,11 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           <div className="">
             <ProductTitle
               icon={`/tokens/${collateralToken.symbol}.svg`}
-              title={`${collateralToken.symbol.split("-")[0]}-${
-                collateralToken.symbol.split("-")[1]
-              } `}
-              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${
-                collateralToken.symbol.split("-")[0]
-              }-${
-                collateralToken.symbol.split("-")[1]
-              } for maximized returns on your idle holdings.`}
+              title={`${collateralToken.symbol.split("-")[0]}-${collateralToken.symbol.split("-")[1]
+                } `}
+              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${collateralToken.symbol.split("-")[0]
+                }-${collateralToken.symbol.split("-")[1]
+                } for maximized returns on your idle holdings.`}
             />
           </div>
 
@@ -381,10 +378,10 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             </div>
           </div>
 
-        {/* investment plans */}
-        <div>
-          <InvestmentPlans collateralToken={collateralToken} desiredLtv={desiredLtv} flashLeverage={flashLeverage}/>
-        </div>
+          {/* investment plans */}
+          <div>
+            <InvestmentPlans collateralToken={collateralToken} desiredLtv={desiredLtv} flashLeverage={flashLeverage} />
+          </div>
 
         </div>
 
