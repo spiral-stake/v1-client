@@ -10,7 +10,7 @@ const Slippage = ({
   return (
     <div className="flex flex-col gap-[8px]">
       <div>
-        <p>Slippage</p>
+        <p className="text-[14px]">Slippage</p>
       </div>
       <div className="flex items-center justify-around p-[4px] rounded-[10px] border-[1px] border-white border-opacity-[10%]">
         <SlippageTab

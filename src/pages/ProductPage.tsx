@@ -12,7 +12,12 @@ import TokenAmount from "../components/TokenAmount";
 import APYInfo from "../components/InfoSection";
 import LeverageBreakdown from "../components/LeverageBreakdown";
 import Action from "../components/Action";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import SectionOverlay from "../components/low-level/SectionOverlay";
 import lockIcon from "../assets/icons/lock-svgrepo-com.svg";
 import closeIcon from "../assets/icons/close.svg";
@@ -36,14 +41,21 @@ import ReviewOverlay from "../components/new-components/reviewOverlay";
 import { HoverInfo } from "../components/low-level/HoverInfo";
 import { toastSuccess } from "../utils/toastWrapper";
 import InvestmentPlans from "../components/new-components/invetmentPlans";
+import SlippageRange from "../components/new-components/slippageRange";
+import { useQuery } from "wagmi/query";
 
 const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
-  const [slippage, setSlippage] = useState(0.005);
+  const [slippage, setSlippage] = useState(0.001);
+  const [showSlippage, setShowSlippage] = useState(false);
   const [showLTV, setShowLTV] = useState(false);
   const [collateralToken, setCollateralToken] = useState<CollateralToken>();
   const [fromToken, setFromToken] = useState<Token>();
   const [amountCollateral, setAmountCollateral] = useState("");
-  const [desiredLtv, setDesiredLtv] = useState("");
+  const [searchParams] = useSearchParams();
+  const leverage = searchParams.get("leverage")
+  const [desiredLtv, setDesiredLtv] = useState(
+    Number(leverage) > 0 ? String(leverage) : ""
+  );
   const [maxLeverage, setMaxLeverage] = useState("");
   const [showSummary, setShowSummary] = useState(false);
   const [userFromTokenBalance, setUserFromTokenBalance] = useState<BigNumber>(
@@ -69,6 +81,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const navigate = useNavigate();
 
   const ltvRef = useRef<HTMLDivElement>(null);
+  const slippageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function initialize() {
@@ -78,7 +91,9 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
       setCollateralToken({ ...collateralToken });
       setFromToken({ ...flashLeverage.usdc });
-      setDesiredLtv(collateralToken.safeLtv);
+      setDesiredLtv(
+        Number(leverage) > 0 ? String(leverage) : collateralToken.safeLtv
+      );
     }
 
     initialize();
@@ -190,15 +205,31 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   }, [showSummary]);
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleLTVClickOutside(event: MouseEvent) {
       if (ltvRef.current && !ltvRef.current.contains(event.target as Node)) {
         setShowLTV(false);
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleLTVClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleLTVClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    function handleSlippageClickOutside(event: MouseEvent) {
+      if (
+        slippageRef.current &&
+        !slippageRef.current.contains(event.target as Node)
+      ) {
+        setShowSlippage(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleSlippageClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleSlippageClickOutside);
     };
   }, []);
 
@@ -320,18 +351,33 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           <div className="">
             <ProductTitle
               icon={`/tokens/${collateralToken.symbol}.svg`}
-              title={`${collateralToken.symbol.split("-")[0]}-${collateralToken.symbol.split("-")[1]
-                } `}
-              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${collateralToken.symbol.split("-")[0]
-                }-${collateralToken.symbol.split("-")[1]
-                } for maximized returns on your idle holdings.`}
+              title={`${collateralToken.symbol.split("-")[0]}-${
+                collateralToken.symbol.split("-")[1]
+              } `}
+              maturity={`${collateralToken.name.slice(
+                collateralToken.name.length - 9,
+                collateralToken.name.length - 7
+              )}${" "}
+                  ${collateralToken.name.slice(
+                    collateralToken.name.length - 7,
+                    collateralToken.name.length - 4
+                  )}${" "}
+                  ${collateralToken.name.slice(
+                    collateralToken.name.length - 4,
+                    collateralToken.name.length
+                  )}`}
+              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${
+                collateralToken.symbol.split("-")[0]
+              }-${
+                collateralToken.symbol.split("-")[1]
+              } for maximized returns on your idle holdings.`}
             />
           </div>
 
           {/* deposit info */}
           <div
             className="grid grid-cols-[160px_auto_160px_auto_160px_auto_160px]
- grid-rows-1 gap-[13px] items-center"
+ grid-rows-1 gap-[13px] cursor-default items-center"
           >
             <div className="flex flex-col pr-[60px]">
               <div className="flex items-center gap-1">
@@ -356,10 +402,31 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               <p className="text-[14px] text-[#8E8E8E]">Max APY</p>
             </div>
             <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
-            <div className="pr-[60px]">
-              <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">
-                {maxLeverage}x
-              </p>
+            <div className="pr-[0px]">
+              <div className="flex pr-[40px] items-center">
+                <p className="text-[20px] text-[#E4E4E4] min-w-[40px] font-normal">
+                  {maxLeverage}x
+                </p>
+                <div ref={ltvRef} className="flex items-center gap-[8px]">
+                  <img
+                    src={pencil}
+                    alt=""
+                    className="w-[35px] cursor-pointer rounded-[20px] shadow-md shadow-gray-900"
+                    onClick={() => setShowLTV(!showLTV)}
+                  />
+                  {showLTV && (
+                    <div className="absolute  top-[200px] z-50 left-[290px]">
+                      <LeverageRange
+                        maxLeverage={maxLeverage}
+                        maxLtv={collateralToken.maxLtv}
+                        ltv={desiredLtv}
+                        handleLtvSlider={handleLtvSlider}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <p className="text-[14px] text-[#8E8E8E]">Leverage</p>
             </div>
             <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
@@ -380,9 +447,27 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
           {/* investment plans */}
           <div>
-            <InvestmentPlans collateralToken={collateralToken} desiredLtv={desiredLtv} flashLeverage={flashLeverage} />
+            <InvestmentPlans
+              maturity={`${collateralToken.name.slice(
+                collateralToken.name.length - 9,
+                collateralToken.name.length - 7
+              )}${" "}
+                  ${collateralToken.name.slice(
+                    collateralToken.name.length - 7,
+                    collateralToken.name.length - 4
+                  )}${", "}
+                  ${collateralToken.name.slice(
+                    collateralToken.name.length - 4,
+                    collateralToken.name.length
+                  )}`}
+              amountInUsd={Number(
+                BigNumber(amountCollateral).multipliedBy(fromToken.valueInUsd)
+              )}
+              collateralToken={collateralToken}
+              desiredLtv={desiredLtv}
+              flashLeverage={flashLeverage}
+            />
           </div>
-
         </div>
 
         {/* deposit part */}
@@ -395,22 +480,18 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               </p>
             </div>
             <div className="flex flex-col gap-[4px] items-end">
-              <div ref={ltvRef} className="flex items-center gap-[8px]">
+              <div ref={slippageRef} className="flex items-center gap-[8px]">
                 <img
                   src={setting}
                   alt=""
-                  className="w-[36px] cursor-pointer"
-                  onClick={() => setShowLTV(!showLTV)}
+                  className="w-[36px] cursor-pointer shadow-lg rounded-full shadow-gray-900"
+                  onClick={() => setShowSlippage(!showSlippage)}
                 />
-                {showLTV && (
+                {showSlippage && (
                   <div className="absolute  top-[215px] z-50 right-[97px]">
-                    <LeverageRange
+                    <SlippageRange
                       slippage={slippage}
                       setSlippage={setSlippage}
-                      maxLeverage={maxLeverage}
-                      maxLtv={collateralToken.maxLtv}
-                      ltv={desiredLtv}
-                      handleLtvSlider={handleLtvSlider}
                     />
                   </div>
                 )}
