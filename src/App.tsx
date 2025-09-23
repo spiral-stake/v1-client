@@ -4,7 +4,6 @@ import FlashLeverage from "./contract-hooks/FlashLeverage";
 import { Toaster } from "react-hot-toast";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Products from "./pages/Products";
-import Leverage from "./pages/Leverage";
 import Portfolio from "./pages/Portfolio";
 import Overlay from "./components/low-level/Overlay";
 import Navbar from "./components/Navbar";
