@@ -29,8 +29,6 @@ export class Base {
       args,
     });
 
-    // await wait(2);
-
     return res as T;
   }
 

@@ -17,7 +17,7 @@
   "0x545A490f9ab534AdF409A2E682bc4098f49952e3": {
     "underlyingCollateral": "USD",
     "yieldSource": "Cap Operators",
-    "riskProfile": "medium"
+    "riskProfile": "high"
   },
   "0x62C6E813b9589C3631Ba0Cdb013acdB8544038B7": {
     "underlyingCollateral": "ETH",
@@ -32,7 +32,7 @@
   "0xC3c7E5E277d31CD24a3Ac4cC9af3B6770F30eA33": {
     "underlyingCollateral": "USD",
     "yieldSource": "Cap Operators",
-    "riskProfile": "medium"
+    "riskProfile": "high"
   },
   "0xDBf6feC5A012A13c456Bac3B67C3B9CF2830A122": {
     "underlyingCollateral": "T-Bills",

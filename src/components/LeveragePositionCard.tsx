@@ -92,7 +92,7 @@ const LeveragePositionCard = ({
       <div className="w-full mt-4 bg-transparent hover:bg-white hover:bg-opacity-[4%] rounded-xl py-5 lg:py-2 border-y border-y-slate-800 lg:border-y-0 grid grid-cols-4 grid-rows-[1fr_1fr_2fr] lg:grid-cols-12 lg:px-5 lg:grid-rows-1 items-center lg:pr-5 transition-all ease-out duration-150">
         <div className="col-span-4 row-span-2 lg:col-span-3 lg:row-span-1 flex justify-center items-center lg:hidden">
           <div className="col-span-1 h-16 py-3 pr-5 inline-flex justify-start items-center gap-2">
-            <img
+            <img className="w-[40px]"
               src={`/tokens/${leveragePosition.collateralToken.symbol}.svg`}
               alt=""
             />
@@ -117,14 +117,14 @@ const LeveragePositionCard = ({
         </div>
 
         {/* symbol */}
-        <div className="col-span-1 h-16 py-3 pr-5 inline-flex justify-start items-center gap-2">
-          <img
+        <div className="hidden col-span-1 h-16 py-3 pr-5 lg:inline-flex justify-start items-center gap-2">
+          <img className="w-[40px]"
             src={`/tokens/${leveragePosition.collateralToken.symbol}.svg`}
             alt=""
           />
         </div>
         {/* token */}
-        <div className="col-span-2 w-full h-16 py-3 inline-flex justify-start items-center gap-4">
+        <div className="hidden col-span-2 w-full h-16 py-3 lg:inline-flex justify-start items-center gap-4">
           <div className="inline-flex flex-col justify-center items-start">
             <div className="inline-flex justify-center items-center gap-2">
               <div className="text-lg font-semibold">
@@ -184,7 +184,7 @@ const LeveragePositionCard = ({
           </div>
         </div>
       </div>
-    </Link>
+    </Link >
   );
 };
 
