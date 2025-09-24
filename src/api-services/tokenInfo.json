@@ -42,7 +42,7 @@
   "0xF3f491e5608f8B8a6Fd9E9d66a4a4036d7FD282C": {
     "underlyingCollateral": "USDe",
     "yieldSource": "Carry & Basis Trades",
-    "riskProfile": "low"
+    "riskProfile": "medium"
   },
   "0xdcFDf8434e8FDfFF2dD7dfC9299877e813348EE7": {
     "underlyingCollateral": "RWAs & Digital Assets",

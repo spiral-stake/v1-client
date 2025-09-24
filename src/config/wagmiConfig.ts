@@ -2,15 +2,23 @@ import { http } from "wagmi";
 import { anvil, mainnet } from "wagmi/chains";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 
+// Detect environment
+const isProd = import.meta.env.VITE_ENV === "prod";
+
+// Base transports object
+const transports: Record<number, ReturnType<typeof http>> = {};
+
+// Assign depending on env
+if (isProd) {
+  transports[mainnet.id] = http(`https://mainnet.infura.io/v3/${import.meta.env.VITE_INFURA_ID}`);
+} else {
+  transports[anvil.id] = http("http://127.0.0.1:8545");
+}
+
+// Final wagmi config
 export const wagmiConfig = getDefaultConfig({
   appName: "Spiral Stake",
-  projectId: "49bdf41453b575598177350acab135bd",
-  chains: [mainnet],
-  transports: {
-    [1]: http("https://mainnet.infura.io/v3/34c180ccaea34433a2a35cb904afb19b"),
-    // [2522]: http(chain[2522]?.rpcUrls.default.http[0]),
-    // [31337]: http("http://127.0.0.1:8545"),
-    // [421614]: http("https://sepolia-rollup.arbitrum.io/rpc"),
-    // [8453]: http("https://mainnet.base.org"),
-  },
+  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID,
+  chains: isProd ? [mainnet] : [anvil],
+  transports,
 });
