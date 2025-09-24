@@ -14,18 +14,17 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [risk, setRisk] = useState<string>("all");
 
   return flashLeverage ? (
-    <div className="flex flex-col gap-[48px] py-[48px]">
+    <div className="flex flex-col gap-[32px] lg:gap-[48px] py-[16px] lg:py-[48px]">
       <div className="">
         <PageTitle
           title="Maximize your stablecoin yields"
           subheading="Our system helps you leverage safely and instantly, so you earn more from the same money without extra effort."
         />
       </div>
-      <div className="flex w-full gap-[48px]">
-        <div className="flex flex-col gap-[16px]">
+      <div className="flex flex-col lg:flex-row w-full gap-[48px]">
+        <div className="flex gap-[8px] lg:flex-col lg:gap-[16px] overflow-x-scroll no-scrollbar">
           <RiskTab
             risk="all"
-            apy="25"
             icon={allRisk}
             text="A combined view of all strategies across the risk spectrum"
             setRisk={setRisk}
@@ -34,7 +33,6 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           />
           <RiskTab
             risk="high"
-
             icon={highRisk}
             text="Involves stablecoin’s with higher volatility exposure."
             setRisk={setRisk}
@@ -43,7 +41,6 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           />
           <RiskTab
             risk="medium"
-
             icon={mediumRisk}
             text="Stablecoins backed by DeFi mechanisms like CDPs & funding rate arbitrage"
             setRisk={setRisk}
@@ -52,7 +49,6 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           />
           <RiskTab
             risk="low"
-
             icon={lowRisk}
             text="Stablecoins backed by highly credible collateral such as T-bills"
             setRisk={setRisk}
@@ -60,7 +56,7 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             color="rgba(63, 255, 20, 0.1)"
           />
         </div>
-        <div className="grid grid-cols-2 gap-x-[24px] gap-y-[34px] px-6 w-full">
+        <div className="flex flex-col lg:grid grid-cols-2 gap-[16px] lg:gap-x-[24px] lg:gap-y-[34px] lg:px-6 w-full">
           {flashLeverage.collateralTokens
             .filter((collateralToken) => {
               if (risk === "all") return true;
@@ -86,13 +82,13 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   collateralToken.name.length - 7
                 )}${" "}
                   ${collateralToken.name.slice(
-                  collateralToken.name.length - 7,
-                  collateralToken.name.length - 4
-                )}${", "}
+                    collateralToken.name.length - 7,
+                    collateralToken.name.length - 4
+                  )}${", "}
                   ${collateralToken.name.slice(
-                  collateralToken.name.length - 4,
-                  collateralToken.name.length
-                )}`}
+                    collateralToken.name.length - 4,
+                    collateralToken.name.length
+                  )}`}
                 underlyingCollatateralIcon={`/tokens/${collateralToken.symbol}.svg`}
                 underlyingCollatateralName={
                   collateralToken.info.underlyingCollateral

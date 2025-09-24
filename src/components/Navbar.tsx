@@ -19,17 +19,17 @@ const Navbar = ({
   return (
     <>
       <div className="w-full px-4 lg:px-16 py-4 border-b-[0.72px] border-white border-opacity-10 inline-flex justify-start items-center gap-3">
-        <div className="w-6 h-6 relative overflow-hidden lg:hidden">
+        <div className="inline-flex overflow-hidden lg:hidden">
           <img
             src={menuIcon}
             alt=""
-            className=" cursor-pointer"
+            className="w-[24px] h-[24px] cursor-pointer"
             onClick={() => showDropdown(true)}
           />
         </div>
 
         <div className="flex w-full justify-between items-center">
-          <div className="w-[800px] flex items-center justify-between">
+          <div className="lg:w-[800px] flex items-center justify-start lg:justify-between">
             {/* logo part */}
             <div className="flex justify-start items-center gap-3">
               <Link to={"/products"}>
@@ -88,10 +88,6 @@ const Navbar = ({
                 </span>
               </div>
             </div>
-            <div
-              data-property-1="Default"
-              className="h-8 p-2 rounded-full flex justify-start items-center gap-1.5 overflow-hidden"
-            ></div>
             <div>
               <ConnectWalletBtn />
             </div>

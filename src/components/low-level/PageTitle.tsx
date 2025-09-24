@@ -6,11 +6,11 @@ const PageTitle = ({
   subheading: string;
 }) => {
   return (
-    <div className="w-full pb-6 cursor-default">
-      <div className="justify-start text-white text-3xl font-['Outfit'] font-normal">
+    <div className="flex flex-col gap-[8px] w-full cursor-default">
+      <div className="w-[75%] lg:w-full justify-start text-white text-3xl font-['Outfit'] font-normal">
         {title}
       </div>
-      <div className="max-w-[650px] justify-start text-[14.5px] mt-2 text-[#B3B3B3] font-[Outfit] leading-normal">
+      <div className="max-w-[650px] pr-[10px] justify-start text-[16px] font-[400] text-[#B3B3B3] font-[Outfit] leading-normal">
         {subheading}
       </div>
     </div>
