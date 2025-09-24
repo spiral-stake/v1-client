@@ -26,3 +26,6 @@ dist-ssr
 *.sw?
 
 z.doc
+
+.env.local
+.env.prod
