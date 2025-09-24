@@ -23,3 +23,12 @@ body {
   background: linear-gradient(180deg, #211e53 0%, #0b0a13 100%);
   color: white;
 }
+
+.no-scrollbar {
+  overflow: auto;             /* or scroll */
+  scrollbar-width: none;      /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;              /* Chrome, Safari, Edge */
+}
+

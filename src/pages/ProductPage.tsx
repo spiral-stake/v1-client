@@ -52,7 +52,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [fromToken, setFromToken] = useState<Token>();
   const [amountCollateral, setAmountCollateral] = useState("");
   const [searchParams] = useSearchParams();
-  const leverage = searchParams.get("leverage")
+  const leverage = searchParams.get("leverage");
   const [desiredLtv, setDesiredLtv] = useState(
     Number(leverage) > 0 ? String(leverage) : ""
   );
@@ -513,11 +513,6 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             setAmountToMax={setAmountToMax}
           />
 
-          {/* deposit button */}
-          {/* <div className="flex justify-center items-center rounded-xl w-full bg-white bg-opacity-[8%] p-[10px]">
-            <p className="text-[14px]">Deposit USDC</p>
-          </div> */}
-
           {/* old deposit button */}
           <ActionBtn
             btnLoading={false}
@@ -527,16 +522,19 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             onClick={actionBtn.onClick}
           />
 
-          {/* deposit summary */}
-          {/* <div className="flex text-[16px] w-full justify-between text-[#8E8E8E]">
-            <div className="flex items-center gap-[8px] w-fit">
-              <p>Deposit amount</p>
-              <img src={infoIcon} alt="" className="w-[16px]" />
+          <div className="flex flex-col w-full gap-[8px] test-[16px] font-[400] text-[#8E8E8E]">
+            <div className="flex justify-between items-center">
+              <p>Current price</p>
+              <p>${Number(collateralToken.valueInUsd).toFixed(4)}</p>
             </div>
-            <div className="w-fit">
-              <p>0 USDC ($0)</p>
+            <div className="flex justify-between items-center">
+              <p>Liquidation price</p>
+              <p>
+                ${((Number(desiredLtv) / Number(collateralToken.liqLtv)) *
+                  Number(collateralToken.valueInUsd)).toFixed(4)}
+              </p>
             </div>
-          </div> */}
+          </div>
 
           {/* review section */}
           {showSummary && (

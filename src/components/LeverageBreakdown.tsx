@@ -14,33 +14,33 @@ const LeverageBreakdown = ({ collateralTokenApy, borrowApy, maxLeverage }: { col
 
 
     return (
-        <div className="bg-[#1A1D2E] p-5 rounded-2xl w-full max-w-sm text-sm text-white/90 shadow-lg border border-white/10">
-            <div className="space-y-3">
-                <div>
+        <div className="bg-white bg-opacity-[4%] p-6 rounded-2xl w-full text-sm text-white/90 shadow-lg border border-white/10">
+            <div className="flex flex-col gap-[8px]">
+                <div className="flex flex-col gap-[4px]">
                     <div className="flex justify-between">
-                        <span>Base Yield</span>
-                        <span className="text-white font-bold">{leveragedYield.toFixed(2)}%</span>
+                        <span className="text-[14px] font-[400]">Base Yield</span>
+                        <span className="text-white font-[500]">{leveragedYield.toFixed(2)}%</span>
                     </div>
-                    <div className="text-xs text-white/50 mt-1">
-                        Token APY <span className="font-medium text-white/80">{tokenApy.toFixed(2)}%</span> × Leverage <span className="font-medium text-white/80">{leverage.toFixed(2)}</span>
+                    <div className="text-[12px] text-[#8E8E8E] font-[400]">
+                        Token APY  <span className="text-white/80">( {tokenApy.toFixed(2)}% )</span>  x  Leverage <span className="font-medium text-white/80">( {leverage.toFixed(2)} )</span>
                     </div>
                 </div>
 
-                <div>
+                <div className="flex flex-col gap-[4px]">
                     <div className="flex justify-between">
-                        <span>Borrow Cost</span>
-                        <span className="text-white font-bold">{leveragedBorrowCost.toFixed(2)}%</span>
+                        <span className="text-[14px] font-[400]">Borrow Cost</span>
+                        <span className="text-white font-[500]">{leveragedBorrowCost.toFixed(2)}%</span>
                     </div>
-                    <div className="text-xs text-white/50 mt-1">
-                        Borrow APY <span className="font-medium text-white/80">{_borrowApy.toFixed(2)}%</span> × Borrowed <span className="font-medium text-white/80">{borrowMultiplier.toFixed(2)}</span>
+                    <div className="text-[12px] text-[#8E8E8E] font-[400]">
+                        Borrow APY <span className="text-white/80">( {_borrowApy.toFixed(2)}% )</span>  ×  Borrowed <span className="font-medium text-white/80">( {borrowMultiplier.toFixed(2)} )</span>
                     </div>
                 </div>
 
                 <div className="border-t border-white/10 my-3" />
 
                 <div className="flex justify-between text-base">
-                    <span className="font-medium text-white/80">Net APY:</span>
-                    <span className="font-bold text-white">{netApy.toFixed(2)}%</span>
+                    <span className="font-medium text-white/80">Net APY</span>
+                    <span className="font-[500] text-white">{netApy.toFixed(2)}%</span>
                 </div>
             </div>
         </div>
