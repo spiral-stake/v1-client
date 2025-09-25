@@ -10,7 +10,7 @@ const LeverageRange = ({
   handleLtvSlider: (e: any) => void;
 }) => {
   return (
-    <form className="flex flex-col w-[267px] gap-[12px] p-[20px] rounded-xl border-[1px] border-white border-opacity-[14%] backdrop-blur-lg bg-white bg-opacity-[4%]">
+    <form className="flex flex-col w-full lg:w-[267px] gap-[12px] p-[20px] pb-[30px] lg:pb-[20px] rounded-[16px] rounded-b-none lg:rounded-b-[16px] border-[1px] border-white border-opacity-[14%] backdrop-blur-3xl lg:backdrop-blur-lg bg-white bg-opacity-[10%] lg:bg-opacity-[4%]">
       <div className="flex flex-col mt-[-18px]">
         <div
           className="relative text-[15px] bg-white w-[40px] text-center px-2 text-black  rounded-xl top-[24px]"

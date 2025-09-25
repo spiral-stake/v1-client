@@ -76,7 +76,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 ${sum.toFixed(2)}
               </p>
             </div>
-            <img src={portfolioChart} alt="" className="w-full" />
+            {/* <img src={portfolioChart} alt="" className="w-full" /> */}
           </div>
 
           {/* mobile */}

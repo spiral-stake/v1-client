@@ -8,7 +8,7 @@ const SlippageRange = ({
   setSlippage: React.Dispatch<React.SetStateAction<number>>;
 }) => {
   return (
-    <form className="flex flex-col w-[267px] gap-[12px] p-[16px] rounded-xl border-[1px] border-white border-opacity-[14%] backdrop-blur-lg bg-white bg-opacity-[4%]">
+    <form className="flex flex-col w-full lg:w-[267px] pb-[30px] lg:pb-[16px] gap-[12px] p-[16px] rounded-[16px] rounded-b-none lg:rounded-b-[16px] border-[1px] border-white border-opacity-[14%] backdrop-blur-lg bg-white bg-opacity-[4%]">
       <div>
         <Slippage slippage={slippage} setSlippage={setSlippage} />
       </div>
