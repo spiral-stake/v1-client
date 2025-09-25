@@ -13,8 +13,8 @@ const ProductTitle = ({
 }) => {
   return (
     <div className="w-full pb-6 cursor-default">
-      <div className="flex gap-[12px] justify-start text-gray-200 text-[24px] lg:text-[32px] font-medium font-['Outfit']">
-        <img src={icon} alt="" className="w-[30px] lg:w-[36px]" />
+      <div className="flex items-center gap-[12px] justify-start text-gray-200 text-[24px] lg:text-[32px] font-medium font-['Outfit']">
+        <img src={icon} alt="" className="w-[30px] h-[30px] lg:w-[36px] lg:h-[36px]" />
         <div className="flex items-baseline gap-[4px]">
           <p>{title}</p>
           <p className="text-[15px] lg:text-[20px] h-fit font-normal">( {maturity} )</p>
