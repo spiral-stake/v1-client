@@ -69,14 +69,19 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       ) : leveragePositions.length ? (
         <>
           {/* chart */}
-          <div className="w-full flex justify-between p-[24px] gap-[200px] bg-white bg-opacity-[4%] rounded-[20px] border-[1px] border-white border-opacity-[6%]">
+          <div className="w-full flex p-[24px] gap-[100px] bg-white bg-opacity-[4%] rounded-[20px] border-[1px] border-white border-opacity-[6%]">
             <div className="flex flex-col">
               <p className="text-[14px] text-[#B6B6B6]">My positions</p>
               <p className="text-[24px] font-[500] text-[#E4E4E4]">
                 ${sum.toFixed(2)}
               </p>
             </div>
-            {/* <img src={portfolioChart} alt="" className="w-full" /> */}
+            <div className="flex flex-col">
+              <p className="text-[14px] text-[#B6B6B6]">Total positions</p>
+              <p className="text-center text-[24px] font-[500] text-[#E4E4E4]">
+                {leveragePositions.length}
+              </p>
+            </div>
           </div>
 
           {/* mobile */}

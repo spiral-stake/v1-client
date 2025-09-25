@@ -69,7 +69,7 @@ const ProductCard = ({
               <p className="text-[12px] text-right text-[#CCCCCC]">
                 Underlying collateral
               </p>
-              <div className="flex justify-end items-center gap-[2px]">
+              <div className="flex text-right justify-end items-center gap-[2px]">
                 {/* <img src={underlyingCollatateralIcon} alt="" className="w-[16px]" /> */}
                 <p className="text-[16px] text-[#E4E4E4] font-normal">
                   {underlyingCollatateralName}

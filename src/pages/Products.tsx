@@ -18,7 +18,7 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       <div className="">
         <PageTitle
           title="Maximize your stablecoin yields"
-          subheading="Our system helps you leverage safely and instantly, so you earn more from the same money without extra effort."
+          subheading="Our system helps you leverage safely and instantly so you earn more from the same money without extra effort."
         />
       </div>
       <div className="flex flex-col lg:flex-row w-full gap-[48px]">
@@ -34,7 +34,7 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           <RiskTab
             risk="high"
             icon={highRisk}
-            text="Involves stablecoin’s with higher volatility exposure."
+            text="Involves stablecoins with higher volatility exposure but the best yields possible"
             setRisk={setRisk}
             currentRisk={risk}
             color="rgba(255, 60, 60, 0.1)"
@@ -84,7 +84,7 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   ${collateralToken.name.slice(
                     collateralToken.name.length - 7,
                     collateralToken.name.length - 4
-                  )}${", "}
+                  )}${" "}
                   ${collateralToken.name.slice(
                     collateralToken.name.length - 4,
                     collateralToken.name.length

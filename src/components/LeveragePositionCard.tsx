@@ -12,6 +12,10 @@ import { toastSuccess } from "../utils/toastWrapper";
 import BigNumber from "bignumber.js";
 import axios from "axios";
 import { formatUnits } from "../utils/formatUnits";
+import { getSlippage } from "../utils/getSlippage";
+import Overlay from "./low-level/Overlay";
+import CloseReviewOverlay from "./new-components/closeReviewOverlay";
+import BtnGreen from "./new-components/btnGreen";
 
 const LeveragePositionCard = ({
   flashLeverage,
@@ -23,12 +27,22 @@ const LeveragePositionCard = ({
   deleteLeveragePosition: (positionId: number) => void;
 }) => {
   const { address, chainId } = useAccount();
+  const [showCloseReview, setShowCloseReview] = useState(false);
+
+  const [actionBtn, setActionBtn] = useState({
+    text: "close",
+    onClick: () => {
+      setShowCloseReview(true);
+    },
+    disabled: false,
+    error: "",
+  });
   const [loading, setLoading] = useState<boolean>(false);
 
   const appChainId = useChainId();
 
   const handleCloseLeveragePosition = async () => {
-    const slippage = 0.001; // 0.1%
+    const slippage = getSlippage(Number(leveragePosition.amountCollateral));
 
     const { pendleSwap, tokenRedeemSy, minTokenOut, swapData, limitOrderData } =
       await getInternalReswapData(
@@ -89,15 +103,16 @@ const LeveragePositionCard = ({
 
   return (
     <Link to="">
-      <div className="w-full mt-4 bg-transparent hover:bg-white hover:bg-opacity-[4%] rounded-xl py-5 lg:py-2 border-y border-y-slate-800 lg:border-y-0 grid grid-cols-4 grid-rows-[1fr_1fr_2fr] lg:grid-cols-12 lg:px-5 lg:grid-rows-1 items-center lg:pr-5 transition-all ease-out duration-150">
-        <div className="col-span-4 row-span-2 lg:col-span-3 lg:row-span-1 flex justify-center items-center lg:hidden">
+      <div className="w-full px-2 mt-4 bg-transparent hover:bg-white hover:bg-opacity-[4%] rounded-xl py-5 lg:py-2 border-y border-y-slate-800 lg:border-y-0 grid grid-cols-4 grid-rows-[1fr_1fr_2fr] lg:grid-cols-12 lg:px-5 lg:grid-rows-1 items-center lg:pr-5 transition-all ease-out duration-150">
+        <div className="col-span-4 row-span-2 lg:col-span-3 lg:row-span-1 flex items-center lg:hidden">
           <div className="col-span-1 h-16 py-3 pr-5 inline-flex justify-start items-center gap-2">
-            <img className="w-[40px]"
+            <img
+              className="w-[40px]"
               src={`/tokens/${leveragePosition.collateralToken.symbol}.svg`}
               alt=""
             />
           </div>
-          <div className="col-span-2 w-full h-16 py-3 inline-flex justify-start items-center gap-4">
+          <div className="col-span-1 h-16 py-3 pr-5 inline-flex justify-start items-center gap-4">
             <div className="inline-flex flex-col justify-center items-start">
               <div className="inline-flex justify-center items-center gap-2">
                 <div className="text-lg font-semibold">
@@ -106,19 +121,15 @@ const LeveragePositionCard = ({
               </div>
             </div>
           </div>
-          <div className=" lg:hidden">
-            <ActionBtn
-              btnLoading={loading}
-              text="Close"
-              onClick={handleAsync(handleCloseLeveragePosition, setLoading)}
-              expectedChainId={Number(chainId)}
-            />
+          <div className="text-[#68EA6A]">
+            <BtnGreen text={`${calcMaxLeverage(leveragePosition.ltv)}x`} />
           </div>
         </div>
 
         {/* symbol */}
         <div className="hidden col-span-1 h-16 py-3 pr-5 lg:inline-flex justify-start items-center gap-2">
-          <img className="w-[40px]"
+          <img
+            className="w-[40px]"
             src={`/tokens/${leveragePosition.collateralToken.symbol}.svg`}
             alt=""
           />
@@ -135,7 +146,7 @@ const LeveragePositionCard = ({
         </div>
 
         {/* Leverage */}
-        <div className="col-span-1 lg:col-span-1 h-16  flex flex-col items-start justify-center">
+        <div className="col-span-2 lg:col-span-1 h-16  flex flex-col items-start justify-center">
           {calcMaxLeverage(leveragePosition.ltv)}x
           <div className="text-xs lg:hidden">Leverage</div>
         </div>
@@ -143,7 +154,9 @@ const LeveragePositionCard = ({
         {/* LTV */}
         <div className="col-span-2 h-16 flex flex-col items-start justify-center">
           {leveragePosition.ltv}%<div className="text-xs lg:hidden">LTV</div>
-          <div className="text-xs">liq. {leveragePosition.collateralToken.liqLtv}%</div>
+          <div className="text-xs">
+            liq. {leveragePosition.collateralToken.liqLtv}%
+          </div>
         </div>
 
         {/* Levraged APY */}
@@ -160,8 +173,9 @@ const LeveragePositionCard = ({
 
         {/* My position */}
         <div className="col-span-2 h-16 flex flex-col items-start justify-center truncate">
-          <div>{`${displayTokenAmount(leveragePosition.amountCollateral)} ${leveragePosition.collateralToken.symbol.split("-")[0]
-            }-${leveragePosition.collateralToken.symbol.split("-")[1]}`}</div>
+          <div>{`${displayTokenAmount(leveragePosition.amountCollateral)} ${
+            leveragePosition.collateralToken.symbol.split("-")[0]
+          }-${leveragePosition.collateralToken.symbol.split("-")[1]}`}</div>
           <div className="text-xs">
             $
             {displayTokenAmount(
@@ -183,8 +197,16 @@ const LeveragePositionCard = ({
             />
           </div>
         </div>
+        <div className="col-span-4 mx-[8px] lg:hidden">
+          <ActionBtn
+            btnLoading={loading}
+            text="Close"
+            onClick={handleAsync(handleCloseLeveragePosition, setLoading)}
+            expectedChainId={Number(chainId)}
+          />
+        </div>
       </div>
-    </Link >
+    </Link>
   );
 };
 
