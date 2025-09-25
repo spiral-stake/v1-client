@@ -45,7 +45,7 @@ import SlippageRange from "../components/new-components/slippageRange";
 import { useQuery } from "wagmi/query";
 
 const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
-  const [slippage, setSlippage] = useState(0.001);
+  const [slippage, setSlippage] = useState(0.005);
   const [showSlippage, setShowSlippage] = useState(false);
   const [showLTV, setShowLTV] = useState(false);
   const [collateralToken, setCollateralToken] = useState<CollateralToken>();
@@ -351,26 +351,23 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           <div className="">
             <ProductTitle
               icon={`/tokens/${collateralToken.symbol}.svg`}
-              title={`${collateralToken.symbol.split("-")[0]}-${
-                collateralToken.symbol.split("-")[1]
-              } `}
+              title={`${collateralToken.symbol.split("-")[0]}-${collateralToken.symbol.split("-")[1]
+                } `}
               maturity={`${collateralToken.name.slice(
                 collateralToken.name.length - 9,
                 collateralToken.name.length - 7
               )}${" "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 7,
-                    collateralToken.name.length - 4
-                  )}${" "}
+                collateralToken.name.length - 7,
+                collateralToken.name.length - 4
+              )}${" "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 4,
-                    collateralToken.name.length
-                  )}`}
-              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${
-                collateralToken.symbol.split("-")[0]
-              }-${
-                collateralToken.symbol.split("-")[1]
-              } for maximized returns on your idle holdings.`}
+                collateralToken.name.length - 4,
+                collateralToken.name.length
+              )}`}
+              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${collateralToken.symbol.split("-")[0]
+                }-${collateralToken.symbol.split("-")[1]
+                } for maximized returns on your idle holdings.`}
             />
           </div>
 
@@ -637,13 +634,13 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 collateralToken.name.length - 7
               )}${" "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 7,
-                    collateralToken.name.length - 4
-                  )}${", "}
+                collateralToken.name.length - 7,
+                collateralToken.name.length - 4
+              )}${", "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 4,
-                    collateralToken.name.length
-                  )}`}
+                collateralToken.name.length - 4,
+                collateralToken.name.length
+              )}`}
               amountInUsd={Number(
                 BigNumber(amountCollateral).multipliedBy(fromToken.valueInUsd)
               )}
