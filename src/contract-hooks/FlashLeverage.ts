@@ -104,11 +104,21 @@ export default class FlashLeverage extends Base {
       },
     ]);
 
-    const { positionId } = this.decodeEvent(txReceipt, "LeveragePositionOpened") as {
+    const { positionId, amountDepositedInLoanToken } = this.decodeEvent(
+      txReceipt,
+      "LeveragePositionOpened"
+    ) as {
       positionId: bigint;
+      amountDepositedInLoanToken: bigint;
     };
 
-    return Number(positionId);
+    return {
+      positionId: Number(positionId),
+      amountDepositedInUsd: formatUnits(
+        amountDepositedInLoanToken,
+        collateralToken.loanToken.decimals
+      ),
+    };
   }
 
   async leverage(
@@ -129,11 +139,21 @@ export default class FlashLeverage extends Base {
       },
     ]);
 
-    const { positionId } = this.decodeEvent(txReceipt, "LeveragePositionOpened") as {
+    const { positionId, amountDepositedInLoanToken } = this.decodeEvent(
+      txReceipt,
+      "LeveragePositionOpened"
+    ) as {
       positionId: bigint;
+      amountDepositedInLoanToken: bigint;
     };
 
-    return Number(positionId);
+    return {
+      positionId: Number(positionId),
+      amountDepositedInUsd: formatUnits(
+        amountDepositedInLoanToken,
+        collateralToken.loanToken.decimals
+      ),
+    };
   }
 
   async unleverage(

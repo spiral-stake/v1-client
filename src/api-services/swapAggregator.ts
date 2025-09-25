@@ -42,7 +42,7 @@ export async function getExternalSwapData(
     tokenOut: collateralToken.address,
     amountIn: parseUnits(amount, fromToken.decimals),
     enableAggregator: true,
-    aggregators: "odos, okx, paraswap",
+    aggregators: "kyberswap, okx, paraswap",
   };
 
   const res = await callSDK<InternalSwapData>(
@@ -84,7 +84,7 @@ export async function getInternalSwapData(
     tokenOut: collateralToken.address,
     amountIn: amountLoan,
     enableAggregator: true,
-    aggregators: "odos, okx, paraswap",
+    aggregators: "kyberswap, okx, paraswap",
   };
 
   const res = await callSDK(
@@ -118,7 +118,7 @@ export async function getInternalReswapData(
     tokenOut: collateralToken.loanToken.address,
     amountIn: String(parseUnits(String(amountLeveragedCollateral), collateralToken.decimals)),
     enableAggregator: true,
-    aggregators: "odos, okx, paraswap",
+    aggregators: "kyberswap, okx, paraswap",
   };
 
   const res = await callSDK(

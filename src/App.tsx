@@ -22,10 +22,14 @@ function App() {
   const appChainId = useChainId();
 
   useEffect(() => {
-    if (!address || chainId === 31337) return;
+    if (!address) return;
 
     // Dashboard Related
-    axios.post("https://dapi.spiralstake.xyz/user", {
+    const baseUrl = chainId !== 31337
+      ? "https://api.spiralstake.xyz"
+      : "http://localhost:5000";
+
+    axios.post(`${baseUrl}/user`, {
       address: address.toLowerCase(),
     });
   }, [address]);
@@ -55,7 +59,7 @@ function App() {
         <DropdownMenu showDropdown={showDropdown} />
       )}
 
-      {flashLeverage&&!dropdown ? (
+      {flashLeverage && !dropdown ? (
         <main className="px-4 lg:px-16">
           <Routes>
             <Route
@@ -80,7 +84,7 @@ function App() {
           <Overlay overlay={overlay} />
         </main>
       ) : (
-        <div className={`mt-10 ${dropdown?"hidden":""}`}>
+        <div className={`mt-10 ${dropdown ? "hidden" : ""}`}>
           <Loader />
         </div>
       )}

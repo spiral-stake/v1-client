@@ -84,12 +84,15 @@ const LeveragePositionCard = ({
       limitOrderData
     );
 
-    if (chainId !== 31337) {
-      axios.put("https://dapi.spiralstake.xyz/leverage/close", {
-        user: leveragePosition.owner.toLowerCase(),
-        positionId: leveragePosition.id,
-      });
-    }
+    const baseUrl = chainId !== 31337
+      ? "https://api.spiralstake.xyz"
+      : "http://localhost:5000";
+
+    axios.put(`${baseUrl}/leverage/close`, {
+      user: leveragePosition.owner.toLowerCase(),
+      positionId: leveragePosition.id,
+      amountReturnedInUsd: amountReturned
+    });
 
     deleteLeveragePosition(leveragePosition.id);
     toastSuccess(

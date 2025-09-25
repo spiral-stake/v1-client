@@ -277,55 +277,57 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     )
       return;
 
-    let positionId;
-
     try {
-      if (collateralToken.address == fromToken.address) {
-        positionId = await flashLeverage.leverage(
+      const isSameToken = collateralToken.address === fromToken.address;
+
+      // Early return if external swap data is needed but missing
+      if (!isSameToken && !externalSwapData) return;
+
+      const { positionId, amountDepositedInUsd } = await (isSameToken
+        ? flashLeverage.leverage(
           address,
           desiredLtv,
           fromToken as CollateralToken,
           amountCollateral,
           internalSwapData
-        );
-        toastSuccess(
-          `Deposited ${amountCollateral} USDC succesfully!`,
-          `You’ve deposited ${amountCollateral} USDC into ${collateralToken.symbol}. Your leveraged position is now earning yield.`
-        );
-      } else {
-        if (!externalSwapData) return;
-
-        positionId = await flashLeverage.swapAndLeverage(
+        )
+        : flashLeverage.swapAndLeverage(
           address,
           desiredLtv,
           fromToken,
           amountCollateral,
-          externalSwapData,
+          externalSwapData!,
           collateralToken,
           internalSwapData
-        );
-        toastSuccess(
-          `Deposited ${amountCollateral} USDC succesfully!`,
-          `You’ve deposited ${amountCollateral} USDC into ${collateralToken.symbol}. Your leveraged position is now earning yield.`
-        );
-      }
+        ));
+
+      // Single toast success message
+      toastSuccess(
+        `Deposited ${amountCollateral} USDC successfully!`,
+        `You've deposited ${amountCollateral} USDC into ${collateralToken.symbol}. Your leveraged position is now earning yield.`
+      );
+
+      // Single API call with dynamic base URL
+      const baseUrl = chainId !== 31337
+        ? "https://api.spiralstake.xyz"
+        : "http://localhost:5000";
+
+      try {
+        await axios.post(`${baseUrl}/leverage/open`, {
+          user: address.toLowerCase(),
+          positionId,
+          amountDepositedInUsd,
+          atImpliedApy: collateralToken.impliedApy,
+          atBorrowApy: collateralToken.borrowApy,
+          desiredLtv,
+        });
+      } catch (e) { }
+
+      navigate("/portfolio");
     } catch (e) {
       setShowSummary(false);
       throw e;
     }
-
-    // Dashboard Related
-    if (chainId !== 31337) {
-      axios.post("https://dapi.spiralstake.xyz/leverage/open", {
-        user: address.toLowerCase(),
-        positionId,
-        amountCollateralInUsd: BigNumber(amountCollateral).multipliedBy(
-          collateralToken.valueInUsd
-        ),
-      });
-    }
-
-    navigate("/portfolio");
   }
 
   const setAmountToMax = () => {
