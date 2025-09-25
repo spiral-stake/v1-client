@@ -13,7 +13,7 @@ const DropdownMenu = ({
 
   return (
     // <div className="w-full self-stretch px-4 pt-4 pb-8 inline-flex flex-col items-center gap-6">
-    <div className="lg:hidden w-full h-[100vh] relative flex flex-col justify-between items-center p-5">
+    <div className="lg:hidden w-full h-[100vh] backdrop-blur-sm bg-opacity-20 flex flex-col justify-between items-center p-5">
       <div className="w-full flex flex-col justify-start items-start gap-4">
         <div className="w-full mb-10">
           <img
@@ -85,7 +85,7 @@ const DropdownMenu = ({
           <div className="flex-1 flex justify-start items-center gap-2">
             <div className="w-6 h-6 relative overflow-hidden">
               <img
-                className="w-8 h-8 rounded-full"
+                className="w-6 h-6 rounded-full"
                 src={chainConfig[appChainId].logo}
                 alt=""
               />

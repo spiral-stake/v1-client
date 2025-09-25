@@ -25,7 +25,7 @@ const ReviewOverlay = ({
   desiredLtv: string
 }) => {
   return (
-    <div className="flex flex-col p-[24px] backdrop-blur-2xl bg-white bg-opacity-[8%] rounded-xl gap-[20px] w-[500px] border-[1px] border-white border-opacity-[4%]">
+    <div className="flex flex-col p-[24px] backdrop-blur-2xl bg-white bg-opacity-[8%] rounded-[16px] rounded-b-none lg:rounded-b-[16px] gap-[20px] w-full lg:w-[500px] border-[1px] border-white border-opacity-[4%]">
       <div className="flex justify-between items-center text-[20px]">
         <div>
           <p className="font-[500]">Review your Deposit</p>

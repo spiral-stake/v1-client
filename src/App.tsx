@@ -55,7 +55,7 @@ function App() {
         <DropdownMenu showDropdown={showDropdown} />
       )}
 
-      {flashLeverage && !dropdown ? (
+      {flashLeverage&&!dropdown ? (
         <main className="px-4 lg:px-16">
           <Routes>
             <Route
@@ -80,7 +80,7 @@ function App() {
           <Overlay overlay={overlay} />
         </main>
       ) : (
-        <div className="mt-10">
+        <div className={`mt-10 ${dropdown?"hidden":""}`}>
           <Loader />
         </div>
       )}

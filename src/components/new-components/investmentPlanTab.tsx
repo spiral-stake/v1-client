@@ -18,18 +18,18 @@ const InvestmentPlanTab = ({
   return (
     <Link to={`/products/${collateralToken.address}?leverage=${desiredLtv}`}>
       <div
-        className={`p-[12px] grid grid-cols-[max-content,1fr,1fr,1fr,max-content] items-center rounded-[12px] hover:bg-white hover:bg-opacity-[4%] ${
+        className={`py-[12px] lg:p-[12px] grid grid-cols-[max-content,1fr,1fr,1fr,max-content] items-center rounded-[12px] hover:bg-white hover:bg-opacity-[4%] ${
           selected ? "bg-white bg-opacity-[4%]" : ""
         }`}
       >
-        <div className="flex items-center justify-center p-[12px]">
+        <div className="flex items-center justify-center p-[8px] lg:p-[12px]">
           <img
             src={`/tokens/${collateralToken.symbol}.svg`}
             alt=""
-            className="w-[24px]"
+            className="w-[16px] lg:w-[24px]"
           />
         </div>
-        <div className="text-[16px] font-[500] text-[#D7D7D7]">{`${
+        <div className="text-[12px] lg:text-[16px] font-[500] text-[#D7D7D7]">{`${
           collateralToken.symbol.split("-")[0]
         }-${collateralToken.symbol.split("-")[1]} `}</div>
         <div>
@@ -41,7 +41,7 @@ const InvestmentPlanTab = ({
             )}% APY`}
           />
         </div>
-        <div className="text-[16px] text-[#68EA6A]">
+        <div className="text-[12px] lg:text-[16px] text-[#68EA6A]">
           +$
           {amountInUsd > 0
             ? `${(
@@ -67,8 +67,8 @@ const InvestmentPlanTab = ({
                 10000
               ).toFixed(2)}`}
         </div>
-        <div className="p-[12px]">
-          <img src={arrowRight} alt="" className="w-[24px]" />
+        <div className="p-[6px] lg:p-[12px]">
+          <img src={arrowRight} alt="" className="w-[20px] lg:w-[24px]" />
         </div>
       </div>
     </Link>
