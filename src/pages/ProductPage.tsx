@@ -201,7 +201,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       }
     };
 
-    fetchSwapData();
+    // fetchSwapData();
   }, [showSummary]);
 
   useEffect(() => {
