@@ -22,6 +22,7 @@ const Input = ({
   ) : (
     <input
       type={type}
+      
       autoFocus={autoFocus}
       autoComplete="off"
       value={value}

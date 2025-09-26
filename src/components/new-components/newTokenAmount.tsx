@@ -54,6 +54,7 @@ const NewTokenAmount = ({
       <div className="flex flex-col border-[1px] border-white border-opacity-[14%] bg-white bg-opacity-[4%] p-[16px] rounded-[20px]">
         <div className="flex items-center justify-between">
           <Input
+            type="number"
             name="amountCollateral"
             placeholder="0"
             onChange={(e: any) => handleAmountChange(e.target.value)}
@@ -64,8 +65,9 @@ const NewTokenAmount = ({
           <div className="relative transition-all duration-300" ref={ref}>
             <div
               onClick={() => setIsOpen(!isOpen)}
-              className={`cursor-pointer flex w-full gap-[8px] items-center ${isOpen ? "rounded-b-none border-b-0" : ""
-                } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
+              className={`cursor-pointer flex w-full gap-[8px] items-center ${
+                isOpen ? "rounded-b-none border-b-0" : ""
+              } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
             >
               {/* Need to add Symbol */}
               <div className="w-[60px]">
@@ -113,10 +115,15 @@ const NewTokenAmount = ({
       <div className="flex text-[14px] items-center justify-between">
         <div className="flex items-center gap-[4px]">
           <img src={wallet} alt="" />
-          <p className="text-[#8E8E8E]">{displayTokenAmount(balance)} {truncateStr(selectedToken.symbol, 12)}</p>
+          <p className="text-[#8E8E8E]">
+            {displayTokenAmount(balance)}{" "}
+            {truncateStr(selectedToken.symbol, 12)}
+          </p>
         </div>
         <div>
-          <p className="cursor-pointer" onClick={setAmountToMax}>MAX</p>
+          <p className="cursor-pointer" onClick={setAmountToMax}>
+            MAX
+          </p>
         </div>
       </div>
     </section>
