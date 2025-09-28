@@ -43,14 +43,19 @@ import { toastSuccess } from "../utils/toastWrapper";
 import InvestmentPlans from "../components/new-components/invetmentPlans";
 import SlippageRange from "../components/new-components/slippageRange";
 import { useQuery } from "wagmi/query";
+import auto from "../assets/icons/auto.svg";
+import { getSlippage } from "../utils/getSlippage";
 
 const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
-  const [slippage, setSlippage] = useState(0.005);
   const [showSlippage, setShowSlippage] = useState(false);
   const [showLTV, setShowLTV] = useState(false);
   const [collateralToken, setCollateralToken] = useState<CollateralToken>();
   const [fromToken, setFromToken] = useState<Token>();
   const [amountCollateral, setAmountCollateral] = useState("");
+  const [slippage, setSlippage] = useState(
+    getSlippage(Number(amountCollateral))
+  );
+  const [autoMode, setAutoMode] = useState(true);
   const [searchParams] = useSearchParams();
   const leverage = searchParams.get("leverage");
   const [desiredLtv, setDesiredLtv] = useState(
@@ -98,6 +103,12 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
     initialize();
   }, [collateralTokenAddress]);
+
+  useEffect(() => {
+    if (autoMode) {
+      setSlippage(getSlippage(Number(amountCollateral)));
+    }
+  }, [amountCollateral]);
 
   useEffect(() => {
     if (!fromToken || !address) return;
@@ -210,10 +221,13 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
         setShowLTV(false);
       }
     }
-
-    document.addEventListener("mousedown", handleLTVClickOutside);
+    if (window.innerWidth >= 1024) {
+      document.addEventListener("mousedown", handleLTVClickOutside);
+    }
     return () => {
-      document.removeEventListener("mousedown", handleLTVClickOutside);
+      if (window.innerWidth >= 1024) {
+        document.removeEventListener("mousedown", handleLTVClickOutside);
+      }
     };
   }, []);
 
@@ -227,9 +241,14 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       }
     }
 
-    document.addEventListener("mousedown", handleSlippageClickOutside);
+    if (window.innerWidth >= 1024) {
+      document.addEventListener("mousedown", handleSlippageClickOutside);
+    }
+
     return () => {
-      document.removeEventListener("mousedown", handleSlippageClickOutside);
+      if (window.innerWidth >= 1024) {
+        document.removeEventListener("mousedown", handleSlippageClickOutside);
+      }
     };
   }, []);
 
@@ -353,23 +372,26 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           <div className="">
             <ProductTitle
               icon={`/tokens/${collateralToken.symbol}.svg`}
-              title={`${collateralToken.symbol.split("-")[0]}-${collateralToken.symbol.split("-")[1]
-                } `}
+              title={`${collateralToken.symbol.split("-")[0]}-${
+                collateralToken.symbol.split("-")[1]
+              } `}
               maturity={`${collateralToken.name.slice(
                 collateralToken.name.length - 9,
                 collateralToken.name.length - 7
               )}${" "}
                   ${collateralToken.name.slice(
-                collateralToken.name.length - 7,
-                collateralToken.name.length - 4
-              )}${" "}
+                    collateralToken.name.length - 7,
+                    collateralToken.name.length - 4
+                  )}${" "}
                   ${collateralToken.name.slice(
-                collateralToken.name.length - 4,
-                collateralToken.name.length
-              )}`}
-              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${collateralToken.symbol.split("-")[0]
-                }-${collateralToken.symbol.split("-")[1]
-                } for maximized returns on your idle holdings.`}
+                    collateralToken.name.length - 4,
+                    collateralToken.name.length
+                  )}`}
+              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${
+                collateralToken.symbol.split("-")[0]
+              }-${
+                collateralToken.symbol.split("-")[1]
+              } for maximized returns on your idle holdings.`}
             />
           </div>
 
@@ -406,7 +428,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 <p className="text-[20px] text-[#E4E4E4] min-w-[40px] font-normal">
                   {maxLeverage}x
                 </p>
-                <div ref={ltvRef} className="flex items-center gap-[8px]">
+                <div className="flex items-center gap-[8px]">
                   <img
                     src={pencil}
                     alt=""
@@ -530,8 +552,14 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   Deposit assets, earn max yield
                 </p>
               </div>
-              <div className="flex flex-col gap-[4px] items-end">
-                <div ref={slippageRef} className="flex  items-center gap-[8px]">
+              <div className="bg-white bg-opacity-[4%] p-[6px] px-[8px] rounded-[999px] flex items-center gap-[8px]">
+                <div className="flex items-center gap-[4px]">
+                  <p className="text-[14px] font-[400] text-[#8B8B8B]">
+                    {parseFloat((slippage * 100).toFixed(3))}%
+                  </p>{" "}
+                  {autoMode && <img src={auto} alt="" className="w-[24px]" />}
+                </div>
+                <div className="flex  items-center gap-[8px]">
                   <img
                     src={setting}
                     alt=""
@@ -543,6 +571,9 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                       onClose={() => setShowSlippage(false)}
                       overlay={
                         <SlippageRange
+                          autoMode={autoMode}
+                          setAutoMode={setAutoMode}
+                          amountCollateral={amountCollateral}
                           slippage={slippage}
                           setSlippage={setSlippage}
                         />
@@ -636,13 +667,13 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 collateralToken.name.length - 7
               )}${" "}
                   ${collateralToken.name.slice(
-                collateralToken.name.length - 7,
-                collateralToken.name.length - 4
-              )}${", "}
+                    collateralToken.name.length - 7,
+                    collateralToken.name.length - 4
+                  )}${", "}
                   ${collateralToken.name.slice(
-                collateralToken.name.length - 4,
-                collateralToken.name.length
-              )}`}
+                    collateralToken.name.length - 4,
+                    collateralToken.name.length
+                  )}`}
               amountInUsd={Number(
                 BigNumber(amountCollateral).multipliedBy(fromToken.valueInUsd)
               )}
@@ -662,7 +693,13 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 Deposit assets, earn max yield
               </p>
             </div>
-            <div className="flex flex-col gap-[4px] items-end">
+            <div className="bg-white bg-opacity-[4%] p-[6px] px-[8px] rounded-[999px] flex items-center gap-[8px]">
+              <div className="flex items-center gap-[4px]">
+                <p className="text-[14px] font-[400] text-[#8B8B8B]">
+                  {parseFloat((slippage * 100).toFixed(3))}%
+                </p>
+                {autoMode && <img src={auto} alt="" className="w-[24px]" />}
+              </div>
               <div ref={slippageRef} className="flex items-center gap-[8px]">
                 <img
                   src={setting}
@@ -673,6 +710,9 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 {showSlippage && (
                   <div className="absolute  top-[215px] z-50 right-[97px]">
                     <SlippageRange
+                      autoMode={autoMode}
+                      setAutoMode={setAutoMode}
+                      amountCollateral={amountCollateral}
                       slippage={slippage}
                       setSlippage={setSlippage}
                     />
@@ -705,7 +745,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             onClick={actionBtn.onClick}
           />
 
-          <div className="flex flex-col w-full gap-[8px] test-[16px] font-[400] text-[#8E8E8E]">
+          <div className="flex flex-col w-full gap-[8px] text-[15px] text-[#8E8E8E]">
             <div className="flex justify-between items-center">
               <p>Current price</p>
               <p>${Number(collateralToken.valueInUsd).toFixed(4)}</p>
