@@ -13,8 +13,6 @@ import BigNumber from "bignumber.js";
 import axios from "axios";
 import { formatUnits } from "../utils/formatUnits";
 import { getSlippage } from "../utils/getSlippage";
-import Overlay from "./low-level/Overlay";
-import CloseReviewOverlay from "./new-components/closeReviewOverlay";
 import BtnGreen from "./new-components/btnGreen";
 
 const LeveragePositionCard = ({
@@ -176,9 +174,8 @@ const LeveragePositionCard = ({
 
         {/* My position */}
         <div className="col-span-2 h-16 flex flex-col items-start justify-center truncate">
-          <div>{`${displayTokenAmount(leveragePosition.amountCollateral)} ${
-            leveragePosition.collateralToken.symbol.split("-")[0]
-          }-${leveragePosition.collateralToken.symbol.split("-")[1]}`}</div>
+          <div>{`${displayTokenAmount(leveragePosition.amountCollateral)} ${leveragePosition.collateralToken.symbol.split("-")[0]
+            }-${leveragePosition.collateralToken.symbol.split("-")[1]}`}</div>
           <div className="text-xs">
             $
             {displayTokenAmount(

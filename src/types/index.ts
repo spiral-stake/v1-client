@@ -18,6 +18,8 @@ export interface CollateralToken extends Token {
   pendleMarket: string;
   loanToken: Token;
   info: TokenInfo;
+  YT: string;
+  expiryTimestamp: number;
 }
 
 export interface TokenInfo {

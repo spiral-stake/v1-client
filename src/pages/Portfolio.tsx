@@ -5,7 +5,8 @@ import { LeveragePosition, Position } from "../types";
 import { useAccount, useChainId } from "wagmi";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import LeveragePositionCard from "../components/LeveragePositionCard";
-import portfolioChart from "../assets/portfolioChart2.svg";
+import legacyAddresses from "../api-services/legacyAddresses.json";
+import LegacyPositions from "../components/LegacyPositions.tsx";
 
 const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [positions, setPositions] = useState<Position[]>([]);
@@ -124,12 +125,18 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               )}
             </div>
           </div>
+
+
         </>
       ) : (
         <h1 className="text-3xl w-full text-center text-gray-300">
           No Open Positions
         </h1>
       )}
+
+      {
+        address && legacyAddresses[address.toLowerCase() as keyof typeof legacyAddresses] && <LegacyPositions />
+      }
     </div>
   ) : (
     <div className="mt-10">

@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import PageTitle from "../components/low-level/PageTitle";
-import LTVSlider from "../components/LTVSlider";
 import BigNumber from "bignumber.js";
 import { CollateralToken, InternalSwapData, Token } from "../types";
 import { useAccount, useChainId } from "wagmi";
@@ -8,8 +6,6 @@ import { calcLeverageApy, calcMaxLeverage } from "../utils";
 import ActionBtn from "../components/ActionBtn";
 import ERC20 from "../contract-hooks/ERC20";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
-import TokenAmount from "../components/TokenAmount";
-import APYInfo from "../components/InfoSection";
 import LeverageBreakdown from "../components/LeverageBreakdown";
 import Action from "../components/Action";
 import {
@@ -18,9 +14,6 @@ import {
   useParams,
   useSearchParams,
 } from "react-router-dom";
-import SectionOverlay from "../components/low-level/SectionOverlay";
-import lockIcon from "../assets/icons/lock-svgrepo-com.svg";
-import closeIcon from "../assets/icons/close.svg";
 import setting from "../assets/icons/setting.svg";
 import {
   getExternalSwapData,
@@ -29,11 +22,7 @@ import {
 import axios from "axios";
 import arrowBack from "../assets/icons/arrowBack.svg";
 import ProductTitle from "../components/new-components/productTitle";
-import chart from "../assets/Chart.svg";
 import pencil from "../assets/icons/pencil.svg";
-import infoIcon from "../assets/icons/infoIcon.svg";
-import wallet from "../assets/icons/wallet.svg";
-import arrowDown from "../assets/icons/arrowDown.svg";
 import NewTokenAmount from "../components/new-components/newTokenAmount";
 import LeverageRange from "../components/new-components/leverageRange";
 import Overlay from "../components/low-level/Overlay";
@@ -212,7 +201,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       }
     };
 
-    // fetchSwapData();
+    fetchSwapData();
   }, [showSummary]);
 
   useEffect(() => {
@@ -372,26 +361,23 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           <div className="">
             <ProductTitle
               icon={`/tokens/${collateralToken.symbol}.svg`}
-              title={`${collateralToken.symbol.split("-")[0]}-${
-                collateralToken.symbol.split("-")[1]
-              } `}
+              title={`${collateralToken.symbol.split("-")[0]}-${collateralToken.symbol.split("-")[1]
+                } `}
               maturity={`${collateralToken.name.slice(
                 collateralToken.name.length - 9,
                 collateralToken.name.length - 7
               )}${" "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 7,
-                    collateralToken.name.length - 4
-                  )}${" "}
+                collateralToken.name.length - 7,
+                collateralToken.name.length - 4
+              )}${" "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 4,
-                    collateralToken.name.length
-                  )}`}
-              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${
-                collateralToken.symbol.split("-")[0]
-              }-${
-                collateralToken.symbol.split("-")[1]
-              } for maximized returns on your idle holdings.`}
+                collateralToken.name.length - 4,
+                collateralToken.name.length
+              )}`}
+              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${collateralToken.symbol.split("-")[0]
+                }-${collateralToken.symbol.split("-")[1]
+                } for maximized returns on your idle holdings.`}
             />
           </div>
 
@@ -667,13 +653,13 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 collateralToken.name.length - 7
               )}${" "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 7,
-                    collateralToken.name.length - 4
-                  )}${", "}
+                collateralToken.name.length - 7,
+                collateralToken.name.length - 4
+              )}${", "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 4,
-                    collateralToken.name.length
-                  )}`}
+                collateralToken.name.length - 4,
+                collateralToken.name.length
+              )}`}
               amountInUsd={Number(
                 BigNumber(amountCollateral).multipliedBy(fromToken.valueInUsd)
               )}

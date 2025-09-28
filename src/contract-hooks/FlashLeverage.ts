@@ -30,13 +30,15 @@ export default class FlashLeverage extends Base {
     this.flashLeverageCore = new FlashLeverageCore(""); // To avoid warning
   }
 
-  static async createInstance(chainId: number) {
+  static async createInstance(chainId: number, legacy?: boolean) {
     const flashLeverageCore = await FlashLeverageCore.createInstance(chainId);
     if (!flashLeverageCore) return;
 
     try {
       const [{ flashLeverageAddress }, _collateralTokens, _usdc] = await Promise.all([
-        import(`../addresses/${chainId}.json`),
+        !legacy
+          ? import(`../addresses/${chainId}.json`)
+          : import(`../legacy-addresses/${chainId}.json`),
         readCollateralTokens(chainId),
         readToken(chainId, "USDC"),
       ]);
