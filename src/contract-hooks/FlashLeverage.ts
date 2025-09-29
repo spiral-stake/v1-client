@@ -204,6 +204,8 @@ export default class FlashLeverage extends Base {
       amountCollateralInLoanToken: bigint;
     }>;
 
+    console.log(_userLeveragePositions);
+
     if (!Array.isArray(_userLeveragePositions)) {
       throw new Error("Invalid positionInfo data received");
     }

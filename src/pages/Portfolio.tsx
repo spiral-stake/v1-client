@@ -135,7 +135,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       )}
 
       {
-        address && legacyAddresses[address.toLowerCase() as keyof typeof legacyAddresses] && <LegacyPositions />
+        address && legacyAddresses[address.toLowerCase() as keyof typeof legacyAddresses] && <LegacyPositions address={address} />
       }
     </div>
   ) : (

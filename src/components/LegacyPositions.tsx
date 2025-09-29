@@ -24,18 +24,19 @@ const LegacyPositions = ({ address }: { address: string }) => {
       setFlashLeverage(_flashLeverage);
     }
 
+    console.log(flashLeverage?.address)
+
     handleChainChange();
   }, [appChainId]);
 
   useEffect(() => {
-    if (!flashLeverage)
-      async function getUserPositions() {
-        if (flashLeverage) {
-          setLeveragePositions([
-            ...(await flashLeverage.getUserLeveragePositions(address)),
-          ]);
-        }
+    async function getUserPositions() {
+      if (flashLeverage) {
+        setLeveragePositions([
+          ...(await flashLeverage.getUserLeveragePositions(address)),
+        ]);
       }
+    }
 
     getUserPositions();
   }, [flashLeverage]);
@@ -45,6 +46,8 @@ const LegacyPositions = ({ address }: { address: string }) => {
       prev.filter((position) => position.id !== positionId)
     );
   }
+
+  console.log(leveragePositions);
 
   return flashLeverage && (
     <div className="bg-white bg-opacity-[4%] rounded-xl p-[12px]">
