@@ -43,8 +43,6 @@ export default class FlashLeverage extends Base {
         readToken(chainId, "USDC"),
       ]);
 
-      console.log(flashLeverageAddress);
-
       const instance = new FlashLeverage(flashLeverageAddress);
 
       instance.flashLeverageCore = flashLeverageCore;

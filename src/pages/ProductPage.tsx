@@ -351,13 +351,17 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const setAmountToMax = (maxLeverageAmount: BigNumber) => {
     const truncated = new BigNumber(userFromTokenBalance)
       .multipliedBy(100)
-      .integerValue(BigNumber.ROUND_FLOOR) // BigNumber floor
-      .div(100); // back to original scale
+      .integerValue(BigNumber.ROUND_FLOOR)
+      .div(100);
 
-    setAmountCollateral(
-      BigNumber.min(truncated, maxLeverageAmount).toFixed(2)
+    const _amountCollateral = BigNumber.max(
+      0,
+      BigNumber.min(truncated, maxLeverageAmount)
     );
+
+    setAmountCollateral(_amountCollateral.toFixed(2));
   };
+
 
   return (
     collateralToken &&
