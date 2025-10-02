@@ -6,8 +6,10 @@ import DropdownIcon from "../low-level/DropDownIcon";
 import Input from "../low-level/Input.tsx";
 import wallet from "../../assets/icons/wallet.svg";
 import truncateStr from "../../utils/truncateStr.ts";
+import { formatNumber } from "../../utils/formatNumber.ts";
 
 const NewTokenAmount = ({
+  maxLeverageAmount,
   tokens,
   selectedToken,
   handleTokenChange,
@@ -26,7 +28,8 @@ const NewTokenAmount = ({
   amountInUsd: BigNumber;
   error?: string;
   balance: BigNumber;
-  setAmountToMax: () => void;
+  setAmountToMax: (maxLeverageAmount: BigNumber) => void;
+  maxLeverageAmount: BigNumber
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -65,9 +68,8 @@ const NewTokenAmount = ({
           <div className="relative transition-all duration-300" ref={ref}>
             <div
               onClick={() => setIsOpen(!isOpen)}
-              className={`cursor-pointer flex w-full gap-[8px] items-center ${
-                isOpen ? "rounded-b-none border-b-0" : ""
-              } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
+              className={`cursor-pointer flex w-full gap-[8px] items-center ${isOpen ? "rounded-b-none border-b-0" : ""
+                } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
             >
               {/* Need to add Symbol */}
               <div className="w-[60px]">
@@ -120,8 +122,9 @@ const NewTokenAmount = ({
             {truncateStr(selectedToken.symbol, 12)}
           </p>
         </div>
-        <div>
-          <p className="cursor-pointer" onClick={setAmountToMax}>
+        <div className="flex items-center gap-1">
+          <p className="text-[#8E8E8E]">${formatNumber(maxLeverageAmount)}</p>
+          <p className="cursor-pointer" onClick={() => setAmountToMax(maxLeverageAmount)}>
             MAX
           </p>
         </div>

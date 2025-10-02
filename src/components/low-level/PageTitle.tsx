@@ -10,7 +10,7 @@ const PageTitle = ({
       <div className="w-[75%] lg:w-full justify-start text-white text-3xl font-['Outfit'] font-normal">
         {title}
       </div>
-      <div className="max-w-[650px] pr-[10px] justify-start text-[16px] font-[400] text-[#B3B3B3] font-[Outfit] leading-normal">
+      <div className="max-w-[650px] pr-[10px] justify-start text-[16px] text-[#B3B3B3] font-[Outfit]">
         {subheading}
       </div>
     </div>

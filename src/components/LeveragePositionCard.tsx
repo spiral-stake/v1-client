@@ -63,14 +63,14 @@ const LeveragePositionCard = ({
       ])
     ).result;
 
-    console.log(
-      formatUnits(
-        amountReturnedSimulated,
-        leveragePosition.collateralToken.loanToken.decimals
-      )
-        .minus(leveragePosition.amountCollateralInLoanToken)
-        .toString()
-    );
+    // console.log(
+    //   formatUnits(
+    //     amountReturnedSimulated,
+    //     leveragePosition.collateralToken.loanToken.decimals
+    //   )
+    //     .minus(leveragePosition.amountCollateralInLoanToken)
+    //     .toString()
+    // );
 
     const amountReturned = await flashLeverage.unleverage(
       address as string,

@@ -34,6 +34,7 @@ import SlippageRange from "../components/new-components/slippageRange";
 import { useQuery } from "wagmi/query";
 import auto from "../assets/icons/auto.svg";
 import { getSlippage } from "../utils/getSlippage";
+import { formatNumber } from "../utils/formatNumber";
 
 const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [showSlippage, setShowSlippage] = useState(false);
@@ -122,6 +123,8 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   }, [address, fromToken]);
 
   useEffect(() => {
+    if (!collateralToken) return;
+
     const updateActionBtn = async () => {
       if (amountCollateral == "" || BigNumber(amountCollateral).isZero()) {
         return setActionBtn((prev) => ({
@@ -137,15 +140,12 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           disabled: true,
           error: "Amount exceeds your available balance",
         }));
-        // } else if (BigNumber(amountCollateral).isGreaterThan(100)) {
-        //   return setActionBtn((prev) => ({
-        //     ...prev,
-        //     disabled: true,
-        //     error: `Deposit amount is capped at ${displayTokenAmount(
-        //       BigNumber(100),
-        //       collateralToken
-        //     )}`,
-        //   }));
+      } else if (BigNumber(amountCollateral).isGreaterThan(BigNumber(collateralToken.liquidityAssetsUsd).dividedBy(BigNumber(calcMaxLeverage(desiredLtv)).minus(1)).minus(1000))) {
+        return setActionBtn((prev) => ({
+          ...prev,
+          disabled: true,
+          error: "Exceeds Max Leverage Amount",
+        }));
       } else {
         return setActionBtn((prev) => ({
           ...prev,
@@ -156,8 +156,18 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       }
     };
 
+    //  else if (BigNumber(amountCollateral).isGreaterThan(100)) {
+    //   return setActionBtn((prev) => ({
+    //     ...prev,
+    //     disabled: true,
+    //     error: `Deposit amount is capped at ${displayTokenAmount(
+    //       BigNumber(100),
+    //       collateralToken
+    //     )}`,
+    //   })); 
+
     updateActionBtn();
-  }, [amountCollateral, userFromTokenBalance]);
+  }, [collateralToken, amountCollateral, userFromTokenBalance]);
 
   useEffect(() => {
     if (!collateralToken || !fromToken) return;
@@ -338,11 +348,15 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     }
   }
 
-  const setAmountToMax = () => {
-    const truncated = (
-      Math.floor(userFromTokenBalance.toNumber() * 100) / 100
-    ).toFixed(2);
-    setAmountCollateral(truncated);
+  const setAmountToMax = (maxLeverageAmount: BigNumber) => {
+    const truncated = new BigNumber(userFromTokenBalance)
+      .multipliedBy(100)
+      .integerValue(BigNumber.ROUND_FLOOR) // BigNumber floor
+      .div(100); // back to original scale
+
+    setAmountCollateral(
+      BigNumber.min(truncated, maxLeverageAmount).toFixed(2)
+    );
   };
 
   return (
@@ -545,7 +559,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   </p>{" "}
                   {autoMode && <img src={auto} alt="" className="w-[24px]" />}
                 </div>
-                <div className="flex  items-center gap-[8px]">
+                <div className="flex items-center gap-[8px]">
                   <img
                     src={setting}
                     alt=""
@@ -582,6 +596,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               error={actionBtn.error}
               balance={userFromTokenBalance}
               setAmountToMax={setAmountToMax}
+              maxLeverageAmount={BigNumber(collateralToken.liquidityAssetsUsd).dividedBy(BigNumber(calcMaxLeverage(desiredLtv)).minus(1)).minus(1000)}
             />
 
             {/* old deposit button */}
@@ -608,7 +623,16 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   ).toFixed(4)}
                 </p>
               </div>
+              <div className="flex justify-between items-center">
+                <p>Available Borrow</p>
+                <p>${`${formatNumber(collateralToken.liquidityAssetsUsd)}`}</p>
+              </div>
+              <div className="flex justify-between items-center">
+                <p>Borrow Market</p>
+                <a className="text-white underline" target="_blank" href={`https://app.morpho.org/ethereum/market/${collateralToken.morphoMarketId}`}> <p>{`PT-${collateralToken.symbol.split("-")[1]} / ${collateralToken.loanToken.symbol}`}</p></a>
+              </div>
             </div>
+
 
             {/* review section */}
             {showSummary && (
@@ -720,8 +744,8 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             error={actionBtn.error}
             balance={userFromTokenBalance}
             setAmountToMax={setAmountToMax}
+            maxLeverageAmount={BigNumber(collateralToken.liquidityAssetsUsd).dividedBy(BigNumber(calcMaxLeverage(desiredLtv)).minus(1)).minus(1000)}
           />
-
           {/* old deposit button */}
           <ActionBtn
             btnLoading={false}
@@ -745,6 +769,14 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   Number(collateralToken.valueInUsd)
                 ).toFixed(4)}
               </p>
+            </div>
+            <div className="flex justify-between items-center">
+              <p>Available Borrow</p>
+              <p>${`${formatNumber(collateralToken.liquidityAssetsUsd)}`}</p>
+            </div>
+            <div className="flex justify-between items-center">
+              <p>Borrow Market</p>
+              <a className="text-white underline" target="_blank" href={`https://app.morpho.org/ethereum/market/${collateralToken.morphoMarketId}`}> <p>{`PT-${collateralToken.symbol.split("-")[1]} / ${collateralToken.loanToken.symbol}`}</p></a>
             </div>
           </div>
 

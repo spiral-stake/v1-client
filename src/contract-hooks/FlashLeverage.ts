@@ -8,7 +8,7 @@ import { readCollateralTokens, readToken } from "../api-services/contractsData.t
 import BigNumber from "bignumber.js";
 import FlashLeverageCore from "./FlashLeverageCore.ts";
 import { getImpliedApy } from "../api-services/pendle.ts";
-import { getBorrowApy } from "../api-services/morpho.ts";
+import { getMarketData } from "../api-services/morpho.ts";
 
 export default class FlashLeverage extends Base {
   public chainId: number = 0;
@@ -31,7 +31,7 @@ export default class FlashLeverage extends Base {
   }
 
   static async createInstance(chainId: number, legacy?: boolean) {
-    const flashLeverageCore = await FlashLeverageCore.createInstance(chainId);
+    const flashLeverageCore = await FlashLeverageCore.createInstance(chainId, legacy);
     if (!flashLeverageCore) return;
 
     try {
@@ -43,6 +43,8 @@ export default class FlashLeverage extends Base {
         readToken(chainId, "USDC"),
       ]);
 
+      console.log(flashLeverageAddress);
+
       const instance = new FlashLeverage(flashLeverageAddress);
 
       instance.flashLeverageCore = flashLeverageCore;
@@ -51,19 +53,20 @@ export default class FlashLeverage extends Base {
       instance.collateralTokens = await Promise.all(
         _collateralTokens.map(
           async (collateralToken: CollateralToken): Promise<CollateralToken> => {
-            const [valueInUsd, maxLtv, liqLtv, impliedApy, borrowApy] = await Promise.all([
+            const [valueInUsd, maxLtv, liqLtv, impliedApy, marketData] = await Promise.all([
               instance.flashLeverageCore.getTokenUsdValue(collateralToken, "1"),
               instance.flashLeverageCore.getMaxLtv(collateralToken, collateralToken.loanToken),
               instance.flashLeverageCore.getLiqLtv(collateralToken, collateralToken.loanToken),
               getImpliedApy(chainId, collateralToken),
-              getBorrowApy(chainId, collateralToken),
+              getMarketData(chainId, collateralToken),
             ]);
 
             return {
               ...collateralToken,
               valueInUsd,
               impliedApy,
-              borrowApy,
+              borrowApy: marketData.borrowApy,
+              liquidityAssetsUsd: marketData.liquidityAssetsUsd,
               safeLtv: maxLtv.minus(1).toFixed(2),
               maxLtv: maxLtv.toFixed(2),
               liqLtv: liqLtv.toFixed(2),
@@ -203,8 +206,6 @@ export default class FlashLeverage extends Base {
       positionValueInLoanToken: bigint;
       amountCollateralInLoanToken: bigint;
     }>;
-
-    console.log(_userLeveragePositions);
 
     if (!Array.isArray(_userLeveragePositions)) {
       throw new Error("Invalid positionInfo data received");

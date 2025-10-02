@@ -10,9 +10,7 @@ import LegacyPositions from "../components/LegacyPositions.tsx";
 
 const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [positions, setPositions] = useState<Position[]>([]);
-  const [leveragePositions, setLeveragePositions] = useState<
-    LeveragePosition[]
-  >([]);
+  const [leveragePositions, setLeveragePositions] = useState<LeveragePosition[]>([]);
   const [showLoader, setShowLoader] = useState(true);
 
   const { address } = useAccount();
@@ -20,12 +18,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
   const sum = leveragePositions.reduce(
     (total, current) =>
-      total +
-      Number(
-        current.amountCollateral.multipliedBy(
-          current.collateralToken.valueInUsd
-        )
-      ),
+      total + Number(current.amountCollateral.multipliedBy(current.collateralToken.valueInUsd)),
     0
   );
 
@@ -42,9 +35,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       if (!chainId || !address) return;
 
       if (flashLeverage) {
-        setLeveragePositions([
-          ...(await flashLeverage.getUserLeveragePositions(address)),
-        ]);
+        setLeveragePositions([...(await flashLeverage.getUserLeveragePositions(address))]);
       }
     }
 
@@ -52,9 +43,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   }, [address, flashLeverage]);
 
   function deleteLeveragePosition(positionId: number) {
-    setLeveragePositions((prev) =>
-      prev.filter((position) => position.id !== positionId)
-    );
+    setLeveragePositions((prev) => prev.filter((position) => position.id !== positionId));
   }
 
   return flashLeverage ? (
@@ -73,9 +62,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           <div className="w-full flex p-[24px] gap-[100px] bg-white bg-opacity-[4%] rounded-[20px] border-[1px] border-white border-opacity-[6%]">
             <div className="flex flex-col">
               <p className="text-[14px] text-[#B6B6B6]">My positions</p>
-              <p className="text-[24px] font-[500] text-[#E4E4E4]">
-                ${sum.toFixed(2)}
-              </p>
+              <p className="text-[24px] font-[500] text-[#E4E4E4]">${sum.toFixed(2)}</p>
             </div>
             <div className="flex flex-col">
               <p className="text-[14px] text-[#B6B6B6]">Total positions</p>
@@ -92,9 +79,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 <span>#</span>
               </div>
               <div className="col-span-2 flex justify-start items-center">
-                <span className="w-full inline-flex justify-start items-center gap-4">
-                  SLYs
-                </span>
+                <span className="w-full inline-flex justify-start items-center gap-4">SLYs</span>
               </div>
 
               <div className="col-span-1 flex justify-start items-center">
@@ -113,30 +98,24 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             </div>
             {/* <div className="h-0 w-full px-5 outline-[10px] outline-gray-600"/> */}
             <div className="">
-              {leveragePositions.map(
-                (leveragePosition: LeveragePosition, index: number) => (
-                  <LeveragePositionCard
-                    key={index}
-                    leveragePosition={leveragePosition}
-                    flashLeverage={flashLeverage}
-                    deleteLeveragePosition={deleteLeveragePosition}
-                  />
-                )
-              )}
+              {leveragePositions.map((leveragePosition: LeveragePosition, index: number) => (
+                <LeveragePositionCard
+                  key={index}
+                  leveragePosition={leveragePosition}
+                  flashLeverage={flashLeverage}
+                  deleteLeveragePosition={deleteLeveragePosition}
+                />
+              ))}
             </div>
           </div>
-
-
         </>
       ) : (
-        <h1 className="text-3xl w-full text-center text-gray-300">
-          No Open Positions
-        </h1>
+        <h1 className="text-3xl w-full text-center text-gray-300">No Open Positions</h1>
       )}
 
-      {
-        address && legacyAddresses[address.toLowerCase() as keyof typeof legacyAddresses] && <LegacyPositions address={address} />
-      }
+      {address && legacyAddresses[address.toLowerCase() as keyof typeof legacyAddresses] && (
+        <LegacyPositions address={address} />
+      )}
     </div>
   ) : (
     <div className="mt-10">

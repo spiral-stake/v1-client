@@ -128,8 +128,6 @@ export async function getInternalReswapData(
       params
     );
 
-    console.log(res);
-
     return {
       pendleSwap: res.contractCallParams[3].pendleSwap,
       tokenRedeemSy: res.contractCallParams[3].tokenRedeemSy,
@@ -149,8 +147,6 @@ export async function getInternalReswapData(
     };
 
     const res = await callSDK(`/v2/sdk/${chainId}/redeem`, params);
-
-    console.log(res);
 
     return {
       pendleSwap: res.contractCallParams[3].pendleSwap,
