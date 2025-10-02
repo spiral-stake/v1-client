@@ -140,7 +140,12 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           disabled: true,
           error: "Amount exceeds your available balance",
         }));
-      } else if (BigNumber(amountCollateral).isGreaterThan(BigNumber(collateralToken.liquidityAssetsUsd).dividedBy(BigNumber(calcMaxLeverage(desiredLtv)).minus(1)).minus(1000))) {
+      } else if (BigNumber(amountCollateral).isGreaterThan(BigNumber.max(
+        0,
+        new BigNumber(collateralToken?.liquidityAssetsUsd)
+          .dividedBy(new BigNumber(calcMaxLeverage(desiredLtv)).minus(1))
+          .minus(1000)
+      ))) {
         return setActionBtn((prev) => ({
           ...prev,
           disabled: true,
@@ -167,7 +172,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     //   })); 
 
     updateActionBtn();
-  }, [collateralToken, amountCollateral, userFromTokenBalance]);
+  }, [collateralToken, desiredLtv, amountCollateral, userFromTokenBalance]);
 
   useEffect(() => {
     if (!collateralToken || !fromToken) return;
@@ -351,17 +356,13 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const setAmountToMax = (maxLeverageAmount: BigNumber) => {
     const truncated = new BigNumber(userFromTokenBalance)
       .multipliedBy(100)
-      .integerValue(BigNumber.ROUND_FLOOR)
-      .div(100);
+      .integerValue(BigNumber.ROUND_FLOOR) // BigNumber floor
+      .div(100); // back to original scale
 
-    const _amountCollateral = BigNumber.max(
-      0,
-      BigNumber.min(truncated, maxLeverageAmount)
+    setAmountCollateral(
+      BigNumber.min(truncated, maxLeverageAmount).toFixed(2)
     );
-
-    setAmountCollateral(_amountCollateral.toFixed(2));
   };
-
 
   return (
     collateralToken &&
@@ -600,7 +601,12 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               error={actionBtn.error}
               balance={userFromTokenBalance}
               setAmountToMax={setAmountToMax}
-              maxLeverageAmount={BigNumber(collateralToken.liquidityAssetsUsd).dividedBy(BigNumber(calcMaxLeverage(desiredLtv)).minus(1)).minus(1000)}
+              maxLeverageAmount={BigNumber.max(
+                0,
+                new BigNumber(collateralToken?.liquidityAssetsUsd)
+                  .dividedBy(new BigNumber(calcMaxLeverage(desiredLtv)).minus(1))
+                  .minus(1000)
+              )}
             />
 
             {/* old deposit button */}
@@ -748,7 +754,12 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             error={actionBtn.error}
             balance={userFromTokenBalance}
             setAmountToMax={setAmountToMax}
-            maxLeverageAmount={BigNumber(collateralToken.liquidityAssetsUsd).dividedBy(BigNumber(calcMaxLeverage(desiredLtv)).minus(1)).minus(1000)}
+            maxLeverageAmount={BigNumber.max(
+              0,
+              new BigNumber(collateralToken?.liquidityAssetsUsd)
+                .dividedBy(new BigNumber(calcMaxLeverage(desiredLtv)).minus(1))
+                .minus(1000)
+            )}
           />
           {/* old deposit button */}
           <ActionBtn
