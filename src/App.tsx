@@ -12,10 +12,13 @@ import Loader from "./components/low-level/Loader";
 import axios from "axios";
 import Test from "./components/new-components/test";
 import ProductPage from "./pages/ProductPage";
+import Help from "./components/new-components/help";
+import Feedback from "./components/new-components/feedback";
 
 function App() {
   const [flashLeverage, setFlashLeverage] = useState<FlashLeverage>();
   const [dropdown, setDropDown] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
   const [overlay, setOverlay] = useState<React.ReactNode>();
 
   const { address, chainId } = useAccount();
@@ -48,6 +51,7 @@ function App() {
 
   return (
     <div className="app font-[Outfit] font-[340] relative overflow-hidden ">
+      <Help onClick={() => setShowFeedback(true)} />
       <Toaster />
       {!dropdown ? (
         <Navbar showDropdown={showDropdown} />
@@ -55,7 +59,7 @@ function App() {
         <DropdownMenu showDropdown={showDropdown} />
       )}
 
-      {flashLeverage&&!dropdown ? (
+      {flashLeverage && !dropdown ? (
         <main className="px-4 lg:px-16">
           <Routes>
             <Route
@@ -80,9 +84,13 @@ function App() {
           <Overlay overlay={overlay} />
         </main>
       ) : (
-        <div className={`mt-10 ${dropdown?"hidden":""}`}>
+        <div className={`mt-10 ${dropdown ? "hidden" : ""}`}>
           <Loader />
         </div>
+      )}
+
+      {showFeedback && (
+        <Overlay overlay={<Feedback setShowFeedback={setShowFeedback} />} />
       )}
     </div>
   );

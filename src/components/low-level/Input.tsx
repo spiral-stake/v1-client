@@ -31,6 +31,7 @@ const Input = ({
       placeholder={placeholder}
       name={name}
       className="justify-start text-white w-full lg:flex-grow text-[20px] font-normal font-['Outfit'] bg-transparent outline-none"
+      style={Number(value)<5000?{color: "#f0cd43" }:{ color: "green" }}
     />
   );
 };
