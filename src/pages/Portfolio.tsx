@@ -6,6 +6,7 @@ import { useAccount, useChainId } from "wagmi";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import LeveragePositionCard from "../components/LeveragePositionCard";
 import portfolioChart from "../assets/portfolioChart2.svg";
+import NewLeveragePositionCard from "../components/new-components/newLeveragePositionCard";
 
 const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [positions, setPositions] = useState<Position[]>([]);
@@ -85,36 +86,12 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           </div>
 
           {/* mobile */}
-          <div className="bg-white bg-opacity-[4%] rounded-xl p-[12px]">
-            <div className="hidden py-5 w-full lg:grid grid-cols-12 px-5 border-b-[1px] border-white border-opacity-[10%]">
-              <div className="col-span-1 flex px-3 justify-start items-center">
-                <span>#</span>
-              </div>
-              <div className="col-span-2 flex justify-start items-center">
-                <span className="w-full inline-flex justify-start items-center gap-4">
-                  SLYs
-                </span>
-              </div>
-
-              <div className="col-span-1 flex justify-start items-center">
-                <span>Leverage</span>
-              </div>
-              <div className="col-span-2 flex justify-start px-4 items-center">
-                <span>LTV</span>
-              </div>
-              <div className="col-span-2 flex justify-start items-center">
-                <span>Leveraged(APY)</span>
-              </div>
-              <div className="col-span-2 flex justify-start items-center">
-                <span>My position</span>
-              </div>
-              <div className="col-span-2 flex justify-start items-center"></div>
-            </div>
-            {/* <div className="h-0 w-full px-5 outline-[10px] outline-gray-600"/> */}
-            <div className="">
+          <div className="">
+            
+            <div className="flex flex-col gap-[24px]">
               {leveragePositions.map(
                 (leveragePosition: LeveragePosition, index: number) => (
-                  <LeveragePositionCard
+                  <NewLeveragePositionCard
                     key={index}
                     leveragePosition={leveragePosition}
                     flashLeverage={flashLeverage}

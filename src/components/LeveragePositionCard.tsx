@@ -181,12 +181,6 @@ const LeveragePositionCard = ({
         {/* action btn */}
         <div className="hidden lg:inline-flex col-span-1 justify-end">
           <div className="w-1/2 hidden lg:inline-block">
-            {/* <ActionBtn
-              btnLoading={loading}
-              text="Close"
-              onClick={handleAsync(handleCloseLeveragePosition, setLoading)}
-              expectedChainId={Number(chainId)}
-            /> */}
             <BtnFull
               text="close"
               onClick={() => {
@@ -196,12 +190,6 @@ const LeveragePositionCard = ({
           </div>
         </div>
         <div className="col-span-4 mx-[8px] lg:hidden">
-          {/* <ActionBtn
-            btnLoading={loading}
-            text="Close"
-            onClick={handleAsync(handleCloseLeveragePosition, setLoading)}
-            expectedChainId={Number(chainId)}
-          /> */}
           <BtnFull
             text="close"
             onClick={() => {
