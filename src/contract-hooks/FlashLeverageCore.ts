@@ -21,10 +21,12 @@ export default class FlashLeverageCore extends Base {
     super(flashLeverageAddress, FLASH_LEVERAGE_CORE_ABI);
   }
 
-  static async createInstance(chainId: number) {
+  static async createInstance(chainId: number, legacy?: boolean) {
     try {
       const [{ flashLeverageCoreAddress }, _usdc] = await Promise.all([
-        import(`../addresses/${chainId}.json`),
+        !legacy
+          ? import(`../addresses/${chainId}.json`)
+          : import(`../legacy-addresses/${chainId}.json`),
         readToken(chainId, "USDC"),
       ]);
 

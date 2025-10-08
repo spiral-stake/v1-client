@@ -13,8 +13,6 @@ import BigNumber from "bignumber.js";
 import axios from "axios";
 import { formatUnits } from "../utils/formatUnits";
 import { getSlippage } from "../utils/getSlippage";
-import Overlay from "./low-level/Overlay";
-import CloseReviewOverlay from "./new-components/closeReviewOverlay";
 import BtnGreen from "./new-components/btnGreen";
 import BtnFull from "./low-level/BtnFull";
 
@@ -57,14 +55,14 @@ const LeveragePositionCard = ({
       ])
     ).result;
 
-    console.log(
-      formatUnits(
-        amountReturnedSimulated,
-        leveragePosition.collateralToken.loanToken.decimals
-      )
-        .minus(leveragePosition.amountCollateralInLoanToken)
-        .toString()
-    );
+    // console.log(
+    //   formatUnits(
+    //     amountReturnedSimulated,
+    //     leveragePosition.collateralToken.loanToken.decimals
+    //   )
+    //     .minus(leveragePosition.amountCollateralInLoanToken)
+    //     .toString()
+    // );
 
     const amountReturned = await flashLeverage.unleverage(
       address as string,
@@ -76,12 +74,15 @@ const LeveragePositionCard = ({
       limitOrderData
     );
 
-    if (chainId !== 31337) {
-      axios.put("https://dapi.spiralstake.xyz/leverage/close", {
-        user: leveragePosition.owner.toLowerCase(),
-        positionId: leveragePosition.id,
-      });
-    }
+    const baseUrl = chainId !== 31337
+      ? "https://api.spiralstake.xyz"
+      : "http://localhost:5000";
+
+    axios.put(`${baseUrl}/leverage/close`, {
+      user: leveragePosition.owner.toLowerCase(),
+      positionId: leveragePosition.id,
+      amountReturnedInUsd: amountReturned
+    });
 
     deleteLeveragePosition(leveragePosition.id);
     toastSuccess(
@@ -165,9 +166,8 @@ const LeveragePositionCard = ({
 
         {/* My position */}
         <div className="col-span-2 h-16 flex flex-col items-start justify-center truncate">
-          <div>{`${displayTokenAmount(leveragePosition.amountCollateral)} ${
-            leveragePosition.collateralToken.symbol.split("-")[0]
-          }-${leveragePosition.collateralToken.symbol.split("-")[1]}`}</div>
+          <div>{`${displayTokenAmount(leveragePosition.amountCollateral)} ${leveragePosition.collateralToken.symbol.split("-")[0]
+            }-${leveragePosition.collateralToken.symbol.split("-")[1]}`}</div>
           <div className="text-xs">
             $
             {displayTokenAmount(

@@ -8,7 +8,7 @@ import { readCollateralTokens, readToken } from "../api-services/contractsData.t
 import BigNumber from "bignumber.js";
 import FlashLeverageCore from "./FlashLeverageCore.ts";
 import { getImpliedApy } from "../api-services/pendle.ts";
-import { getBorrowApy } from "../api-services/morpho.ts";
+import { getMarketData } from "../api-services/morpho.ts";
 
 export default class FlashLeverage extends Base {
   public chainId: number = 0;
@@ -30,13 +30,15 @@ export default class FlashLeverage extends Base {
     this.flashLeverageCore = new FlashLeverageCore(""); // To avoid warning
   }
 
-  static async createInstance(chainId: number) {
-    const flashLeverageCore = await FlashLeverageCore.createInstance(chainId);
+  static async createInstance(chainId: number, legacy?: boolean) {
+    const flashLeverageCore = await FlashLeverageCore.createInstance(chainId, legacy);
     if (!flashLeverageCore) return;
 
     try {
       const [{ flashLeverageAddress }, _collateralTokens, _usdc] = await Promise.all([
-        import(`../addresses/${chainId}.json`),
+        !legacy
+          ? import(`../addresses/${chainId}.json`)
+          : import(`../legacy-addresses/${chainId}.json`),
         readCollateralTokens(chainId),
         readToken(chainId, "USDC"),
       ]);
@@ -49,19 +51,20 @@ export default class FlashLeverage extends Base {
       instance.collateralTokens = await Promise.all(
         _collateralTokens.map(
           async (collateralToken: CollateralToken): Promise<CollateralToken> => {
-            const [valueInUsd, maxLtv, liqLtv, impliedApy, borrowApy] = await Promise.all([
+            const [valueInUsd, maxLtv, liqLtv, impliedApy, marketData] = await Promise.all([
               instance.flashLeverageCore.getTokenUsdValue(collateralToken, "1"),
               instance.flashLeverageCore.getMaxLtv(collateralToken, collateralToken.loanToken),
               instance.flashLeverageCore.getLiqLtv(collateralToken, collateralToken.loanToken),
               getImpliedApy(chainId, collateralToken),
-              getBorrowApy(chainId, collateralToken),
+              getMarketData(chainId, collateralToken),
             ]);
 
             return {
               ...collateralToken,
               valueInUsd,
               impliedApy,
-              borrowApy,
+              borrowApy: marketData.borrowApy,
+              liquidityAssetsUsd: marketData.liquidityAssetsUsd,
               safeLtv: maxLtv.minus(1).toFixed(2),
               maxLtv: maxLtv.toFixed(2),
               liqLtv: liqLtv.toFixed(2),
@@ -104,11 +107,21 @@ export default class FlashLeverage extends Base {
       },
     ]);
 
-    const { positionId } = this.decodeEvent(txReceipt, "LeveragePositionOpened") as {
+    const { positionId, amountDepositedInLoanToken } = this.decodeEvent(
+      txReceipt,
+      "LeveragePositionOpened"
+    ) as {
       positionId: bigint;
+      amountDepositedInLoanToken: bigint;
     };
 
-    return Number(positionId);
+    return {
+      positionId: Number(positionId),
+      amountDepositedInUsd: formatUnits(
+        amountDepositedInLoanToken,
+        collateralToken.loanToken.decimals
+      ),
+    };
   }
 
   async leverage(
@@ -129,11 +142,21 @@ export default class FlashLeverage extends Base {
       },
     ]);
 
-    const { positionId } = this.decodeEvent(txReceipt, "LeveragePositionOpened") as {
+    const { positionId, amountDepositedInLoanToken } = this.decodeEvent(
+      txReceipt,
+      "LeveragePositionOpened"
+    ) as {
       positionId: bigint;
+      amountDepositedInLoanToken: bigint;
     };
 
-    return Number(positionId);
+    return {
+      positionId: Number(positionId),
+      amountDepositedInUsd: formatUnits(
+        amountDepositedInLoanToken,
+        collateralToken.loanToken.decimals
+      ),
+    };
   }
 
   async unleverage(

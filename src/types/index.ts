@@ -11,6 +11,7 @@ export interface Token {
 export interface CollateralToken extends Token {
   impliedApy: string;
   borrowApy: string;
+  liquidityAssetsUsd: number;
   safeLtv: string;
   maxLtv: string;
   liqLtv: string;
@@ -18,6 +19,8 @@ export interface CollateralToken extends Token {
   pendleMarket: string;
   loanToken: Token;
   info: TokenInfo;
+  YT: string;
+  expiryTimestamp: number;
 }
 
 export interface TokenInfo {

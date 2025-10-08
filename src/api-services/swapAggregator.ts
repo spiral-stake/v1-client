@@ -42,7 +42,7 @@ export async function getExternalSwapData(
     tokenOut: collateralToken.address,
     amountIn: parseUnits(amount, fromToken.decimals),
     enableAggregator: true,
-    aggregators: "odos, okx, paraswap",
+    aggregators: "kyberswap, okx",
   };
 
   const res = await callSDK<InternalSwapData>(
@@ -84,7 +84,7 @@ export async function getInternalSwapData(
     tokenOut: collateralToken.address,
     amountIn: amountLoan,
     enableAggregator: true,
-    aggregators: "odos, okx, paraswap",
+    aggregators: "kyberswap, okx",
   };
 
   const res = await callSDK(
@@ -110,27 +110,56 @@ export async function getInternalReswapData(
   amountLeveragedCollateral: BigNumber
 ): Promise<InternalReswapData> {
   if (chainId == 31337) chainId = 1;
+  const currentTimestamp = Math.floor(Date.now() / 1000);
 
-  const params = {
-    receiver: flashLeverage.flashLeverageCore.address,
-    slippage,
-    tokenIn: collateralToken.address,
-    tokenOut: collateralToken.loanToken.address,
-    amountIn: String(parseUnits(String(amountLeveragedCollateral), collateralToken.decimals)),
-    enableAggregator: true,
-    aggregators: "odos, okx, paraswap",
-  };
+  if (currentTimestamp < collateralToken.expiryTimestamp) {
+    const params = {
+      receiver: flashLeverage.flashLeverageCore.address,
+      slippage,
+      tokenIn: collateralToken.address,
+      tokenOut: collateralToken.loanToken.address,
+      amountIn: String(parseUnits(String(amountLeveragedCollateral), collateralToken.decimals)),
+      enableAggregator: true,
+      aggregators: "kyberswap, okx",
+    };
 
-  const res = await callSDK(
-    `/v2/sdk/${chainId}/markets/${collateralToken.pendleMarket}/swap`,
-    params
-  );
+    const res = await callSDK(
+      `/v2/sdk/${chainId}/markets/${collateralToken.pendleMarket}/swap`,
+      params
+    );
 
-  return {
-    pendleSwap: res.contractCallParams[3].pendleSwap,
-    tokenRedeemSy: res.contractCallParams[3].tokenRedeemSy,
-    minTokenOut: BigInt(res.contractCallParams[3].minTokenOut),
-    swapData: res.contractCallParams[3].swapData,
-    limitOrderData: res.contractCallParams[4],
-  };
+    return {
+      pendleSwap: res.contractCallParams[3].pendleSwap,
+      tokenRedeemSy: res.contractCallParams[3].tokenRedeemSy,
+      minTokenOut: BigInt(res.contractCallParams[3].minTokenOut),
+      swapData: res.contractCallParams[3].swapData,
+      limitOrderData: res.contractCallParams[4],
+    };
+  } else {
+    const params = {
+      receiver: flashLeverage.flashLeverageCore.address,
+      slippage,
+      yt: collateralToken.YT,
+      tokenOut: collateralToken.loanToken.address,
+      amountIn: String(parseUnits(String(amountLeveragedCollateral), collateralToken.decimals)),
+      enableAggregator: true,
+      aggregators: "kyberswap, okx",
+    };
+
+    const res = await callSDK(`/v2/sdk/${chainId}/redeem`, params);
+
+    return {
+      pendleSwap: res.contractCallParams[3].pendleSwap,
+      tokenRedeemSy: res.contractCallParams[3].tokenRedeemSy,
+      minTokenOut: BigInt(res.contractCallParams[3].minTokenOut),
+      swapData: res.contractCallParams[3].swapData,
+      limitOrderData: {
+        limitRouter: "0x0000000000000000000000000000000000000000",
+        epsSkipMarket: "0",
+        normalFills: [],
+        flashFills: [],
+        optData: "0x",
+      },
+    };
+  }
 }

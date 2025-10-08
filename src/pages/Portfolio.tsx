@@ -7,12 +7,12 @@ import FlashLeverage from "../contract-hooks/FlashLeverage";
 import LeveragePositionCard from "../components/LeveragePositionCard";
 import portfolioChart from "../assets/portfolioChart2.svg";
 import NewLeveragePositionCard from "../components/new-components/newLeveragePositionCard";
+import legacyAddresses from "../api-services/legacyAddresses.json";
+import LegacyPositions from "../components/LegacyPositions.tsx";
 
 const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [positions, setPositions] = useState<Position[]>([]);
-  const [leveragePositions, setLeveragePositions] = useState<
-    LeveragePosition[]
-  >([]);
+  const [leveragePositions, setLeveragePositions] = useState<LeveragePosition[]>([]);
   const [showLoader, setShowLoader] = useState(true);
 
   const { address } = useAccount();
@@ -20,12 +20,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
   const sum = leveragePositions.reduce(
     (total, current) =>
-      total +
-      Number(
-        current.amountCollateral.multipliedBy(
-          current.collateralToken.valueInUsd
-        )
-      ),
+      total + Number(current.amountCollateral.multipliedBy(current.collateralToken.valueInUsd)),
     0
   );
 
@@ -42,9 +37,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       if (!chainId || !address) return;
 
       if (flashLeverage) {
-        setLeveragePositions([
-          ...(await flashLeverage.getUserLeveragePositions(address)),
-        ]);
+        setLeveragePositions([...(await flashLeverage.getUserLeveragePositions(address))]);
       }
     }
 
@@ -52,9 +45,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   }, [address, flashLeverage]);
 
   function deleteLeveragePosition(positionId: number) {
-    setLeveragePositions((prev) =>
-      prev.filter((position) => position.id !== positionId)
-    );
+    setLeveragePositions((prev) => prev.filter((position) => position.id !== positionId));
   }
 
   return flashLeverage ? (
@@ -73,9 +64,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           <div className="w-full flex p-[24px] gap-[100px] bg-white bg-opacity-[4%] rounded-[20px] border-[1px] border-white border-opacity-[6%]">
             <div className="flex flex-col">
               <p className="text-[14px] text-[#B6B6B6]">My positions</p>
-              <p className="text-[24px] font-[500] text-[#E4E4E4]">
-                ${sum.toFixed(2)}
-              </p>
+              <p className="text-[24px] font-[500] text-[#E4E4E4]">${sum.toFixed(2)}</p>
             </div>
             <div className="flex flex-col">
               <p className="text-[14px] text-[#B6B6B6]">Total positions</p>
@@ -99,13 +88,48 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   />
                 )
               )}
+          <div className="bg-white bg-opacity-[4%] rounded-xl p-[12px]">
+            <div className="hidden py-5 w-full lg:grid grid-cols-12 px-5 border-b-[1px] border-white border-opacity-[10%]">
+              <div className="col-span-1 flex px-3 justify-start items-center">
+                <span>#</span>
+              </div>
+              <div className="col-span-2 flex justify-start items-center">
+                <span className="w-full inline-flex justify-start items-center gap-4">SLYs</span>
+              </div>
+
+              <div className="col-span-1 flex justify-start items-center">
+                <span>Leverage</span>
+              </div>
+              <div className="col-span-2 flex justify-start px-4 items-center">
+                <span>LTV</span>
+              </div>
+              <div className="col-span-2 flex justify-start items-center">
+                <span>Leveraged(APY)</span>
+              </div>
+              <div className="col-span-2 flex justify-start items-center">
+                <span>My position</span>
+              </div>
+              <div className="col-span-2 flex justify-start items-center"></div>
+            </div>
+            {/* <div className="h-0 w-full px-5 outline-[10px] outline-gray-600"/> */}
+            <div className="">
+              {leveragePositions.map((leveragePosition: LeveragePosition, index: number) => (
+                <LeveragePositionCard
+                  key={index}
+                  leveragePosition={leveragePosition}
+                  flashLeverage={flashLeverage}
+                  deleteLeveragePosition={deleteLeveragePosition}
+                />
+              ))}
             </div>
           </div>
         </>
       ) : (
-        <h1 className="text-3xl w-full text-center text-gray-300">
-          No Open Positions
-        </h1>
+        <h1 className="text-3xl w-full text-center text-gray-300">No Open Positions</h1>
+      )}
+
+      {address && legacyAddresses[address.toLowerCase() as keyof typeof legacyAddresses] && (
+        <LegacyPositions address={address} />
       )}
     </div>
   ) : (

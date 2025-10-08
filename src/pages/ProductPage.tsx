@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import PageTitle from "../components/low-level/PageTitle";
-import LTVSlider from "../components/LTVSlider";
 import BigNumber from "bignumber.js";
 import { CollateralToken, InternalSwapData, Token } from "../types";
 import { useAccount, useChainId } from "wagmi";
@@ -8,8 +6,6 @@ import { calcLeverageApy, calcMaxLeverage } from "../utils";
 import ActionBtn from "../components/ActionBtn";
 import ERC20 from "../contract-hooks/ERC20";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
-import TokenAmount from "../components/TokenAmount";
-import APYInfo from "../components/InfoSection";
 import LeverageBreakdown from "../components/LeverageBreakdown";
 import Action from "../components/Action";
 import {
@@ -18,9 +14,6 @@ import {
   useParams,
   useSearchParams,
 } from "react-router-dom";
-import SectionOverlay from "../components/low-level/SectionOverlay";
-import lockIcon from "../assets/icons/lock-svgrepo-com.svg";
-import closeIcon from "../assets/icons/close.svg";
 import setting from "../assets/icons/setting.svg";
 import {
   getExternalSwapData,
@@ -29,11 +22,7 @@ import {
 import axios from "axios";
 import arrowBack from "../assets/icons/arrowBack.svg";
 import ProductTitle from "../components/new-components/productTitle";
-import chart from "../assets/Chart.svg";
 import pencil from "../assets/icons/pencil.svg";
-import infoIcon from "../assets/icons/infoIcon.svg";
-import wallet from "../assets/icons/wallet.svg";
-import arrowDown from "../assets/icons/arrowDown.svg";
 import NewTokenAmount from "../components/new-components/newTokenAmount";
 import LeverageRange from "../components/new-components/leverageRange";
 import Overlay from "../components/low-level/Overlay";
@@ -45,6 +34,7 @@ import SlippageRange from "../components/new-components/slippageRange";
 import { useQuery } from "wagmi/query";
 import auto from "../assets/icons/auto.svg";
 import { getSlippage } from "../utils/getSlippage";
+import { formatNumber } from "../utils/formatNumber";
 
 const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [showSlippage, setShowSlippage] = useState(false);
@@ -133,6 +123,8 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   }, [address, fromToken]);
 
   useEffect(() => {
+    if (!collateralToken) return;
+
     const updateActionBtn = async () => {
       if (amountCollateral == "" || BigNumber(amountCollateral).isZero()) {
         return setActionBtn((prev) => ({
@@ -148,15 +140,17 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           disabled: true,
           error: "Amount exceeds your available balance",
         }));
-        // } else if (BigNumber(amountCollateral).isGreaterThan(100)) {
-        //   return setActionBtn((prev) => ({
-        //     ...prev,
-        //     disabled: true,
-        //     error: `Deposit amount is capped at ${displayTokenAmount(
-        //       BigNumber(100),
-        //       collateralToken
-        //     )}`,
-        //   }));
+      } else if (BigNumber(amountCollateral).isGreaterThan(BigNumber.max(
+        0,
+        new BigNumber(collateralToken?.liquidityAssetsUsd)
+          .dividedBy(new BigNumber(calcMaxLeverage(desiredLtv)).minus(1))
+          .minus(1000)
+      ))) {
+        return setActionBtn((prev) => ({
+          ...prev,
+          disabled: true,
+          error: "Exceeds Max Leverage Amount",
+        }));
       } else {
         return setActionBtn((prev) => ({
           ...prev,
@@ -167,8 +161,18 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       }
     };
 
+    //  else if (BigNumber(amountCollateral).isGreaterThan(100)) {
+    //   return setActionBtn((prev) => ({
+    //     ...prev,
+    //     disabled: true,
+    //     error: `Deposit amount is capped at ${displayTokenAmount(
+    //       BigNumber(100),
+    //       collateralToken
+    //     )}`,
+    //   })); 
+
     updateActionBtn();
-  }, [amountCollateral, userFromTokenBalance]);
+  }, [collateralToken, desiredLtv, amountCollateral, userFromTokenBalance]);
 
   useEffect(() => {
     if (!collateralToken || !fromToken) return;
@@ -296,62 +300,68 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     )
       return;
 
-    let positionId;
-
     try {
-      if (collateralToken.address == fromToken.address) {
-        positionId = await flashLeverage.leverage(
+      const isSameToken = collateralToken.address === fromToken.address;
+
+      // Early return if external swap data is needed but missing
+      if (!isSameToken && !externalSwapData) return;
+
+      const { positionId, amountDepositedInUsd } = await (isSameToken
+        ? flashLeverage.leverage(
           address,
           desiredLtv,
           fromToken as CollateralToken,
           amountCollateral,
           internalSwapData
-        );
-        toastSuccess(
-          `Deposited ${amountCollateral} USDC succesfully!`,
-          `You’ve deposited ${amountCollateral} USDC into ${collateralToken.symbol}. Your leveraged position is now earning yield.`
-        );
-      } else {
-        if (!externalSwapData) return;
-
-        positionId = await flashLeverage.swapAndLeverage(
+        )
+        : flashLeverage.swapAndLeverage(
           address,
           desiredLtv,
           fromToken,
           amountCollateral,
-          externalSwapData,
+          externalSwapData!,
           collateralToken,
           internalSwapData
-        );
-        toastSuccess(
-          `Deposited ${amountCollateral} USDC succesfully!`,
-          `You’ve deposited ${amountCollateral} USDC into ${collateralToken.symbol}. Your leveraged position is now earning yield.`
-        );
-      }
+        ));
+
+      // Single toast success message
+      toastSuccess(
+        `Deposited ${amountCollateral} USDC successfully!`,
+        `You've deposited ${amountCollateral} USDC into ${collateralToken.symbol}. Your leveraged position is now earning yield.`
+      );
+
+      // Single API call with dynamic base URL
+      const baseUrl = chainId !== 31337
+        ? "https://api.spiralstake.xyz"
+        : "http://localhost:5000";
+
+      try {
+        await axios.post(`${baseUrl}/leverage/open`, {
+          user: address.toLowerCase(),
+          positionId,
+          amountDepositedInUsd,
+          atImpliedApy: collateralToken.impliedApy,
+          atBorrowApy: collateralToken.borrowApy,
+          desiredLtv,
+        });
+      } catch (e) { }
+
+      navigate("/portfolio");
     } catch (e) {
       setShowSummary(false);
       throw e;
     }
-
-    // Dashboard Related
-    if (chainId !== 31337) {
-      axios.post("https://dapi.spiralstake.xyz/leverage/open", {
-        user: address.toLowerCase(),
-        positionId,
-        amountCollateralInUsd: BigNumber(amountCollateral).multipliedBy(
-          collateralToken.valueInUsd
-        ),
-      });
-    }
-
-    navigate("/portfolio");
   }
 
-  const setAmountToMax = () => {
-    const truncated = (
-      Math.floor(userFromTokenBalance.toNumber() * 100) / 100
-    ).toFixed(2);
-    setAmountCollateral(truncated);
+  const setAmountToMax = (maxLeverageAmount: BigNumber) => {
+    const truncated = new BigNumber(userFromTokenBalance)
+      .multipliedBy(100)
+      .integerValue(BigNumber.ROUND_FLOOR) // BigNumber floor
+      .div(100); // back to original scale
+
+    setAmountCollateral(
+      BigNumber.min(truncated, maxLeverageAmount).toFixed(2)
+    );
   };
 
   return (
@@ -370,26 +380,23 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           <div className="">
             <ProductTitle
               icon={`/tokens/${collateralToken.symbol}.svg`}
-              title={`${collateralToken.symbol.split("-")[0]}-${
-                collateralToken.symbol.split("-")[1]
-              } `}
+              title={`${collateralToken.symbol.split("-")[0]}-${collateralToken.symbol.split("-")[1]
+                } `}
               maturity={`${collateralToken.name.slice(
                 collateralToken.name.length - 9,
                 collateralToken.name.length - 7
               )}${" "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 7,
-                    collateralToken.name.length - 4
-                  )}${" "}
+                collateralToken.name.length - 7,
+                collateralToken.name.length - 4
+              )}${" "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 4,
-                    collateralToken.name.length
-                  )}`}
-              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${
-                collateralToken.symbol.split("-")[0]
-              }-${
-                collateralToken.symbol.split("-")[1]
-              } for maximized returns on your idle holdings.`}
+                collateralToken.name.length - 4,
+                collateralToken.name.length
+              )}`}
+              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${collateralToken.symbol.split("-")[0]
+                }-${collateralToken.symbol.split("-")[1]
+                } for maximized returns on your idle holdings.`}
             />
           </div>
 
@@ -573,7 +580,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   </p>{" "}
                   {autoMode && <img src={auto} alt="" className="w-[24px]" />}
                 </div>
-                <div className="flex  items-center gap-[8px]">
+                <div className="flex items-center gap-[8px]">
                   <img
                     src={setting}
                     alt=""
@@ -610,6 +617,12 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               error={actionBtn.error}
               balance={userFromTokenBalance}
               setAmountToMax={setAmountToMax}
+              maxLeverageAmount={BigNumber.max(
+                0,
+                new BigNumber(collateralToken?.liquidityAssetsUsd)
+                  .dividedBy(new BigNumber(calcMaxLeverage(desiredLtv)).minus(1))
+                  .minus(1000)
+              )}
             />
 
             {/* old deposit button */}
@@ -636,7 +649,16 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   ).toFixed(4)}
                 </p>
               </div>
+              <div className="flex justify-between items-center">
+                <p>Available Borrow</p>
+                <p>${`${formatNumber(collateralToken.liquidityAssetsUsd)}`}</p>
+              </div>
+              <div className="flex justify-between items-center">
+                <p>Borrow Market</p>
+                <a className="text-white underline" target="_blank" href={`https://app.morpho.org/ethereum/market/${collateralToken.morphoMarketId}`}> <p>{`PT-${collateralToken.symbol.split("-")[1]} / ${collateralToken.loanToken.symbol}`}</p></a>
+              </div>
             </div>
+
 
             {/* review section */}
             {showSummary && (
@@ -683,13 +705,13 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 collateralToken.name.length - 7
               )}${" "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 7,
-                    collateralToken.name.length - 4
-                  )}${", "}
+                collateralToken.name.length - 7,
+                collateralToken.name.length - 4
+              )}${", "}
                   ${collateralToken.name.slice(
-                    collateralToken.name.length - 4,
-                    collateralToken.name.length
-                  )}`}
+                collateralToken.name.length - 4,
+                collateralToken.name.length
+              )}`}
               amountInUsd={Number(
                 BigNumber(amountCollateral).multipliedBy(fromToken.valueInUsd)
               )}
@@ -750,8 +772,13 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             error={actionBtn.error}
             balance={userFromTokenBalance}
             setAmountToMax={setAmountToMax}
+            maxLeverageAmount={BigNumber.max(
+              0,
+              new BigNumber(collateralToken?.liquidityAssetsUsd)
+                .dividedBy(new BigNumber(calcMaxLeverage(desiredLtv)).minus(1))
+                .minus(1000)
+            )}
           />
-
           {/* old deposit button */}
           <ActionBtn
             btnLoading={false}
@@ -775,6 +802,14 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   Number(collateralToken.valueInUsd)
                 ).toFixed(4)}
               </p>
+            </div>
+            <div className="flex justify-between items-center">
+              <p>Available Borrow</p>
+              <p>${`${formatNumber(collateralToken.liquidityAssetsUsd)}`}</p>
+            </div>
+            <div className="flex justify-between items-center">
+              <p>Borrow Market</p>
+              <a className="text-white underline" target="_blank" href={`https://app.morpho.org/ethereum/market/${collateralToken.morphoMarketId}`}> <p>{`PT-${collateralToken.symbol.split("-")[1]} / ${collateralToken.loanToken.symbol}`}</p></a>
             </div>
           </div>
 

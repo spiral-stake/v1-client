@@ -1,8 +1,9 @@
 import BigNumber from "bignumber.js";
 import { CollateralToken } from "./../types/index";
 import axios from "axios";
+import { formatUnits } from "../utils/formatUnits";
 
-export const getBorrowApy = async (chainId: number, collateralToken: CollateralToken) => {
+export const getMarketData = async (chainId: number, collateralToken: CollateralToken) => {
   if (chainId === 31337) chainId = 1;
 
   const query = `
@@ -13,12 +14,16 @@ export const getBorrowApy = async (chainId: number, collateralToken: CollateralT
       ) {
         state {
           avgBorrowApy
+          liquidityAssetsUsd
         }
       }
     }
   `;
 
   const { data } = (await axios.post("https://api.morpho.org/graphql", { query })).data;
+
+  const liquidityAssetsUsd = data.marketByUniqueKey.state.liquidityAssetsUsd as number;
+
   const borrowApy = data.marketByUniqueKey.state.avgBorrowApy;
-  return BigNumber(borrowApy * 100).toFixed(2);
+  return { borrowApy: BigNumber(borrowApy * 100).toFixed(2), liquidityAssetsUsd };
 };

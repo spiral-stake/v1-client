@@ -8,8 +8,10 @@
   },
   "collateralTokens": {
     "0x21aacE56a8F21210b7E76d8eF1a77253Db85BF0a": {
+      "YT": "0x3787c19c32e727310708C0693AEC00Fb37a01E7b",
       "address": "0x21aacE56a8F21210b7E76d8eF1a77253Db85BF0a",
       "decimals": 18,
+      "expiryTimestamp": 1761782400,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -22,8 +24,10 @@
       "symbol": "PT-fxSAVE-30OCT2025"
     },
     "0x23e0D07095DAec91B6Ae016cA9F08222dCc64c49": {
+      "YT": "0x13BddF66Cb25Ac8D2c7D25Fe29ee52919BcfE3bD",
       "address": "0x23e0D07095DAec91B6Ae016cA9F08222dCc64c49",
       "decimals": 18,
+      "expiryTimestamp": 1764806400,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -36,8 +40,10 @@
       "symbol": "PT-USR-4DEC2025"
     },
     "0x545A490f9ab534AdF409A2E682bc4098f49952e3": {
+      "YT": "0x06f946d590010eaB6a5556AD29D9979EB1A7fA3A",
       "address": "0x545A490f9ab534AdF409A2E682bc4098f49952e3",
       "decimals": 18,
+      "expiryTimestamp": 1769644800,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -50,8 +56,10 @@
       "symbol": "PT-cUSD-29JAN2026"
     },
     "0x62C6E813b9589C3631Ba0Cdb013acdB8544038B7": {
+      "YT": "0x99C92D4Da7a81c7698EF33a39D7538d0f92623f7",
       "address": "0x62C6E813b9589C3631Ba0Cdb013acdB8544038B7",
       "decimals": 18,
+      "expiryTimestamp": 1764201600,
       "loanToken": {
         "address": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
         "decimals": 18,
@@ -64,8 +72,10 @@
       "symbol": "PT-USDe-27NOV2025"
     },
     "0xB10DA2F9147f9cf2B8826877Cd0c95c18A0f42dc": {
+      "YT": "0x349C55BAD4A9F17c3381e3299e0A07D58cdd8a1d",
       "address": "0xB10DA2F9147f9cf2B8826877Cd0c95c18A0f42dc",
       "decimals": 18,
+      "expiryTimestamp": 1763596800,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -78,8 +88,10 @@
       "symbol": "PT-cUSDO-20NOV2025"
     },
     "0xC3c7E5E277d31CD24a3Ac4cC9af3B6770F30eA33": {
+      "YT": "0x8B4A52d28E49a9e8994D563420422e1a26a83df1",
       "address": "0xC3c7E5E277d31CD24a3Ac4cC9af3B6770F30eA33",
       "decimals": 18,
+      "expiryTimestamp": 1769644800,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -92,8 +104,10 @@
       "symbol": "PT-stcUSD-29JAN2026"
     },
     "0xDBf6feC5A012A13c456Bac3B67C3B9CF2830A122": {
+      "YT": "0x153BbF41EBd0830931A39A8Cb6B416ae9559e7FB",
       "address": "0xDBf6feC5A012A13c456Bac3B67C3B9CF2830A122",
       "decimals": 18,
+      "expiryTimestamp": 1761782400,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -106,8 +120,10 @@
       "symbol": "PT-csUSDL-30OCT2025"
     },
     "0xF3f491e5608f8B8a6Fd9E9d66a4a4036d7FD282C": {
+      "YT": "0xE49462fFd604D35061fb6937626f675873314C93",
       "address": "0xF3f491e5608f8B8a6Fd9E9d66a4a4036d7FD282C",
       "decimals": 18,
+      "expiryTimestamp": 1760572800,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -120,8 +136,10 @@
       "symbol": "PT-pUSDe-16OCT2025"
     },
     "0xdcFDf8434e8FDfFF2dD7dfC9299877e813348EE7": {
+      "YT": "0x75c7105d1938753B3e6138FB0F956410A38e811F",
       "address": "0xdcFDf8434e8FDfFF2dD7dfC9299877e813348EE7",
       "decimals": 18,
+      "expiryTimestamp": 1761782400,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -134,8 +152,10 @@
       "symbol": "PT-RUSD-30OCT2025"
     },
     "0xe6A934089BBEe34F832060CE98848359883749B3": {
+      "YT": "0x28E626b560F1FaaC01544770425e2De8FD179c79",
       "address": "0xe6A934089BBEe34F832060CE98848359883749B3",
       "decimals": 18,
+      "expiryTimestamp": 1764201600,
       "loanToken": {
         "address": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
         "decimals": 18,
@@ -148,6 +168,6 @@
       "symbol": "PT-sUSDE-27NOV2025"
     }
   },
-  "flashLeverageAddress": "0x346422cF9c620668089453838EDD1a30F9b1A273",
-  "flashLeverageCoreAddress": "0x21A21fa613917600e9dDE4441920562bB6238DaE"
+  "flashLeverageAddress": "0x3907e0Ebb70c4e556a9DFAC210ACE0B7b6c9c3c4",
+  "flashLeverageCoreAddress": "0x00a66377e109B1348Ac65B31d8729a55EfEa75f4"
 }
