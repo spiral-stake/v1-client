@@ -14,6 +14,7 @@ import axios from "axios";
 import { formatUnits } from "../utils/formatUnits";
 import { getSlippage } from "../utils/getSlippage";
 import BtnGreen from "./new-components/btnGreen";
+import BtnFull from "./low-level/BtnFull";
 
 const LeveragePositionCard = ({
   flashLeverage,
@@ -26,15 +27,6 @@ const LeveragePositionCard = ({
 }) => {
   const { address, chainId } = useAccount();
   const [showCloseReview, setShowCloseReview] = useState(false);
-
-  const [actionBtn, setActionBtn] = useState({
-    text: "close",
-    onClick: () => {
-      setShowCloseReview(true);
-    },
-    disabled: false,
-    error: "",
-  });
   const [loading, setLoading] = useState<boolean>(false);
 
   const appChainId = useChainId();
@@ -103,7 +95,7 @@ const LeveragePositionCard = ({
   };
 
   return (
-    <Link to="">
+    <div>
       <div className="w-full px-2 mt-4 bg-transparent hover:bg-white hover:bg-opacity-[4%] rounded-xl py-5 lg:py-2 border-y border-y-slate-800 lg:border-y-0 grid grid-cols-4 grid-rows-[1fr_1fr_2fr] lg:grid-cols-12 lg:px-5 lg:grid-rows-1 items-center lg:pr-5 transition-all ease-out duration-150">
         <div className="col-span-4 row-span-2 lg:col-span-3 lg:row-span-1 flex items-center lg:hidden">
           <div className="col-span-1 h-16 py-3 pr-5 inline-flex justify-start items-center gap-2">
@@ -189,24 +181,72 @@ const LeveragePositionCard = ({
         {/* action btn */}
         <div className="hidden lg:inline-flex col-span-1 justify-end">
           <div className="w-1/2 hidden lg:inline-block">
-            <ActionBtn
-              btnLoading={loading}
-              text="Close"
-              onClick={handleAsync(handleCloseLeveragePosition, setLoading)}
-              expectedChainId={Number(chainId)}
+            <BtnFull
+              text="close"
+              onClick={() => {
+                setShowCloseReview(true);
+              }}
             />
           </div>
         </div>
         <div className="col-span-4 mx-[8px] lg:hidden">
-          <ActionBtn
-            btnLoading={loading}
-            text="Close"
-            onClick={handleAsync(handleCloseLeveragePosition, setLoading)}
-            expectedChainId={Number(chainId)}
+          <BtnFull
+            text="close"
+            onClick={() => {
+              setShowCloseReview(true);
+            }}
           />
         </div>
       </div>
-    </Link>
+
+      {showCloseReview && (
+        <div>
+          {/* lg close review */}
+          <div className="hidden z-10 fixed top-0 left-0 bg-black bg-opacity-[70%] lg:flex flex-col gap-[24px] lg:justify-center items-end lg:items-center w-[100vw] h-[100vh]">
+            <CloseReviewOverlay
+              amountCollateral={Number(leveragePosition.amountCollateral)}
+              collateralToken={leveragePosition.collateralToken}
+              setShowCloseReview={setShowCloseReview}
+            />
+            <div className="lg:w-[500px]">
+              <ActionBtn
+                btnLoading={loading}
+                text="Close"
+                onClick={handleAsync(handleCloseLeveragePosition, setLoading)}
+                expectedChainId={Number(chainId)}
+              />
+            </div>
+          </div>
+
+          {/* mobile close review */}
+          <div className="lg:hidden">
+            <Overlay
+              onClose={() => setShowCloseReview(false)}
+              overlay={
+                <div className="flex flex-col gap-[24px] pb-[70px] lg:pb-0 rounded-[16px] rounded-b-none bg-white bg-opacity-[10%] backdrop-blur-2xl">
+                  <CloseReviewOverlay
+                    amountCollateral={Number(leveragePosition.amountCollateral)}
+                    collateralToken={leveragePosition.collateralToken}
+                    setShowCloseReview={setShowCloseReview}
+                  />
+                  <div className="lg:w-[500px] px-2">
+                    <ActionBtn
+                      btnLoading={loading}
+                      text="Close"
+                      onClick={handleAsync(
+                        handleCloseLeveragePosition,
+                        setLoading
+                      )}
+                      expectedChainId={Number(chainId)}
+                    />
+                  </div>
+                </div>
+              }
+            />
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

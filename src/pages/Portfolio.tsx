@@ -5,6 +5,8 @@ import { LeveragePosition, Position } from "../types";
 import { useAccount, useChainId } from "wagmi";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import LeveragePositionCard from "../components/LeveragePositionCard";
+import portfolioChart from "../assets/portfolioChart2.svg";
+import NewLeveragePositionCard from "../components/new-components/newLeveragePositionCard";
 import legacyAddresses from "../api-services/legacyAddresses.json";
 import LegacyPositions from "../components/LegacyPositions.tsx";
 
@@ -73,6 +75,19 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           </div>
 
           {/* mobile */}
+          <div className="">
+            
+            <div className="flex flex-col gap-[24px]">
+              {leveragePositions.map(
+                (leveragePosition: LeveragePosition, index: number) => (
+                  <NewLeveragePositionCard
+                    key={index}
+                    leveragePosition={leveragePosition}
+                    flashLeverage={flashLeverage}
+                    deleteLeveragePosition={deleteLeveragePosition}
+                  />
+                )
+              )}
           <div className="bg-white bg-opacity-[4%] rounded-xl p-[12px]">
             <div className="hidden py-5 w-full lg:grid grid-cols-12 px-5 border-b-[1px] border-white border-opacity-[10%]">
               <div className="col-span-1 flex px-3 justify-start items-center">

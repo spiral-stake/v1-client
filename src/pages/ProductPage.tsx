@@ -423,7 +423,9 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                     }
                   />
                 </div>
-                <p className="text-[14px] text-[#8E8E8E]">Max APY</p>
+                <p className="text-[14px] text-[#8E8E8E] cursor-default">
+                  Max APY
+                </p>
               </div>
             </div>
 
@@ -456,14 +458,18 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 </div>
               </div>
 
-              <p className="text-[14px] text-[#8E8E8E]">Leverage</p>
+              <p className="text-[14px] text-[#8E8E8E] cursor-default">
+                Leverage
+              </p>
             </div>
 
             <div className="pr-[60px]">
               <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">
                 {desiredLtv}%
               </p>
-              <p className="text-[14px] text-[#8E8E8E]">Safe LTV</p>
+              <p className="text-[14px] text-[#8E8E8E] cursor-default">
+                Safe LTV
+              </p>
             </div>
 
             <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%] font-normal"></div>
@@ -471,14 +477,16 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">
                 {collateralToken.liqLtv}%
               </p>
-              <p className="text-[14px] text-[#8E8E8E]">Liquidation LTV</p>
+              <p className="text-[14px] text-[#8E8E8E] cursor-default">
+                Liquidation LTV
+              </p>
             </div>
           </div>
 
           {/* deposit info */}
           <div
             className="hidden lg:grid grid-cols-[160px_auto_160px_auto_160px_auto_160px]
- grid-rows-1 gap-[13px] cursor-default items-center"
+ grid-rows-1 gap-[13px] items-center"
           >
             <div className="flex flex-col pr-[60px]">
               <div className="flex items-center gap-1">
@@ -500,7 +508,9 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   }
                 />
               </div>
-              <p className="text-[14px] text-[#8E8E8E]">Max APY</p>
+              <p className="text-[14px] text-[#8E8E8E] cursor-default">
+                Max APY
+              </p>
             </div>
             <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
             <div className="pr-[0px]">
@@ -528,21 +538,27 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 </div>
               </div>
 
-              <p className="text-[14px] text-[#8E8E8E]">Leverage</p>
+              <p className="text-[14px] text-[#8E8E8E] cursor-default">
+                Leverage
+              </p>
             </div>
             <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
             <div className="pr-[60px]">
               <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">
                 {desiredLtv}%
               </p>
-              <p className="text-[14px] text-[#8E8E8E]">Safe LTV</p>
+              <p className="text-[14px] text-[#8E8E8E] cursor-default">
+                Safe LTV
+              </p>
             </div>
             <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%] font-normal"></div>
             <div>
               <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">
                 {collateralToken.liqLtv}%
               </p>
-              <p className="text-[14px] text-[#8E8E8E]">Liquidation LTV</p>
+              <p className="text-[14px] text-[#8E8E8E] cursor-default">
+                Liquidation LTV
+              </p>
             </div>
           </div>
 
@@ -682,6 +698,8 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           {/* investment plans */}
           <div>
             <InvestmentPlans
+              maxLeverage={maxLeverage}
+              slippage={slippage}
               maturity={`${collateralToken.name.slice(
                 collateralToken.name.length - 9,
                 collateralToken.name.length - 7

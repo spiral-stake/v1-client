@@ -52,6 +52,15 @@ const NewTokenAmount = ({
     <section
       className={`w-full text-white lg:p-0 sm:p-5 flex flex-1 flex-col gap-4`}
     >
+      {/* $5000 recomendation */}
+      {Number(amountInUsd) < 5000 && (
+        <div>
+          <p className="text-sm text-red-500">
+            We recommend you to deposit a minimum amount of $5000
+          </p>
+        </div>
+      )}
+
       {/* input area box   */}
 
       <div className="flex flex-col border-[1px] border-white border-opacity-[14%] bg-white bg-opacity-[4%] p-[16px] rounded-[20px]">
