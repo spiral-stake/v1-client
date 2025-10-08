@@ -676,6 +676,8 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           {/* investment plans */}
           <div>
             <InvestmentPlans
+              maxLeverage={maxLeverage}
+              slippage={slippage}
               maturity={`${collateralToken.name.slice(
                 collateralToken.name.length - 9,
                 collateralToken.name.length - 7

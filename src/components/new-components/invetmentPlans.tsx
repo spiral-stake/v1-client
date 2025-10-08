@@ -7,14 +7,19 @@ import BtnGreen from "./btnGreen";
 import InvestmentPlanTab from "./investmentPlanTab";
 import { useEffect, useState } from "react";
 import { daysLeft } from "../../utils/daysLeft";
+import Slippage from "./slippage";
 
 const InvestmentPlans = ({
+  slippage,
+  maxLeverage,
   maturity,
   amountInUsd,
   collateralToken,
   flashLeverage,
   desiredLtv,
 }: {
+  slippage: number;
+  maxLeverage: string;
   maturity: string;
   amountInUsd: number;
   collateralToken: CollateralToken;
@@ -52,7 +57,9 @@ const InvestmentPlans = ({
                         100) *
                         amountInUsd) /
                         365) *
-                      daysLeft(maturity)
+                        daysLeft(maturity) -
+                      ((amountInUsd * Number(maxLeverage)) / 100) *
+                        (0.1)
                     ).toFixed(2)}`
                   : `${(
                       (((Number(
@@ -65,7 +72,8 @@ const InvestmentPlans = ({
                         100) *
                         10000) /
                         365) *
-                      daysLeft(maturity)
+                        daysLeft(maturity) -
+                      ((10000 * Number(maxLeverage)) / 100) * 0.1
                     ).toFixed(2)}`}
               </p>
               <BtnGreen text={`in ${daysLeft(maturity)} Days`} />
