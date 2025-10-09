@@ -8,7 +8,7 @@ const InvestmentPlanTab = ({
   selected,
   collateralToken,
   desiredLtv,
-  leverageApy
+  leverageApy,
 }: {
   amountInUsd: number;
   selected?: boolean;
@@ -19,8 +19,9 @@ const InvestmentPlanTab = ({
   return (
     <Link to={`/products/${collateralToken.address}?leverage=${desiredLtv}`}>
       <div
-        className={`py-[12px] lg:p-[12px] grid grid-cols-[max-content,1fr,1fr,1fr,max-content] items-center rounded-[12px] hover:bg-white hover:bg-opacity-[4%] ${selected ? "bg-white bg-opacity-[4%]" : ""
-          }`}
+        className={`py-[12px] lg:p-[12px] grid grid-cols-[max-content,1fr,1fr,1fr,max-content] items-center rounded-[12px] hover:bg-white hover:bg-opacity-[4%] ${
+          selected ? "bg-white bg-opacity-[4%]" : ""
+        }`}
       >
         <div className="flex items-center justify-center p-[8px] lg:p-[12px]">
           <img
@@ -31,27 +32,16 @@ const InvestmentPlanTab = ({
         </div>
         <div className="text-[12px] lg:text-[16px] font-[500] text-[#D7D7D7]">{`${collateralToken.symbol}`}</div>
         <div>
-          <BtnGreen
-            text={`${leverageApy}% APR`}
-          />
+          <BtnGreen text={`${leverageApy}% APR`} />
         </div>
-        <div className="text-[12px] lg:text-[16px] text-[#68EA6A]">
-          +$
-          {amountInUsd > 0
-            ? `${(
-              (Number(
-                leverageApy
-              ) /
-                100) *
-              amountInUsd
-            ).toFixed(2)}`
-            : `${(
-              (Number(
-                leverageApy
-              ) /
-                100) *
-              10000
-            ).toFixed(2)}`}
+        <div className="flex items-end gap-[8px] text-[12px] lg:text-[16px] text-[#68EA6A]">
+          <p>
+            +$
+            {amountInUsd > 0
+              ? `${((Number(leverageApy) / 100) * amountInUsd).toFixed(2)}`
+              : `${((Number(leverageApy) / 100) * 10000).toFixed(2)}`}
+          </p>
+          <p className="text-[12px]">(annually)</p>
         </div>
         <div className="p-[6px] lg:p-[12px]">
           <img src={arrowRight} alt="" className="w-[20px] lg:w-[24px]" />
