@@ -16,6 +16,7 @@ const NewTokenAmount = ({
   amount,
   handleAmountChange,
   amountInUsd,
+  warning,
   error,
   balance,
   setAmountToMax,
@@ -27,6 +28,7 @@ const NewTokenAmount = ({
   handleAmountChange: (amount: any) => void;
   amountInUsd: BigNumber;
   error?: string;
+  warning?: string;
   balance: BigNumber;
   setAmountToMax: (maxLeverageAmount: BigNumber) => void;
   maxLeverageAmount: BigNumber
@@ -52,15 +54,6 @@ const NewTokenAmount = ({
     <section
       className={`w-full text-white lg:p-0 sm:p-5 flex flex-1 flex-col gap-4`}
     >
-      {/* $5000 recomendation */}
-      {Number(amountInUsd) < 5000 && (
-        <div>
-          <p className="text-sm text-red-500">
-            We recommend you to deposit a minimum amount of $5000
-          </p>
-        </div>
-      )}
-
       {/* input area box   */}
 
       <div className="flex flex-col border-[1px] border-white border-opacity-[14%] bg-white bg-opacity-[4%] p-[16px] rounded-[20px]">
@@ -120,7 +113,11 @@ const NewTokenAmount = ({
         </div>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {(error || warning) && (
+        <p className={`text-sm ${error ? 'text-red-600' : 'text-amber-500'}`}>
+          {error || warning}
+        </p>
+      )}
 
       {/* MAX part */}
       <div className="flex text-[14px] items-center justify-between">

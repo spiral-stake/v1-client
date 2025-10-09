@@ -10,7 +10,7 @@
     "0x21aacE56a8F21210b7E76d8eF1a77253Db85BF0a": {
       "address": "0x21aacE56a8F21210b7E76d8eF1a77253Db85BF0a",
       "decimals": 18,
-      "expiryTimestamp": 1761782400,
+      "maturityTimestamp": 1761782400,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -25,7 +25,7 @@
     "0x23e0D07095DAec91B6Ae016cA9F08222dCc64c49": {
       "address": "0x23e0D07095DAec91B6Ae016cA9F08222dCc64c49",
       "decimals": 18,
-      "expiryTimestamp": 1764806400,
+      "maturityTimestamp": 1764806400,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -40,7 +40,7 @@
     "0x545A490f9ab534AdF409A2E682bc4098f49952e3": {
       "address": "0x545A490f9ab534AdF409A2E682bc4098f49952e3",
       "decimals": 18,
-      "expiryTimestamp": 1769644800,
+      "maturityTimestamp": 1769644800,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -55,7 +55,7 @@
     "0x62C6E813b9589C3631Ba0Cdb013acdB8544038B7": {
       "address": "0x62C6E813b9589C3631Ba0Cdb013acdB8544038B7",
       "decimals": 18,
-      "expiryTimestamp": 1764201600,
+      "maturityTimestamp": 1764201600,
       "loanToken": {
         "address": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
         "decimals": 18,
@@ -70,7 +70,7 @@
     "0xB10DA2F9147f9cf2B8826877Cd0c95c18A0f42dc": {
       "address": "0xB10DA2F9147f9cf2B8826877Cd0c95c18A0f42dc",
       "decimals": 18,
-      "expiryTimestamp": 1763596800,
+      "maturityTimestamp": 1763596800,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -85,7 +85,7 @@
     "0xC3c7E5E277d31CD24a3Ac4cC9af3B6770F30eA33": {
       "address": "0xC3c7E5E277d31CD24a3Ac4cC9af3B6770F30eA33",
       "decimals": 18,
-      "expiryTimestamp": 1769644800,
+      "maturityTimestamp": 1769644800,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -100,7 +100,7 @@
     "0xDBf6feC5A012A13c456Bac3B67C3B9CF2830A122": {
       "address": "0xDBf6feC5A012A13c456Bac3B9CF2830A122",
       "decimals": 18,
-      "expiryTimestamp": 1761782400,
+      "maturityTimestamp": 1761782400,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -115,7 +115,7 @@
     "0xF3f491e5608f8B8a6Fd9E9d66a4a4036d7FD282C": {
       "address": "0xF3f491e5608f8B8a6Fd9E9d66a4a4036d7FD282C",
       "decimals": 18,
-      "expiryTimestamp": 1760572800,
+      "maturityTimestamp": 1760572800,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -130,7 +130,7 @@
     "0xdcFDf8434e8FDfFF2dD7dfC9299877e813348EE7": {
       "address": "0xdcFDf8434e8FDfFF2dD7dfC9299877e813348EE7",
       "decimals": 18,
-      "expiryTimestamp": 1761782400,
+      "maturityTimestamp": 1761782400,
       "loanToken": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
@@ -145,7 +145,7 @@
     "0xe6A934089BBEe34F832060CE98848359883749B3": {
       "address": "0xe6A934089BBEe34F832060CE98848359883749B3",
       "decimals": 18,
-      "expiryTimestamp": 1764201600,
+      "maturityTimestamp": 1764201600,
       "loanToken": {
         "address": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
         "decimals": 18,

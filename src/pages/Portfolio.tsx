@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
 import Loader from "../components/low-level/Loader";
 import PageTitle from "../components/low-level/PageTitle";
-import { LeveragePosition, Position } from "../types";
+import { LeveragePosition } from "../types";
 import { useAccount, useChainId } from "wagmi";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
-import LeveragePositionCard from "../components/LeveragePositionCard";
-import portfolioChart from "../assets/portfolioChart2.svg";
-import NewLeveragePositionCard from "../components/new-components/newLeveragePositionCard";
+import LeveragePositionCard from "../components/LeveragePositionCard.tsx";
 import legacyAddresses from "../api-services/legacyAddresses.json";
 import LegacyPositions from "../components/LegacyPositions.tsx";
 
 const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
-  const [positions, setPositions] = useState<Position[]>([]);
+
   const [leveragePositions, setLeveragePositions] = useState<LeveragePosition[]>([]);
   const [showLoader, setShowLoader] = useState(true);
 
@@ -75,54 +73,32 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           </div>
 
           {/* mobile */}
-          <div className="">
-            
-            <div className="flex flex-col gap-[24px]">
-              {leveragePositions.map(
-                (leveragePosition: LeveragePosition, index: number) => (
-                  <NewLeveragePositionCard
-                    key={index}
-                    leveragePosition={leveragePosition}
-                    flashLeverage={flashLeverage}
-                    deleteLeveragePosition={deleteLeveragePosition}
-                  />
-                )
-              )}
-          <div className="bg-white bg-opacity-[4%] rounded-xl p-[12px]">
-            <div className="hidden py-5 w-full lg:grid grid-cols-12 px-5 border-b-[1px] border-white border-opacity-[10%]">
-              <div className="col-span-1 flex px-3 justify-start items-center">
-                <span>#</span>
-              </div>
-              <div className="col-span-2 flex justify-start items-center">
-                <span className="w-full inline-flex justify-start items-center gap-4">SLYs</span>
-              </div>
-
-              <div className="col-span-1 flex justify-start items-center">
-                <span>Leverage</span>
-              </div>
-              <div className="col-span-2 flex justify-start px-4 items-center">
-                <span>LTV</span>
-              </div>
-              <div className="col-span-2 flex justify-start items-center">
-                <span>Leveraged(APY)</span>
-              </div>
-              <div className="col-span-2 flex justify-start items-center">
-                <span>My position</span>
-              </div>
-              <div className="col-span-2 flex justify-start items-center"></div>
-            </div>
-            {/* <div className="h-0 w-full px-5 outline-[10px] outline-gray-600"/> */}
-            <div className="">
-              {leveragePositions.map((leveragePosition: LeveragePosition, index: number) => (
+          <div className="flex flex-col gap-[24px] lg:hidden">
+            {leveragePositions.map(
+              (leveragePosition: LeveragePosition, index: number) => (
                 <LeveragePositionCard
                   key={index}
                   leveragePosition={leveragePosition}
                   flashLeverage={flashLeverage}
                   deleteLeveragePosition={deleteLeveragePosition}
                 />
-              ))}
-            </div>
+              )
+            )}
           </div>
+
+          {/* desktop */}
+
+          <div className="flex flex-col gap-[14px]">
+            {leveragePositions.map((leveragePosition: LeveragePosition, index: number) => (
+              <LeveragePositionCard
+                key={index}
+                leveragePosition={leveragePosition}
+                flashLeverage={flashLeverage}
+                deleteLeveragePosition={deleteLeveragePosition}
+              />
+            ))}
+          </div>
+
         </>
       ) : (
         <h1 className="text-3xl w-full text-center text-gray-300">No Open Positions</h1>

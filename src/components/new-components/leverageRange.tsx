@@ -1,10 +1,10 @@
 const LeverageRange = ({
-  maxLeverage,
+  leverage,
   maxLtv,
   ltv,
   handleLtvSlider,
 }: {
-  maxLeverage: string;
+  leverage: string;
   ltv: string;
   maxLtv: string;
   handleLtvSlider: (e: any) => void;
@@ -18,7 +18,7 @@ const LeverageRange = ({
             left: `${((Number(ltv) || 6) / Number(maxLtv) - 0.12) * 100}%`,
           }}
         >
-          {maxLeverage}x
+          {leverage}x
         </div>
         <label htmlFor="leverage" className="text-[14px] mb-[8px]">
           Leverage

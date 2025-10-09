@@ -4,6 +4,7 @@ import FlashLeverage from "../contract-hooks/FlashLeverage";
 import { CollateralToken, InternalSwapData, Token } from "../types";
 import { parseUnits } from "../utils/formatUnits";
 import BigNumber from "bignumber.js";
+import { isMatured } from "../utils";
 
 const HOSTED_SDK_URL = "https://api-v2.pendle.finance/core";
 
@@ -110,9 +111,8 @@ export async function getInternalReswapData(
   amountLeveragedCollateral: BigNumber
 ): Promise<InternalReswapData> {
   if (chainId == 31337) chainId = 1;
-  const currentTimestamp = Math.floor(Date.now() / 1000);
 
-  if (currentTimestamp < collateralToken.expiryTimestamp) {
+  if (isMatured(collateralToken)) {
     const params = {
       receiver: flashLeverage.flashLeverageCore.address,
       slippage,

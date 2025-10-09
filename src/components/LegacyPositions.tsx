@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import { LeveragePosition } from "../types";
-import LeveragePositionCard from "./LeveragePositionCard";
+import LeveragePositionCard from "./LeveragePositionCard.tsx";
 import { useChainId } from "wagmi";
 
 const LegacyPositions = ({ address }: { address: string }) => {
@@ -85,7 +85,7 @@ const LegacyPositions = ({ address }: { address: string }) => {
             <span>LTV</span>
           </div>
           <div className="col-span-2 flex justify-start items-center">
-            <span>Leveraged(APY)</span>
+            <span>Leveraged(APR)</span>
           </div>
           <div className="col-span-2 flex justify-start items-center">
             <span>My position</span>
@@ -93,7 +93,7 @@ const LegacyPositions = ({ address }: { address: string }) => {
           <div className="col-span-2 flex justify-start items-center"></div>
         </div>
         {/* <div className="h-0 w-full px-5 outline-[10px] outline-gray-600"/> */}
-        <div className="">
+        <div className="flex flex-col gap-[14px]">
           {leveragePositions.map((leveragePosition: LeveragePosition, index: number) => (
             <LeveragePositionCard
               key={index}

@@ -1,20 +1,18 @@
 import ReviewinfoTabs from "./reviewInfoTabs";
 import close from "../../assets/icons/close.svg";
 import { CollateralToken, Token } from "../../types";
-import FlashLeverage from "../../contract-hooks/FlashLeverage";
-import ActionBtn from "../ActionBtn";
-import BigNumber from "bignumber.js";
 import Action from "../Action";
-import { calcLeverageApy, calcMaxLeverage } from "../../utils";
 
-const ReviewOverlay = ({
+const DepositReviewOverlay = ({
   setShowSummary,
   amountCollateral,
   collateralToken,
   handleApprove,
   token,
   completed,
-  desiredLtv
+  desiredLtv,
+  leverage,
+  leverageApy
 }: {
   setShowSummary: React.Dispatch<React.SetStateAction<boolean>>;
   amountCollateral: string;
@@ -22,7 +20,9 @@ const ReviewOverlay = ({
   handleApprove: () => Promise<void>;
   token: Token;
   completed?: boolean;
-  desiredLtv: string
+  desiredLtv: string,
+  leverage: string,
+  leverageApy: string
 }) => {
   return (
     <div className="flex flex-col p-[24px] backdrop-blur-2xl bg-white bg-opacity-[8%] rounded-[16px] rounded-b-none lg:rounded-b-[16px] gap-[20px] w-full lg:w-[500px] border-[1px] border-white border-opacity-[4%]">
@@ -46,21 +46,10 @@ const ReviewOverlay = ({
           />
           <ReviewinfoTabs
             title="Maturity Date"
-            info={`${collateralToken.name.slice(
-              collateralToken.name.length - 9,
-              collateralToken.name.length - 7
-            )}${" "}
-                  ${collateralToken.name.slice(
-              collateralToken.name.length - 7,
-              collateralToken.name.length - 4
-            )}${" "}
-                  ${collateralToken.name.slice(
-              collateralToken.name.length - 4,
-              collateralToken.name.length
-            )}`}
+            info={collateralToken.maturityDate}
           />
-          <ReviewinfoTabs title="Leverage" info={`${calcMaxLeverage(desiredLtv)}x`} />
-          <ReviewinfoTabs info={`${calcLeverageApy(collateralToken.impliedApy, collateralToken.borrowApy, desiredLtv)}% APY`} title="Estimated Yield" />
+          <ReviewinfoTabs title="Leverage" info={`${leverage}x`} />
+          <ReviewinfoTabs info={`${leverageApy}% APR`} title="Estimated Yield" />
           <ReviewinfoTabs title="Your LTV" info={`${desiredLtv}%`} />
         </div>
       </div>
@@ -83,4 +72,4 @@ const ReviewOverlay = ({
   );
 };
 
-export default ReviewOverlay;
+export default DepositReviewOverlay;

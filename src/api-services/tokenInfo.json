@@ -53,5 +53,10 @@
     "underlyingCollateral": "ETH",
     "yieldSource": "ETH Funding Rates",
     "riskProfile": "low"
+  },
+  "0xb44cdBEF3145C1c1E772e8228E1154c80e70618e": {
+    "underlyingCollateral": "USDC",
+    "yieldSource": "Bluechip DeFi Strategies",
+    "riskProfile": "medium"
   }
 }

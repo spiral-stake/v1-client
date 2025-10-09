@@ -9,6 +9,7 @@ import BigNumber from "bignumber.js";
 import FlashLeverageCore from "./FlashLeverageCore.ts";
 import { getImpliedApy } from "../api-services/pendle.ts";
 import { getMarketData } from "../api-services/morpho.ts";
+import { calcLeverage, calcLeverageApy } from "../utils/index.ts";
 
 export default class FlashLeverage extends Base {
   public chainId: number = 0;
@@ -68,6 +69,12 @@ export default class FlashLeverage extends Base {
               safeLtv: maxLtv.minus(1).toFixed(2),
               maxLtv: maxLtv.toFixed(2),
               liqLtv: liqLtv.toFixed(2),
+              defaultLeverage: calcLeverage(collateralToken.safeLtv),
+              defaultLeverageApy: calcLeverageApy(
+                impliedApy,
+                marketData.borrowApy,
+                maxLtv.minus(1).toFixed(2)
+              ),
             };
           }
         )

@@ -1,8 +1,8 @@
 import FlashLeverage from "../../contract-hooks/FlashLeverage";
-import InvestmentPlans from "./invetmentPlans";
+import InvestmentPlans from "./investmentPlans";
 import LeverageRange from "./leverageRange";
 import ProfitChart from "./profitChart";
-import ReviewOverlay from "./reviewOverlay";
+import ReviewOverlay from "./DepositReviewOverlay";
 
 const Test = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   return (

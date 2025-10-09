@@ -1,5 +1,3 @@
-import { daysLeft } from "../../utils/daysLeft";
-
 const ProductTitle = ({
   title,
   subheading,

@@ -1,4 +1,5 @@
 import { CollateralToken, Token, TokenInfo } from "../types";
+import { getMaturityDate, getMaturityDaysLeft } from "../utils";
 
 interface CollateralTokensObject {
   [symbol: string]: CollateralToken;
@@ -18,8 +19,15 @@ export const readCollateralTokens = async (chainId: number): Promise<CollateralT
   const tokenInfo = tokenInfoModule.default;
 
   return Object.keys(collateralTokens).map((tokenAddress) => {
+    const collateralToken = collateralTokens[tokenAddress];
+    const maturityDate = getMaturityDate(collateralToken.symbol);
+
     return {
-      ...collateralTokens[tokenAddress],
+      ...collateralToken,
+      symbolExtended: collateralToken.symbol,
+      symbol: `${collateralToken.symbol.split("-")[0]}-${collateralToken.symbol.split("-")[1]}`,
+      maturityDate,
+      maturityDaysLeft: getMaturityDaysLeft(maturityDate),
       info: tokenInfo[tokenAddress],
     };
   });
@@ -57,8 +65,15 @@ export const readCollateralToken = async (
   const { collateralTokens } = addressesModule.default;
   const tokenInfo = tokenInfoModule.default;
 
+  const collateralToken = collateralTokens[tokenAddress];
+  const maturityDate = getMaturityDate(collateralToken.symbol);
+
   return {
-    ...collateralTokens[tokenAddress],
+    ...collateralToken,
+    symbolExtended: collateralToken.symbol,
+    symbol: `${collateralToken.symbol.split("-")[0]}-${collateralToken.symbol.split("-")[1]}`,
+    maturityDate,
+    maturityDaysLeft: getMaturityDaysLeft(maturityDate),
     info: tokenInfo[tokenAddress],
   };
 };

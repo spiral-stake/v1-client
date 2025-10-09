@@ -75,10 +75,9 @@ const TokenAmount = ({
                 <button
                   type="button"
                   onClick={() => setIsOpen(!isOpen)}
-                  className={`group flex w-full gap-2 items-center justify-between rounded-sm border border-[#142435] bg-[#011B37] text-white p-3 ${
-                    tokens &&
+                  className={`group flex w-full gap-2 items-center justify-between rounded-sm border border-[#142435] bg-[#011B37] text-white p-3 ${tokens &&
                     "hover:border-gray-400 focus-visible:outline-none focus-visible:ring focus-visible:ring-blue-200"
-                  }`}
+                    }`}
                 >
                   <div className="flex flex-row items-center gap-2">
                     {/* Need to add Symbol */}
@@ -129,11 +128,11 @@ const TokenAmount = ({
                 </div>
               </div>
               <div
-                    onClick={setAmountToMax}
-                    className="text-sm w-10 text-right underline cursor-pointer"
-                  >
-                    max
-                  </div>
+                onClick={setAmountToMax}
+                className="text-sm w-10 text-right underline cursor-pointer"
+              >
+                max
+              </div>
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
           </div>

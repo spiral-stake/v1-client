@@ -9,18 +9,23 @@ export interface Token {
 }
 
 export interface CollateralToken extends Token {
+  symbolExtended: string;
   impliedApy: string;
   borrowApy: string;
   liquidityAssetsUsd: number;
   safeLtv: string;
   maxLtv: string;
   liqLtv: string;
+  defaultLeverage: string;
+  defaultLeverageApy: string;
   morphoMarketId: string;
   pendleMarket: string;
   loanToken: Token;
   info: TokenInfo;
   YT: string;
-  expiryTimestamp: number;
+  maturityTimestamp: number;
+  maturityDate: string;
+  maturityDaysLeft: number;
 }
 
 export interface TokenInfo {

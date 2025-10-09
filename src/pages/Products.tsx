@@ -4,7 +4,6 @@ import PageTitle from "../components/low-level/PageTitle";
 import ProductCard from "../components/new-components/productCard";
 import RiskTab from "../components/new-components/riskTab";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
-import { calcLeverageApy } from "../utils";
 import allRisk from "../assets/icons/allRisk.svg";
 import highRisk from "../assets/icons/highRisk.svg";
 import mediumRisk from "../assets/icons/mediumRisk.svg";
@@ -64,37 +63,13 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             })
             .sort(
               (a, b) =>
-                Number(calcLeverageApy(b.impliedApy, b.borrowApy, b.safeLtv)) -
-                Number(calcLeverageApy(a.impliedApy, a.borrowApy, a.safeLtv))
+                Number(b.defaultLeverageApy) -
+                Number(a.defaultLeverageApy)
             )
             .map((collateralToken, index) => (
               <ProductCard
                 key={index}
-                icon={`/tokens/${collateralToken.symbol}.svg`}
-                name={collateralToken.symbol.split("-")[1]}
-                apy={calcLeverageApy(
-                  collateralToken.impliedApy,
-                  collateralToken.borrowApy,
-                  collateralToken.safeLtv
-                )}
-                maturity={`${collateralToken.name.slice(
-                  collateralToken.name.length - 9,
-                  collateralToken.name.length - 7
-                )}${" "}
-                  ${collateralToken.name.slice(
-                    collateralToken.name.length - 7,
-                    collateralToken.name.length - 4
-                  )}${" "}
-                  ${collateralToken.name.slice(
-                    collateralToken.name.length - 4,
-                    collateralToken.name.length
-                  )}`}
-                underlyingCollatateralIcon={`/tokens/${collateralToken.symbol}.svg`}
-                underlyingCollatateralName={
-                  collateralToken.info.underlyingCollateral
-                }
-                yieldSource={collateralToken.info.yieldSource}
-                collateralTokenAddress={collateralToken.address}
+                collateralToken={collateralToken}
               />
             ))}
         </div>

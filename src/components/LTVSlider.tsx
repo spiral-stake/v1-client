@@ -19,7 +19,7 @@ const LTVSlider = ({
           <div className="text-xl font-semibold items-center flex justify-between">
             <div className="flex flex-row items-center gap-2">
               <h4 className="hidden lg:inline-block">Safe Loan to Value (LTV)</h4>
-              <h4 className="lg:hidden">Safe LTV</h4>
+              <h4 className="lg:hidden">Your LTV</h4>
               <HoverInfo content="Ratio of the collateral value to the borrowed value" />
             </div>
             <h4>~{ltv || "0.00"}%</h4>
