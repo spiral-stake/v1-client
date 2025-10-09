@@ -2,14 +2,13 @@ import { getSlippage } from "../../utils/getSlippage";
 import SlippageTab from "./slippageTab";
 
 const Slippage = ({
-  
   autoMode,
   setAutoMode,
   amountCollateral,
   slippage,
   setSlippage,
 }: {
- 
+
   autoMode: boolean;
   setAutoMode: React.Dispatch<React.SetStateAction<boolean>>;
   amountCollateral: string;
@@ -23,7 +22,7 @@ const Slippage = ({
       </div>
       <div className="flex items-center justify-around p-[4px] rounded-[10px] border-[1px] border-white border-opacity-[10%]">
         <SlippageTab
-          
+
           amountCollateral={amountCollateral}
           autoMode={autoMode}
           setAutoMode={setAutoMode}
@@ -33,7 +32,7 @@ const Slippage = ({
           value={getSlippage(Number(amountCollateral))}
         />
         <SlippageTab
-          
+
           amountCollateral={amountCollateral}
           autoMode={autoMode}
           setAutoMode={setAutoMode}
@@ -42,7 +41,7 @@ const Slippage = ({
           value={0.001}
         />
         <SlippageTab
-          
+
           amountCollateral={amountCollateral}
           autoMode={autoMode}
           setAutoMode={setAutoMode}
@@ -51,7 +50,7 @@ const Slippage = ({
           value={0.005}
         />
         <SlippageTab
-          
+
           amountCollateral={amountCollateral}
           autoMode={autoMode}
           setAutoMode={setAutoMode}

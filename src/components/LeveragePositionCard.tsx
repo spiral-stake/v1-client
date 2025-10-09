@@ -7,15 +7,14 @@ import FlashLeverage from "../contract-hooks/FlashLeverage";
 import { LeveragePosition } from "../types";
 import { calcLeverageApy, calcLeverage } from "../utils";
 import { displayTokenAmount } from "../utils/displayTokenAmounts";
-import { formatUnits } from "../utils/formatUnits";
 import { getSlippage } from "../utils/getSlippage";
 import { handleAsync } from "../utils/handleAsyncFunction";
 import { toastSuccess } from "../utils/toastWrapper";
 import ActionBtn from "./ActionBtn";
 import BtnFull from "./low-level/BtnFull";
 import Overlay from "./low-level/Overlay";
-import BtnGreen from "./new-components/btnGreen";
-import CloseReviewOverlay from "./new-components/closeReviewOverlay";
+import BtnGreen from "./low-level/BtnGreen";
+import CloseReviewOverlay from "./CloseReviewOverlay";
 
 const LeveragePositionCard = ({
   flashLeverage,

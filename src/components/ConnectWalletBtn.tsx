@@ -1,6 +1,6 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import BtnFull from "./low-level/BtnFull";
-import ConnectBtnFull from "./new-components/connectBtnFull";
+import ConnectBtnFull from "./low-level/ConnectBtnFull";
 
 const ConnectWalletBtn = () => {
   return (

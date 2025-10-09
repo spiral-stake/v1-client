@@ -1,6 +1,6 @@
-import close from "../../assets/icons/close.svg";
-import form from "../../assets/icons/form.svg";
-import discord from "../../assets/icons/discord.svg";
+import close from "../assets/icons/close.svg";
+import form from "../assets/icons/form.svg";
+import discord from "../assets/icons/discord.svg";
 import React from "react";
 import { Link } from "react-router-dom";
 

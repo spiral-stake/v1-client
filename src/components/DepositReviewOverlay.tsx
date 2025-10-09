@@ -1,7 +1,7 @@
-import ReviewinfoTabs from "./reviewInfoTabs";
-import close from "../../assets/icons/close.svg";
-import { CollateralToken, Token } from "../../types";
-import Action from "../Action";
+import ReviewinfoTabs from "./low-level/ReviewInfoTabs";
+import close from "../assets/icons/close.svg";
+import { CollateralToken, Token } from "../types";
+import Action from "./Action";
 
 const DepositReviewOverlay = ({
   setShowSummary,

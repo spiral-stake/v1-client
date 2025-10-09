@@ -1,5 +1,4 @@
 import { ClipLoader } from "react-spinners";
-import CheckIconBlue from "../../assets/icons/CheckBig.svg";
 import lock from "../../assets/icons/lock-svgrepo-com.svg";
 import power from "../../assets/icons/power.svg";
 

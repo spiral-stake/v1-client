@@ -10,10 +10,9 @@ import Navbar from "./components/Navbar";
 import DropdownMenu from "./components/DropdownMenu";
 import Loader from "./components/low-level/Loader";
 import axios from "axios";
-import Test from "./components/new-components/test";
 import ProductPage from "./pages/ProductPage";
-import Help from "./components/new-components/help";
-import Feedback from "./components/new-components/feedback";
+import Feedback from "./components/Feedback";
+import Help from "./components/low-level/Help";
 
 function App() {
   const [flashLeverage, setFlashLeverage] = useState<FlashLeverage>();
@@ -55,7 +54,7 @@ function App() {
 
   return (
     <div className="app font-[Outfit] font-[340] relative overflow-hidden ">
-      <Help onClick={() => setShowFeedback(true)} />
+      {/* <Help onClick={() => setShowFeedback(true)} /> */}
       <Toaster />
       {!dropdown ? (
         <Navbar showDropdown={showDropdown} />
@@ -79,10 +78,10 @@ function App() {
               element={<Portfolio flashLeverage={flashLeverage} />}
             />
             <Route path="*" element={<Navigate to={"/products"} />} />
-            <Route
+            {/* <Route
               path="/test"
               element={<Test flashLeverage={flashLeverage} />}
-            />
+            /> */}
           </Routes>
 
           <Overlay overlay={overlay} />

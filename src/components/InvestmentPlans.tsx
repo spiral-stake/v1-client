@@ -1,7 +1,7 @@
-import FlashLeverage from "../../contract-hooks/FlashLeverage";
-import { CollateralToken } from "../../types";
-import BtnGreen from "./btnGreen";
-import InvestmentPlanTab from "./investmentPlanTab";
+import FlashLeverage from "../contract-hooks/FlashLeverage";
+import { CollateralToken } from "../types";
+import BtnGreen from "./low-level/BtnGreen";
+import InvestmentPlanTab from "./InvestmentPlanTab";
 
 const InvestmentPlans = ({
   leverage,

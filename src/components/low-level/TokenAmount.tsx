@@ -1,14 +1,14 @@
 import BigNumber from "bignumber.js";
 import { useState, useEffect, useRef } from "react";
-import { Token } from "../../types";
-import { displayTokenAmount } from "../../utils/displayTokenAmounts";
-import DropdownIcon from "../low-level/DropDownIcon";
-import Input from "../low-level/Input.tsx";
+import { Token } from "../../types/index.ts";
+import { displayTokenAmount } from "../../utils/displayTokenAmounts.ts";
+import DropdownIcon from "./DropDownIcon.tsx";
+import Input from "./Input.tsx";
 import wallet from "../../assets/icons/wallet.svg";
 import truncateStr from "../../utils/truncateStr.ts";
 import { formatNumber } from "../../utils/formatNumber.ts";
 
-const NewTokenAmount = ({
+const TokenAmount = ({
   maxLeverageAmount,
   tokens,
   selectedToken,
@@ -139,4 +139,4 @@ const NewTokenAmount = ({
   );
 };
 
-export default NewTokenAmount;
+export default TokenAmount;

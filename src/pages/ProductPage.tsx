@@ -13,19 +13,19 @@ import setting from "../assets/icons/setting.svg";
 import { getExternalSwapData, getInternalSwapData } from "../api-services/swapAggregator";
 import axios from "axios";
 import arrowBack from "../assets/icons/arrowBack.svg";
-import ProductTitle from "../components/new-components/productTitle";
 import pencil from "../assets/icons/pencil.svg";
-import NewTokenAmount from "../components/new-components/newTokenAmount";
-import LeverageRange from "../components/new-components/leverageRange";
+import TokenAmount from "../components/low-level/TokenAmount";
+import LeverageRange from "../components/LeverageRange";
 import Overlay from "../components/low-level/Overlay";
 import { HoverInfo } from "../components/low-level/HoverInfo";
 import { toastSuccess } from "../utils/toastWrapper";
-import InvestmentPlans from "../components/new-components/investmentPlans";
+import InvestmentPlans from "../components/InvestmentPlans";
 import SlippageRange from "../components/new-components/slippageRange";
 import auto from "../assets/icons/auto.svg";
 import { getSlippage } from "../utils/getSlippage";
 import { formatNumber } from "../utils/formatNumber";
-import DepositReviewOverlay from "../components/new-components/DepositReviewOverlay";
+import DepositReviewOverlay from "../components/DepositReviewOverlay";
+import ProductTitle from "../components/low-level/ProductTitle.tsx";
 
 const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [showSlippage, setShowSlippage] = useState(false);
@@ -537,7 +537,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               </div>
             </div>
 
-            <NewTokenAmount
+            <TokenAmount
               tokens={[flashLeverage.usdc, collateralToken]}
               selectedToken={fromToken}
               handleTokenChange={handleFromTokenChange}
@@ -680,7 +680,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             </div>
           </div>
 
-          <NewTokenAmount
+          <TokenAmount
             tokens={[flashLeverage.usdc, collateralToken]}
             selectedToken={fromToken}
             handleTokenChange={handleFromTokenChange}

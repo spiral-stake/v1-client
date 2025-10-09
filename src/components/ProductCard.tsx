@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { CollateralToken } from "../../types";
+import { CollateralToken } from "../types";
 
 const ProductCard = ({
   collateralToken,

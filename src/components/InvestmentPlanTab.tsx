@@ -1,7 +1,7 @@
-import { CollateralToken } from "../../types";
-import BtnGreen from "./btnGreen";
-import arrowRight from "../../assets/icons/arrowRight.svg";
-import { Link, useNavigate } from "react-router-dom";
+import { CollateralToken } from "../types";
+import BtnGreen from "./low-level/BtnGreen";
+import arrowRight from "../assets/icons/arrowRight.svg";
+import { Link } from "react-router-dom";
 
 const InvestmentPlanTab = ({
   amountInUsd,

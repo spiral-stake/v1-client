@@ -1,8 +1,8 @@
 import { useState } from "react";
 import Loader from "../components/low-level/Loader";
 import PageTitle from "../components/low-level/PageTitle";
-import ProductCard from "../components/new-components/productCard";
-import RiskTab from "../components/new-components/riskTab";
+import ProductCard from "../components/ProductCard";
+import RiskTab from "../components/RiskTab";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import allRisk from "../assets/icons/allRisk.svg";
 import highRisk from "../assets/icons/highRisk.svg";

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { capitalize } from "../../utils";
+import { capitalize } from "../utils";
 
 const RiskTab = ({
   icon,

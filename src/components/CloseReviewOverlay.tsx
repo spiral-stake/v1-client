@@ -1,9 +1,9 @@
-import ReviewinfoTabs from "./reviewInfoTabs";
-import close from "../../assets/icons/close.svg";
-import { CollateralToken } from "../../types";
-import warning from "../../assets/icons/warning.svg";
-import success from "../../assets/icons/checkGreen.svg";
-import { isMatured } from "../../utils";
+import ReviewinfoTabs from "./low-level/ReviewInfoTabs";
+import close from "../assets/icons/close.svg";
+import { CollateralToken } from "../types";
+import warning from "../assets/icons/warning.svg";
+import success from "../assets/icons/checkGreen.svg";
+import { isMatured } from "../utils";
 
 const CloseReviewOverlay = ({
   amountCollateral,
