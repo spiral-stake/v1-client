@@ -108,7 +108,9 @@ const LeveragePositionCard = ({
             </div>{" "}
           </div>
           <div className="text-[#68EA6A]">
-            <BtnGreen text={`${calcLeverage(leveragePosition.ltv)}x`} />
+            <BtnGreen
+              text={`${leveragePosition.collateralToken.defaultLeverageApy}% APY  (${leveragePosition.collateralToken.maturityDate})`}
+            />
           </div>
         </div>
         <div className="hidden lg:inline-flex">
@@ -145,7 +147,6 @@ const LeveragePositionCard = ({
               ({leveragePosition.collateralToken.maturityDaysLeft} Days)
             </div>
           </div>
-
         </div>
         <div className="col-span-1 flex flex-col gap-[4px] lg:gap-[8px]">
           <div>

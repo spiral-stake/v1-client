@@ -8,6 +8,11 @@ import LeveragePositionCard from "../components/LeveragePositionCard.tsx";
 import legacyAddresses from "../api-services/legacyAddresses.json";
 import LegacyPositions from "../components/LegacyPositions.tsx";
 import axios from "axios";
+import notfound from "../assets/icons/notfound.svg"
+import magnifyingerror from "../assets/icons/magnifyerror.svg"
+import magnifyingquestion from "../assets/icons/magnifyingquestion.svg"
+
+
 
 const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
@@ -124,7 +129,10 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
         </>
       ) : (
-        <h1 className="text-3xl w-full text-center text-gray-300">No Open Positions</h1>
+        <div className="w-full flex flex-col items-center justify-center gap-[16px] lg:mt-[30px]">
+          <img src={magnifyingquestion} alt="" className="w-[60px]"/>
+          <h1 className="text-3xl w-full text-center text-gray-300">No Open Positions</h1>
+        </div>
       )}
 
       {address && legacyAddresses[address.toLowerCase() as keyof typeof legacyAddresses] && (
