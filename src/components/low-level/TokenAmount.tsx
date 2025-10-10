@@ -70,21 +70,19 @@ const TokenAmount = ({
           <div className="relative transition-all duration-300" ref={ref}>
             <div
               onClick={() => setIsOpen(!isOpen)}
-              className={`cursor-pointer flex w-full gap-[8px] items-center ${
-                isOpen ? "rounded-b-none border-b-0" : ""
-              } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
+              className={`cursor-pointer flex w-full h-[45px] gap-[8px] items-center ${isOpen ? "rounded-b-none border-b-0" : ""
+                } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
             >
               {/* Need to add Symbol */}
               <div className="flex items-center gap-[6px] w-[100px]">
                 {tokens && (
                   <img
-                    src={`/tokens/${
-                      selectedToken.symbol !== "USDC"
-                        ? selectedToken.symbolExtended
-                        : "USDC"
-                    }.svg`}
+                    src={`/tokens/${selectedToken.symbol !== "USDC"
+                      ? selectedToken.symbolExtended
+                      : "USDC"
+                      }.svg`}
                     alt=""
-                    className="w-[16px]"
+                    className="w-[20px]"
                   />
                 )}
                 <p className="truncate text-[16px] font-normal">
@@ -92,7 +90,7 @@ const TokenAmount = ({
                 </p>
               </div>
 
-              {tokens && <DropdownIcon isOpen={isOpen} />}
+              {tokens && <div className="flex items-center"><DropdownIcon isOpen={isOpen} /></div>}
             </div>
 
             {isOpen && (
@@ -109,9 +107,9 @@ const TokenAmount = ({
                   >
                     {/* Need to add token icon */}
                     <img
-                      src={`/tokens/${index==1?tokens[index].symbolExtended:"USDC"}.svg`}
+                      src={`/tokens/${index == 1 ? tokens[index].symbolExtended : "USDC"}.svg`}
                       alt=""
-                      className="w-[16px]"
+                      className="w-[20px]"
                     />
                     {token.symbol}
                   </button>

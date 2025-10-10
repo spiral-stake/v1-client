@@ -7,6 +7,7 @@ import FlashLeverage from "../contract-hooks/FlashLeverage";
 import LeveragePositionCard from "../components/LeveragePositionCard.tsx";
 import legacyAddresses from "../api-services/legacyAddresses.json";
 import LegacyPositions from "../components/LegacyPositions.tsx";
+import axios from "axios";
 
 const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
@@ -34,8 +35,31 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     async function getUserPositions() {
       if (!chainId || !address) return;
 
+      const baseUrl = chainId !== 31337 ? "https://api.spiralstake.xyz" : "http://localhost:5000";
+
       if (flashLeverage) {
-        setLeveragePositions([...(await flashLeverage.getUserLeveragePositions(address))]);
+        let [_leveragePositions, allLeveragePositions] = await Promise.all([
+          flashLeverage.getUserLeveragePositions(address),
+          axios.get<any[]>(`${baseUrl}/leveragePositions`).then(res => res.data)
+        ])
+
+        // // Example: filter positions belonging to the user
+        // let userLeveragePositions = {}
+
+        // allLeveragePositions.filter(
+        //   pos => pos.positionId.startsWith(address.toLowerCase())
+        // ).forEach((pos) => {
+        //   const positionId = pos.positionId.slice(42);
+
+        //   userLeveragePositions[positionId] = pos;
+        // })
+
+        // _leveragePositions.map((pos) => {
+        //   pos.impliedApy = userLeveragePositions[pos.id].atImpliedApy;
+        // })
+
+
+        setLeveragePositions(_leveragePositions);
       }
     }
 
@@ -87,8 +111,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           </div>
 
           {/* desktop */}
-
-          <div className="flex flex-col gap-[14px]">
+          <div className="lg:flex flex-col gap-[14px] hidden">
             {leveragePositions.map((leveragePosition: LeveragePosition, index: number) => (
               <LeveragePositionCard
                 key={index}

@@ -7,22 +7,31 @@ export const getMarketData = async (chainId: number, collateralToken: Collateral
   if (chainId === 31337) chainId = 1;
 
   const query = `
-    query {
+      query {
       marketByUniqueKey(
-        uniqueKey: "${collateralToken.morphoMarketId}"
-        chainId: ${chainId}
+      uniqueKey: "${collateralToken.morphoMarketId}"
+      chainId: ${chainId}
       ) {
-        state {
-          avgBorrowApy
-          liquidityAssetsUsd
-        }
+      state {
+      liquidityAssetsUsd
       }
-    }
-  `;
+      publicAllocatorSharedLiquidity {
+      assets
+      id
+      }
+      }
+      }
+      `;
 
   const { data } = (await axios.post("https://api.morpho.org/graphql", { query })).data;
 
-  const liquidityAssetsUsd = data.marketByUniqueKey.state.liquidityAssetsUsd as number;
+  let liquidityAssetsUsd = 0;
+
+  liquidityAssetsUsd += Number(data.marketByUniqueKey.state.liquidityAssetsUsd);
+
+  data.marketByUniqueKey.publicAllocatorSharedLiquidity.forEach((p: any) => {
+    liquidityAssetsUsd += p.assets;
+  });
 
   const borrowApy = data.marketByUniqueKey.state.avgBorrowApy;
   return { borrowApy: BigNumber(borrowApy * 100).toFixed(2), liquidityAssetsUsd };

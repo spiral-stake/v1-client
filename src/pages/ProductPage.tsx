@@ -308,8 +308,8 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
       // Single toast success message
       toastSuccess(
-        `Deposited ${amountCollateral} USDC successfully!`,
-        `You've deposited ${amountCollateral} USDC into ${collateralToken.symbol}. Your leveraged position is now earning yield.`
+        `Deposited successfully!`,
+        `You've leveraged ${amountCollateral} ${fromToken.symbol}. Your leveraged position is now earning yield.`
       );
 
       // Single API call with dynamic base URL

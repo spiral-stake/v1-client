@@ -39,25 +39,25 @@ const InvestmentPlans = ({
                 +$
                 {amountInUsd > 0
                   ? `${(
-                      (((Number(leverageApy) / 100) * amountInUsd) / 365) *
-                        collateralToken.maturityDaysLeft -
-                      ((amountInUsd * Number(leverage)) / 100) * 0.1 -
-                      (((((Number(leverageApy) / 100) * amountInUsd) / 365) *
-                        collateralToken.maturityDaysLeft -
-                        ((amountInUsd * Number(leverage)) / 100) * 0.1) /
-                        100) *
-                        10
-                    ).toFixed(2)}`
+                    (((Number(leverageApy) / 100) * amountInUsd) / 365) *
+                    collateralToken.maturityDaysLeft -
+                    ((amountInUsd * Number(leverage)) / 100) * 0.1 -
+                    (((((Number(leverageApy) / 100) * amountInUsd) / 365) *
+                      collateralToken.maturityDaysLeft -
+                      ((amountInUsd * Number(leverage)) / 100) * 0.1) /
+                      100) *
+                    10
+                  ).toFixed(2)}`
                   : `${(
-                      (((Number(leverageApy) / 100) * 10000) / 365) *
-                        collateralToken.maturityDaysLeft -
-                      ((10000 * Number(leverage)) / 100) * 0.1 -
-                      (((((Number(leverageApy) / 100) * 10000) / 365) *
-                        collateralToken.maturityDaysLeft -
-                        ((10000 * Number(leverage)) / 100) * 0.1) /
-                        100) *
-                        10
-                    ).toFixed(2)}`}
+                    (((Number(leverageApy) / 100) * 10000) / 365) *
+                    collateralToken.maturityDaysLeft -
+                    ((10000 * Number(leverage)) / 100) * 0.1 -
+                    (((((Number(leverageApy) / 100) * 10000) / 365) *
+                      collateralToken.maturityDaysLeft -
+                      ((10000 * Number(leverage)) / 100) * 0.1) /
+                      100) *
+                    10
+                  ).toFixed(2)}`}
               </p>
               <BtnGreen text={`in ${collateralToken.maturityDaysLeft} Days`} />
             </div>
@@ -94,7 +94,7 @@ const InvestmentPlans = ({
               key={index}
               desiredLtv={desiredLtv}
               collateralToken={newcollateralToken}
-              leverageApy={leverageApy}
+              leverageApy={newcollateralToken.defaultLeverageApy}
             />
           ))}
       </div>

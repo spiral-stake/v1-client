@@ -12,7 +12,7 @@ export const handleAsync = <T extends any[]>(
       return result;
     } catch (error) {
       console.dir(error);
-      toastError(error.name, error.shortMessage);
+      toastError("Error", error.shortMessage);
       return undefined;
     } finally {
       setLoading(false);
