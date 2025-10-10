@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { useState, useEffect, useRef } from "react";
-import { Token } from "../../types/index.ts";
+import { CollateralToken, Token } from "../../types/index.ts";
 import { displayTokenAmount } from "../../utils/displayTokenAmounts.ts";
 import DropdownIcon from "./DropDownIcon.tsx";
 import Input from "./Input.tsx";
@@ -31,7 +31,7 @@ const TokenAmount = ({
   warning?: string;
   balance: BigNumber;
   setAmountToMax: (maxLeverageAmount: BigNumber) => void;
-  maxLeverageAmount: BigNumber
+  maxLeverageAmount: BigNumber;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -70,11 +70,23 @@ const TokenAmount = ({
           <div className="relative transition-all duration-300" ref={ref}>
             <div
               onClick={() => setIsOpen(!isOpen)}
-              className={`cursor-pointer flex w-full gap-[8px] items-center ${isOpen ? "rounded-b-none border-b-0" : ""
-                } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
+              className={`cursor-pointer flex w-full gap-[8px] items-center ${
+                isOpen ? "rounded-b-none border-b-0" : ""
+              } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
             >
               {/* Need to add Symbol */}
-              <div className="w-[60px]">
+              <div className="flex items-center gap-[6px] w-[100px]">
+                {tokens && (
+                  <img
+                    src={`/tokens/${
+                      selectedToken.symbol !== "USDC"
+                        ? selectedToken.symbolExtended
+                        : "USDC"
+                    }.svg`}
+                    alt=""
+                    className="w-[16px]"
+                  />
+                )}
                 <p className="truncate text-[16px] font-normal">
                   {selectedToken.symbol}
                 </p>
@@ -96,6 +108,11 @@ const TokenAmount = ({
                     }
                   >
                     {/* Need to add token icon */}
+                    <img
+                      src={`/tokens/${index==1?tokens[index].symbolExtended:"USDC"}.svg`}
+                      alt=""
+                      className="w-[16px]"
+                    />
                     {token.symbol}
                   </button>
                 ))}
@@ -114,7 +131,7 @@ const TokenAmount = ({
       </div>
 
       {(error || warning) && (
-        <p className={`text-sm ${error ? 'text-red-600' : 'text-amber-500'}`}>
+        <p className={`text-sm ${error ? "text-red-600" : "text-amber-500"}`}>
           {error || warning}
         </p>
       )}
@@ -130,7 +147,10 @@ const TokenAmount = ({
         </div>
         <div className="flex items-center gap-1">
           <p className="text-[#8E8E8E]">${formatNumber(maxLeverageAmount)}</p>
-          <p className="cursor-pointer" onClick={() => setAmountToMax(maxLeverageAmount)}>
+          <p
+            className="cursor-pointer"
+            onClick={() => setAmountToMax(maxLeverageAmount)}
+          >
             MAX
           </p>
         </div>

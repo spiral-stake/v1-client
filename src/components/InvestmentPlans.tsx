@@ -39,33 +39,30 @@ const InvestmentPlans = ({
                 +$
                 {amountInUsd > 0
                   ? `${(
-                    (((Number(
-                      leverageApy
-                    ) /
-                      100) *
-                      amountInUsd) /
-                      365) *
-                    collateralToken.maturityDaysLeft -
-                    ((amountInUsd * Number(leverage)) / 100) *
-                    (0.1)
-                  ).toFixed(2)}`
+                      (((Number(leverageApy) / 100) * amountInUsd) / 365) *
+                        collateralToken.maturityDaysLeft -
+                      ((amountInUsd * Number(leverage)) / 100) * 0.1 -
+                      (((((Number(leverageApy) / 100) * amountInUsd) / 365) *
+                        collateralToken.maturityDaysLeft -
+                        ((amountInUsd * Number(leverage)) / 100) * 0.1) /
+                        100) *
+                        10
+                    ).toFixed(2)}`
                   : `${(
-                    (((Number(
-                      leverageApy
-                    ) /
-                      100) *
-                      10000) /
-                      365) *
-                    collateralToken.maturityDaysLeft -
-                    ((10000 * Number(leverage)) / 100) * 0.1
-                  ).toFixed(2)}`}
+                      (((Number(leverageApy) / 100) * 10000) / 365) *
+                        collateralToken.maturityDaysLeft -
+                      ((10000 * Number(leverage)) / 100) * 0.1 -
+                      (((((Number(leverageApy) / 100) * 10000) / 365) *
+                        collateralToken.maturityDaysLeft -
+                        ((10000 * Number(leverage)) / 100) * 0.1) /
+                        100) *
+                        10
+                    ).toFixed(2)}`}
               </p>
               <BtnGreen text={`in ${collateralToken.maturityDaysLeft} Days`} />
             </div>
             <div className="hidden h-fit lg:inline-flex">
-              <BtnGreen
-                text={`${leverageApy}% APR`}
-              />
+              <BtnGreen text={`${leverageApy}% APR`} />
             </div>
           </div>
           <p className="text-[12px] text-[#8E8E8E]">
@@ -88,8 +85,7 @@ const InvestmentPlans = ({
           )
           .sort(
             (a, b) =>
-              Number(b.defaultLeverageApy) -
-              Number(a.defaultLeverageApy)
+              Number(b.defaultLeverageApy) - Number(a.defaultLeverageApy)
           )
           .slice(0, 4)
           .map((newcollateralToken, index) => (
