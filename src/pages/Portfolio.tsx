@@ -5,9 +5,8 @@ import { LeveragePosition } from "../types";
 import { useAccount, useChainId } from "wagmi";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import LeveragePositionCard from "../components/LeveragePositionCard.tsx";
-import legacyAddresses from "../api-services/legacyAddresses.json";
-import LegacyPositions from "../components/LegacyPositions.tsx";
 import axios from "axios";
+import { updatePositionsImpliedApy } from "../utils/updatePositionsImpliedApy.ts";
 
 const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
@@ -43,22 +42,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           axios.get<any[]>(`${baseUrl}/leveragePositions`).then(res => res.data)
         ])
 
-        // // Example: filter positions belonging to the user
-        // let userLeveragePositions = {}
-
-        // allLeveragePositions.filter(
-        //   pos => pos.positionId.startsWith(address.toLowerCase())
-        // ).forEach((pos) => {
-        //   const positionId = pos.positionId.slice(42);
-
-        //   userLeveragePositions[positionId] = pos;
-        // })
-
-        // _leveragePositions.map((pos) => {
-        //   pos.impliedApy = userLeveragePositions[pos.id].atImpliedApy;
-        // })
-
-
+        _leveragePositions = updatePositionsImpliedApy(allLeveragePositions, address, _leveragePositions);
         setLeveragePositions(_leveragePositions);
       }
     }
@@ -125,10 +109,6 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
         </>
       ) : (
         <h1 className="text-3xl w-full text-center text-gray-300">No Open Positions</h1>
-      )}
-
-      {address && legacyAddresses[address.toLowerCase() as keyof typeof legacyAddresses] && (
-        <LegacyPositions address={address} />
       )}
     </div>
   ) : (

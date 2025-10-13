@@ -53,7 +53,7 @@ function App() {
   const showDropdown = (bool: boolean) => setDropDown(bool);
 
   return (
-    <div className="app font-[Outfit] font-[340] relative overflow-hidden ">
+    <div className="app font-[Outfit] font-[340] relative overflow-hidden">
       {/* <Help onClick={() => setShowFeedback(true)} /> */}
       <Toaster />
       {!dropdown ? (

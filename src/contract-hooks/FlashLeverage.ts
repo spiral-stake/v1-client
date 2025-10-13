@@ -1,15 +1,16 @@
 import { Token } from "./../types/index";
-import { CollateralToken, InternalSwapData, LeveragePosition } from "../types/index";
+import { CollateralToken, InternalSwapData, LeveragePosition } from "../types/index.ts";
 import { Base } from "./Base.ts";
 import { abi as FLASH_LEVERAGE_CORE_ABI } from "../abi/FlashLeverageCore.sol/FlashLeverageCore.json";
 import { abi as FLASH_LEVERAGE_ABI } from "../abi/FlashLeverage.sol/FlashLeverage.json";
 import { formatUnits, parseUnits } from "../utils/formatUnits.ts";
 import { readCollateralTokens, readToken } from "../api-services/contractsData.ts";
-import BigNumber from "bignumber.js";
 import FlashLeverageCore from "./FlashLeverageCore.ts";
 import { getImpliedApy } from "../api-services/pendle.ts";
 import { getMarketData } from "../api-services/morpho.ts";
 import { calcLeverage, calcLeverageApy } from "../utils/index.ts";
+import Morpho from "./Morpho.ts";
+import BigNumber from "bignumber.js";
 
 export default class FlashLeverage extends Base {
   public chainId: number = 0;
@@ -22,24 +23,24 @@ export default class FlashLeverage extends Base {
     valueInUsd: BigNumber(0),
   };
 
+  morpho: Morpho;
   flashLeverageCore: FlashLeverageCore;
   STANDARD_DECIMALS = 18;
   PERCENT_DECIMALS = 16;
 
   constructor(flashLeverageAddress: string) {
     super(flashLeverageAddress, [...FLASH_LEVERAGE_ABI, ...FLASH_LEVERAGE_CORE_ABI]);
+    this.morpho = new Morpho();
     this.flashLeverageCore = new FlashLeverageCore(""); // To avoid warning
   }
 
-  static async createInstance(chainId: number, legacy?: boolean) {
-    const flashLeverageCore = await FlashLeverageCore.createInstance(chainId, legacy);
+  static async createInstance(chainId: number) {
+    const flashLeverageCore = await FlashLeverageCore.createInstance(chainId);
     if (!flashLeverageCore) return;
 
     try {
       const [{ flashLeverageAddress }, _collateralTokens, _usdc] = await Promise.all([
-        !legacy
-          ? import(`../addresses/${chainId}.json`)
-          : import(`../legacy-addresses/${chainId}.json`),
+        import(`../addresses/${chainId}.json`),
         readCollateralTokens(chainId),
         readToken(chainId, "USDC"),
       ]);
@@ -223,12 +224,15 @@ export default class FlashLeverage extends Base {
           (token) => token.address.toLowerCase() === pos.collateralToken.toLowerCase()
         ) as CollateralToken;
 
-        const coreLeveragePosition = (await this.flashLeverageCore.getUserCoreLeveragePosition(
-          user,
-          collateralToken,
-          collateralToken.loanToken,
-          pos.desiredLtv
-        )) as { amountCollateral: bigint; sharesBorrowed: bigint };
+        const [coreLeveragePosition, userProxy] = (await Promise.all([
+          this.flashLeverageCore.getUserCoreLeveragePosition(
+            user,
+            collateralToken,
+            collateralToken.loanToken,
+            pos.desiredLtv
+          ),
+          this.flashLeverageCore.getOrCreateUserProxy(user, pos.desiredLtv),
+        ])) as [{ amountCollateral: bigint; sharesBorrowed: bigint }, string];
 
         const amountLeveragedCollateral = formatUnits(
           coreLeveragePosition.amountCollateral,
@@ -238,17 +242,20 @@ export default class FlashLeverage extends Base {
           collateralToken.valueInUsd
         );
 
-        const [amountLoan] = await Promise.all([
+        const [amountLoan, { collateral: morphoCollateral }] = await Promise.all([
           this.flashLeverageCore.calcUnleverageFlashLoan(
             collateralToken,
             coreLeveragePosition.sharesBorrowed
           ),
+          this.morpho.position(collateralToken.morphoMarketId, userProxy),
         ]);
 
         return {
           open: pos.open,
+          liquidated: pos.open && morphoCollateral < pos.amountLeveragedCollateral,
           owner: user,
           id: index,
+          userProxy: userProxy,
           collateralToken,
           amountCollateral: formatUnits(pos.amountCollateral, collateralToken?.decimals),
           amountLeveragedCollateral,
@@ -264,7 +271,7 @@ export default class FlashLeverage extends Base {
     );
 
     // Filter out null values and return the result
-    return positions.filter((pos): pos is LeveragePosition => pos.open);
+    return positions.filter((pos) => pos.open);
   }
 
   async getPositionYieldInLoanToken(user: string, positionId: number) {
