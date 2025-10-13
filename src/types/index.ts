@@ -36,17 +36,17 @@ export interface TokenInfo {
 
 export interface LeveragePosition {
   open: boolean;
+  liquidated: boolean;
   owner: string;
+  userProxy: string;
   id: number; // user => LeveragePosition[index]
   collateralToken: CollateralToken;
   amountCollateral: BigNumber;
   amountLeveragedCollateral: BigNumber;
   sharesBorrowed: bigint;
   amountLoan: BigNumber;
-  amountYield: BigNumber;
   ltv: string;
   amountCollateralInLoanToken: BigNumber;
-  impliedApy: string;
 }
 
 export interface InternalSwapData {

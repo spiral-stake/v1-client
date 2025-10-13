@@ -32,7 +32,7 @@ const LeveragePositionCard = ({
   const appChainId = useChainId();
 
   const handleCloseLeveragePosition = async () => {
-    const slippage = getSlippage(Number(leveragePosition.amountCollateral));
+    const slippage = getSlippage(Number(leveragePosition.amountLeveragedCollateral));
 
     const { pendleSwap, tokenRedeemSy, minTokenOut, swapData, limitOrderData } =
       await getInternalReswapData(
