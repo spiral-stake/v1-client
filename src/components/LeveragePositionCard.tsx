@@ -32,7 +32,9 @@ const LeveragePositionCard = ({
   const appChainId = useChainId();
 
   const handleCloseLeveragePosition = async () => {
-    const slippage = getSlippage(Number(leveragePosition.amountLeveragedCollateral));
+    const slippage = getSlippage(
+      Number(leveragePosition.amountLeveragedCollateral)
+    );
 
     const { pendleSwap, tokenRedeemSy, minTokenOut, swapData, limitOrderData } =
       await getInternalReswapData(
@@ -115,46 +117,37 @@ const LeveragePositionCard = ({
         </div>
         <div className="hidden lg:inline-flex">
           <div>
-            <BtnFull
-              text="Close"
-              onClick={() => {
-                setShowCloseReview(true);
-              }}
-            />
+            {leveragePosition.open ? (
+              <div>
+                {!leveragePosition.liquidated ? (
+                  <BtnFull
+                    text="Close"
+                    onClick={() => {
+                      setShowCloseReview(true);
+                    }}
+                  />
+                ) : (
+                  <div className="flex justify-center cursor-default border-[1px] border-white border-opacity-[8%] items-cente bg-opacity-[8%] text-sm font-light min-w-[80px] h-10 text-white px-2.5 py-2 rounded-full outline-none w-full bg-neutral-700">
+                    Liquidated
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex justify-center cursor-default border-[1px] border-white border-opacity-[8%] items-cente bg-opacity-[8%] text-sm font-light min-w-[80px] h-10 text-white px-2.5 py-2 rounded-full outline-none w-full bg-neutral-700">
+                Closed
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-[auto,auto] gap-y-[14px] grid-rows-2 lg:grid-rows-1 lg:grid-cols-[auto,auto,auto,auto,auto]">
-        <div className="col-span-1 flex flex-col gap-[4px] lg:gap-[8px]">
+      <div className="flex flex-col gap-y-[8px] lg:grid grid-cols-[auto,auto] lg:gap-y-[14px] grid-rows-2 lg:grid-rows-1 lg:grid-cols-[auto,auto,auto,auto,auto]">
+        <div className="col-span-1 flex justify-between lg:flex-col gap-[4px] lg:gap-[8px]">
           <div>
-            <p className="text-[14px] text-gray-400">LTV</p>
+            <p className="text-[14px] text-gray-400">Deposit amount</p>
           </div>
           <div className="flex items-center gap-[8px] text-[16px]">
-            {leveragePosition.ltv}%<div className="text-xs lg:hidden">LTV</div>
-            <div className="text-[14px] text-[#D7D7D7]">
-              liq. {leveragePosition.collateralToken.liqLtv}%
-            </div>
-          </div>
-        </div>
-        <div className="col-span-1 flex flex-col gap-[4px] lg:gap-[8px]">
-          <div>
-            <p className="text-[14px] text-gray-400">Maturity</p>
-          </div>
-          <div className="flex items-center gap-[8px] text-[16px]">
-            {`${leveragePosition.collateralToken.maturityDate}`}
-            <div className="text-[14px] text-[#D7D7D7]">
-              ({leveragePosition.collateralToken.maturityDaysLeft} Days)
-            </div>
-          </div>
-        </div>
-        <div className="col-span-1 flex flex-col gap-[4px] lg:gap-[8px]">
-          <div>
-            <p className="text-[14px] text-gray-400">My position</p>
-          </div>
-          <div className="flex items-center gap-[8px] text-[16px] truncate">
-            <div>{`${displayTokenAmount(leveragePosition.amountCollateral)} 
-            ${leveragePosition.collateralToken.symbol}`}</div>
+            {displayTokenAmount(leveragePosition.amountCollateral)}
             <div className="text-[14px] text-[#D7D7D7]">
               $
               {displayTokenAmount(
@@ -165,19 +158,51 @@ const LeveragePositionCard = ({
             </div>
           </div>
         </div>
-        <div className="col-span-1 flex flex-col gap-[4px] lg:gap-[8px]">
-          <div>
-            <p className="text-[14px] text-gray-400">Max APY</p>
+        <div className="col-span-1 flex justify-between lg:flex-col gap-[4px] lg:gap-[8px]">
+          <div className="flex items-center gap-[8px]">
+            <p className="text-[14px] text-gray-400">Long amount</p>
+            <p className="text-[12px] text-[#68EA6A] font-[500]">
+              {calcLeverage(leveragePosition.ltv)}x
+            </p>
           </div>
           <div className="flex items-center gap-[8px] text-[16px]">
-            {/* Needs to change, this is obsolete, need to calc for the apy and borrow apy of his positions */}
-            {calcLeverageApy(
-              leveragePosition.collateralToken.impliedApy,
-              leveragePosition.collateralToken.borrowApy,
-              leveragePosition.ltv
-            )}
-            %<div className="text-xs lg:hidden">Max APY</div>
-            {/* <div className="text-[14px] text-[#D7D7D7]">${displayTokenAmount(leveragePosition.amountYield)}</div> */}
+            {displayTokenAmount(leveragePosition.amountLeveragedCollateral)}
+            <div className="text-[14px] text-[#D7D7D7]">
+              $
+              {displayTokenAmount(
+                leveragePosition.amountLeveragedCollateral.multipliedBy(
+                  leveragePosition.collateralToken.valueInUsd
+                )
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="col-span-1 flex justify-between lg:flex-col gap-[4px] lg:gap-[8px]">
+          <div>
+            <p className="text-[14px] text-gray-400">Loan amount</p>
+          </div>
+          <div className="flex items-center gap-[8px] text-[16px] truncate">
+            <div>{displayTokenAmount(leveragePosition.amountLoan)}</div>
+            <div className="text-[14px] text-[#D7D7D7]">
+              {leveragePosition.collateralToken.loanToken.symbol}
+            </div>
+          </div>
+        </div>
+        <div className="col-span-1 flex justify-between lg:flex-col gap-[4px] lg:gap-[8px]">
+          <div>
+            <p className="text-[14px] text-gray-400">Price</p>
+          </div>
+          <div className="flex items-center gap-[8px] text-[16px]">
+            <BtnGreen
+              text={`Current: $${Number(leveragePosition.collateralToken.valueInUsd).toFixed(4)}`}
+            />
+            <BtnGreen
+              text={`Liquidation: $${(
+                (Number(leveragePosition.ltv) /
+                  Number(leveragePosition.collateralToken.liqLtv)) *
+                Number(leveragePosition.collateralToken.valueInUsd)
+              ).toFixed(4)}`}
+            />
           </div>
         </div>
 
@@ -202,12 +227,28 @@ const LeveragePositionCard = ({
 
       {/* mobile close button */}
       <div className="lg:hidden">
-        <BtnFull
-          text="Close"
-          onClick={() => {
-            setShowCloseReview(true);
-          }}
-        />
+        <div>
+          {leveragePosition.open ? (
+            <div>
+              {!leveragePosition.liquidated ? (
+                <BtnFull
+                  text="Close"
+                  onClick={() => {
+                    setShowCloseReview(true);
+                  }}
+                />
+              ) : (
+                <div className="flex justify-center cursor-default border-[1px] border-white border-opacity-[8%] items-cente bg-opacity-[8%] text-sm font-light min-w-[80px] h-10 text-white px-2.5 py-2 rounded-full outline-none w-full bg-neutral-700">
+                  Liquidated
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex justify-center cursor-default border-[1px] border-white border-opacity-[8%] items-cente bg-opacity-[8%] text-sm font-light min-w-[80px] h-10 text-white px-2.5 py-2 rounded-full outline-none w-full bg-neutral-700">
+              Closed
+            </div>
+          )}
+        </div>
       </div>
 
       {showCloseReview && (
