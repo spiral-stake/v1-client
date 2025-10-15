@@ -97,7 +97,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
           {/* desktop */}
           <div className="lg:flex flex-col gap-[14px] hidden">
-            {leveragePositions.map((leveragePosition: LeveragePosition, index: number) => (
+            {leveragePositions.sort((a,b)=>Number(b.open)-Number(a.open)).map((leveragePosition: LeveragePosition, index: number) => (
               <LeveragePositionCard
                 key={index}
                 leveragePosition={leveragePosition}
