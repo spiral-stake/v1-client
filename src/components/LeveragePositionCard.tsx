@@ -17,6 +17,9 @@ import BtnGreen from "./low-level/BtnGreen";
 import CloseReviewOverlay from "./CloseReviewOverlay";
 import LeverageBreakdown from "./LeverageBreakdown";
 import { HoverInfo } from "./low-level/HoverInfo";
+import MorphoLink from "./low-level/morphoLink";
+import morpho from "../assets/icons/morpho.svg";
+import externalLink from "../assets/icons/externalLink.svg";
 
 const LeveragePositionCard = ({
   flashLeverage,
@@ -97,7 +100,7 @@ const LeveragePositionCard = ({
   return (
     <div className="bg-white bg-opacity-[4%] rounded-xl w-full flex flex-col p-[24px] gap-[24px]">
       <div className="w-full flex items-center justify-between pb-[16px] lg:pb-0 lg:border-none border-b-[1px] border-white border-opacity-[6%]">
-        <div className="w-full flex items-center gap-[10px]">
+        <div className="flex items-center gap-[10px]">
           <div>
             <img
               className="w-[48px]"
@@ -113,13 +116,19 @@ const LeveragePositionCard = ({
           </div>
           <div className="text-[#68EA6A] flex items-center gap-1">
             <BtnGreen
-              text={`${calcLeverageApy(leveragePosition.collateralToken.impliedApy, leveragePosition.collateralToken.borrowApy, leveragePosition.ltv)}% APY (${leveragePosition.collateralToken.maturityDate})`}
+              text={`${calcLeverageApy(
+                leveragePosition.collateralToken.impliedApy,
+                leveragePosition.collateralToken.borrowApy,
+                leveragePosition.ltv
+              )}% APY (${leveragePosition.collateralToken.maturityDate})`}
             />
             <div className="hidden lg:block">
               <HoverInfo
                 content={
                   <LeverageBreakdown
-                    collateralTokenApy={leveragePosition.collateralToken.impliedApy}
+                    collateralTokenApy={
+                      leveragePosition.collateralToken.impliedApy
+                    }
                     borrowApy={leveragePosition.collateralToken.borrowApy}
                     leverage={calcLeverage(leveragePosition.ltv)}
                   />
@@ -129,7 +138,7 @@ const LeveragePositionCard = ({
           </div>
         </div>
         <div className="hidden lg:inline-flex">
-          <div>
+          <div className="w-full flex items-center gap-[8px]">
             {leveragePosition.open ? (
               <div>
                 {!leveragePosition.liquidated ? (
@@ -146,10 +155,13 @@ const LeveragePositionCard = ({
                 )}
               </div>
             ) : (
-              <div className="flex justify-center cursor-default border-[1px] border-white border-opacity-[8%] items-cente bg-opacity-[8%] text-sm font-light min-w-[80px] h-10 text-white px-2.5 py-2 rounded-full outline-none w-full bg-neutral-700">
+              <div className="flex justify-center cursor-default border-[1px] border-white border-opacity-[8%] items-cente bg-opacity-[8%] text-sm font-light min-w-[80px] h-10 text-white px-2.5 py-2 rounded-full outline-none bg-neutral-700">
                 Closed
               </div>
             )}
+            <MorphoLink
+              link={`https://app.morpho.org/ethereum/market/${leveragePosition.collateralToken.morphoMarketId}`}
+            />
           </div>
         </div>
       </div>
@@ -160,7 +172,8 @@ const LeveragePositionCard = ({
             <p className="text-[14px] text-gray-400">Deposit amount</p>
           </div>
           <div className="flex items-center gap-[8px] text-[16px]">
-            {displayTokenAmount(leveragePosition.amountCollateral)} {leveragePosition.collateralToken.symbol}
+            {displayTokenAmount(leveragePosition.amountCollateral)}{" "}
+            {leveragePosition.collateralToken.symbol}
             <div className="text-[14px] text-[#D7D7D7]">
               $
               {displayTokenAmount(
@@ -179,7 +192,8 @@ const LeveragePositionCard = ({
             </p>
           </div>
           <div className="flex items-center gap-[8px] text-[16px]">
-            {displayTokenAmount(leveragePosition.amountLeveragedCollateral)} {leveragePosition.collateralToken.symbol}
+            {displayTokenAmount(leveragePosition.amountLeveragedCollateral)}{" "}
+            {leveragePosition.collateralToken.symbol}
             <div className="text-[14px] text-[#D7D7D7]">
               $
               {displayTokenAmount(
@@ -218,7 +232,9 @@ const LeveragePositionCard = ({
           </div>
           <div className="flex items-center gap-[8px] text-[16px]">
             <BtnGreen
-              text={`Current: $${Number(leveragePosition.collateralToken.valueInUsd).toFixed(3)}`}
+              text={`Current: $${Number(
+                leveragePosition.collateralToken.valueInUsd
+              ).toFixed(3)}`}
             />
             <BtnGreen
               text={`Liquidation: $${(
@@ -250,10 +266,10 @@ const LeveragePositionCard = ({
       </div>
 
       {/* mobile close button */}
-      <div className="lg:hidden">
-        <div>
+      <div className="inline-flex lg:hidden">
+        <div className="w-full flex items-center gap-[8px]">
           {leveragePosition.open ? (
-            <div>
+            <div className="flex-1">
               {!leveragePosition.liquidated ? (
                 <BtnFull
                   text="Close"
@@ -268,10 +284,17 @@ const LeveragePositionCard = ({
               )}
             </div>
           ) : (
-            <div className="flex justify-center cursor-default border-[1px] border-white border-opacity-[8%] items-cente bg-opacity-[8%] text-sm font-light min-w-[80px] h-10 text-white px-2.5 py-2 rounded-full outline-none w-full bg-neutral-700">
+            <div className="flex justify-center cursor-default border-[1px] border-white border-opacity-[8%] items-cente bg-opacity-[8%] text-sm font-light min-w-[80px] h-10 text-white px-2.5 py-2 rounded-full outline-none flex-1 bg-neutral-700">
               Closed
             </div>
           )}
+          {/* <div className="flex items-center h-full gap-[4px] py-[10px] px-[14px] rounded-[999px] bg-white bg-opacity-[12%]">
+      <img src={morpho} alt="" className="w-[12.8px] h-[12px]" />
+      <img src={externalLink} alt="" className="w-[12px] h-[12px]" />
+    </div> */}
+          <MorphoLink
+            link={`https://app.morpho.org/ethereum/market/${leveragePosition.collateralToken.morphoMarketId}`}
+          />
         </div>
       </div>
 
