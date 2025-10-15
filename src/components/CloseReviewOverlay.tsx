@@ -40,7 +40,7 @@ const CloseReviewOverlay = ({
               <p className="text-sm leading-relaxed text-amber-500">
                 PTs reach full value only at maturity, causing yields to spike then.{" "}
                 Leverage or unlever actions incur at least <span className="font-medium">0.1% slippage</span>.{" "}
-                If your APR has dropped, it usually recovers as borrow rate spikes subside and pool utilization falls below{" "}
+                If your APY has dropped, it usually recovers as borrow rate spikes subside and pool utilization falls below{" "}
                 <span className="font-medium">90%</span>. Frequent adjustments can erode returns —{" "}
                 <span className="font-medium">holding your position often pays off.</span>
               </p>

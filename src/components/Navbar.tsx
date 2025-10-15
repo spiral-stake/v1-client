@@ -64,7 +64,7 @@ const Navbar = ({
               </Link>
               <Link target="blank" to="https://docs.spiralstake.xyz">
                 <div className="cursor-pointer text-center text-[#C3C3C3] hover:text-white">
-                  Learn
+                  Docs
                 </div>
               </Link>
             </div>

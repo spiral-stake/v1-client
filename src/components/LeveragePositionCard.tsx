@@ -5,7 +5,7 @@ import { useAccount, useChainId } from "wagmi";
 import { getInternalReswapData } from "../api-services/swapAggregator";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import { LeveragePosition } from "../types";
-import { calcLeverageApy, calcLeverage } from "../utils";
+import { calcLeverage, calcLeverageApy } from "../utils";
 import { displayTokenAmount } from "../utils/displayTokenAmounts";
 import { getSlippage } from "../utils/getSlippage";
 import { handleAsync } from "../utils/handleAsyncFunction";
@@ -15,6 +15,8 @@ import BtnFull from "./low-level/BtnFull";
 import Overlay from "./low-level/Overlay";
 import BtnGreen from "./low-level/BtnGreen";
 import CloseReviewOverlay from "./CloseReviewOverlay";
+import LeverageBreakdown from "./LeverageBreakdown";
+import { HoverInfo } from "./low-level/HoverInfo";
 
 const LeveragePositionCard = ({
   flashLeverage,
@@ -109,10 +111,21 @@ const LeveragePositionCard = ({
               {`${leveragePosition.collateralToken.symbol.split("-")[1]}`}
             </div>{" "}
           </div>
-          <div className="text-[#68EA6A]">
+          <div className="text-[#68EA6A] flex items-center gap-1">
             <BtnGreen
-              text={`${leveragePosition.collateralToken.defaultLeverageApy}% APY  (${leveragePosition.collateralToken.maturityDate})`}
+              text={`${calcLeverageApy(leveragePosition.collateralToken.impliedApy, leveragePosition.collateralToken.borrowApy, leveragePosition.ltv)}% APY (${leveragePosition.collateralToken.maturityDate})`}
             />
+            <div className="hidden lg:block">
+              <HoverInfo
+                content={
+                  <LeverageBreakdown
+                    collateralTokenApy={leveragePosition.collateralToken.impliedApy}
+                    borrowApy={leveragePosition.collateralToken.borrowApy}
+                    leverage={calcLeverage(leveragePosition.ltv)}
+                  />
+                }
+              />
+            </div>
           </div>
         </div>
         <div className="hidden lg:inline-flex">
@@ -147,7 +160,7 @@ const LeveragePositionCard = ({
             <p className="text-[14px] text-gray-400">Deposit amount</p>
           </div>
           <div className="flex items-center gap-[8px] text-[16px]">
-            {displayTokenAmount(leveragePosition.amountCollateral)}
+            {displayTokenAmount(leveragePosition.amountCollateral)} {leveragePosition.collateralToken.symbol}
             <div className="text-[14px] text-[#D7D7D7]">
               $
               {displayTokenAmount(
@@ -166,7 +179,7 @@ const LeveragePositionCard = ({
             </p>
           </div>
           <div className="flex items-center gap-[8px] text-[16px]">
-            {displayTokenAmount(leveragePosition.amountLeveragedCollateral)}
+            {displayTokenAmount(leveragePosition.amountLeveragedCollateral)} {leveragePosition.collateralToken.symbol}
             <div className="text-[14px] text-[#D7D7D7]">
               $
               {displayTokenAmount(
@@ -190,18 +203,29 @@ const LeveragePositionCard = ({
         </div>
         <div className="col-span-1 flex justify-between lg:flex-col gap-[4px] lg:gap-[8px]">
           <div>
+            <p className="text-[14px] text-gray-400">LTV</p>
+          </div>
+          <div className="flex items-center gap-[8px] text-[16px] truncate">
+            <div>{leveragePosition.ltv}%</div>
+            <div className="text-[14px] text-[#D7D7D7]">
+              liq. {leveragePosition.collateralToken.liqLtv}%
+            </div>
+          </div>
+        </div>
+        <div className="col-span-1 flex justify-between lg:flex-col gap-[4px] lg:gap-[8px]">
+          <div>
             <p className="text-[14px] text-gray-400">Price</p>
           </div>
           <div className="flex items-center gap-[8px] text-[16px]">
             <BtnGreen
-              text={`Current: $${Number(leveragePosition.collateralToken.valueInUsd).toFixed(4)}`}
+              text={`Current: $${Number(leveragePosition.collateralToken.valueInUsd).toFixed(3)}`}
             />
             <BtnGreen
               text={`Liquidation: $${(
                 (Number(leveragePosition.ltv) /
                   Number(leveragePosition.collateralToken.liqLtv)) *
                 Number(leveragePosition.collateralToken.valueInUsd)
-              ).toFixed(4)}`}
+              ).toFixed(3)}`}
             />
           </div>
         </div>

@@ -2,6 +2,7 @@ import FlashLeverage from "../contract-hooks/FlashLeverage";
 import { CollateralToken } from "../types";
 import BtnGreen from "./low-level/BtnGreen";
 import InvestmentPlanTab from "./InvestmentPlanTab";
+import { getNetYieldUsd } from "../utils/getNetYieldUsd";
 
 const InvestmentPlans = ({
   leverage,
@@ -38,27 +39,7 @@ const InvestmentPlans = ({
               <div className="flex items-center gap-[8px] text-[#68EA6A]">
                 <p className="text-[16px] lg:text-[24px] font-[500]">
                   +$
-                  {amountInUsd > 0
-                    ? `${(
-                        (((Number(leverageApy) / 100) * amountInUsd) / 365) *
-                          collateralToken.maturityDaysLeft -
-                        ((amountInUsd * Number(leverage)) / 100) * 0.1 -
-                        (((((Number(leverageApy) / 100) * amountInUsd) / 365) *
-                          collateralToken.maturityDaysLeft -
-                          ((amountInUsd * Number(leverage)) / 100) * 0.1) /
-                          100) *
-                          10
-                      ).toFixed(2)}`
-                    : `${(
-                        (((Number(leverageApy) / 100) * 10000) / 365) *
-                          collateralToken.maturityDaysLeft -
-                        ((10000 * Number(leverage)) / 100) * 0.1 -
-                        (((((Number(leverageApy) / 100) * 10000) / 365) *
-                          collateralToken.maturityDaysLeft -
-                          ((10000 * Number(leverage)) / 100) * 0.1) /
-                          100) *
-                          10
-                      ).toFixed(2)}`}
+                  {getNetYieldUsd(amountInUsd, leverageApy, leverage, collateralToken.maturityDaysLeft)}
                 </p>
                 <BtnGreen
                   text={`in ${collateralToken.maturityDaysLeft} Days`}
@@ -70,7 +51,7 @@ const InvestmentPlans = ({
                   <div className="self-stretch justify-start text-xs font-normal font-['Outfit'] leading-none">
                     <div className=" bg-white bg-opacity-[4%] p-3 rounded-[14px] w-[160px] lg:w-full text-sm text-white/90 shadow-lg border border-white/10">
                       <p className="text-[14px] text-[#D7D7D7] ">
-                        after slippage of 0.1% & 10% performance fees on yield
+                        After 0.1% Slippage & 10% Performance Fee on Yield Generated
                       </p>
                     </div>
                   </div>
@@ -79,7 +60,7 @@ const InvestmentPlans = ({
             </div>
 
             <div className="hidden h-fit lg:inline-flex">
-              <BtnGreen text={`${leverageApy}% APR`} />
+              <BtnGreen text={`${leverageApy}% APY`} />
             </div>
           </div>
           <p className="text-[12px] text-[#8E8E8E]">

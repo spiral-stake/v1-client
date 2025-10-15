@@ -6,10 +6,6 @@ import { useAccount, useChainId } from "wagmi";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import LeveragePositionCard from "../components/LeveragePositionCard.tsx";
 import axios from "axios";
-import notfound from "../assets/icons/notfound.svg"
-import magnifyingerror from "../assets/icons/magnifyerror.svg"
-import magnifyingquestion from "../assets/icons/magnifyingquestion.svg"
-
 
 import { updatePositionsImpliedApy } from "../utils/updatePositionsImpliedApy.ts";
 

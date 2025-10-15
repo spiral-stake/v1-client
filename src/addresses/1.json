@@ -166,22 +166,6 @@
       "name": "PT Ethena sUSDE 27NOV2025",
       "pendleMarket": "0xb6aC3d5da138918aC4E84441e924a20daA60dBdd",
       "symbol": "PT-sUSDE-27NOV2025"
-    },
-    "0xb44cdBEF3145C1c1E772e8228E1154c80e70618e": {
-      "YT": "0xBF678e1828AE2Fb3c1e4cfBCE00ba595542513E3",
-      "address": "0xb44cdBEF3145C1c1E772e8228E1154c80e70618e",
-      "decimals": 18,
-      "maturityTimestamp": 1764806400,
-      "loanToken": {
-        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-        "decimals": 6,
-        "name": "USD Coin",
-        "symbol": "USDC"
-      },
-      "morphoMarketId": "0x21b67f89513da0b0c94af8778134a1ba3f762f944f16208b42cc0663b07eaf05",
-      "name": "PT infiniFi USD 4DEC2025",
-      "pendleMarket": "0x6524421041a33a559831A6d305936361B6e4D217",
-      "symbol": "PT-iUSD-4DEC2025"
     }
   },
   "flashLeverageAddress": "0xcAcCfC3168402668DBDCc054947Dea0101812cca",

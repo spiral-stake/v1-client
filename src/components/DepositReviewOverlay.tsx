@@ -49,7 +49,7 @@ const DepositReviewOverlay = ({
             info={collateralToken.maturityDate}
           />
           <ReviewinfoTabs title="Leverage" info={`${leverage}x`} />
-          <ReviewinfoTabs info={`${leverageApy}% APR`} title="Estimated Yield" />
+          <ReviewinfoTabs info={`${leverageApy}% APY`} title="Estimated Yield" />
           <ReviewinfoTabs title="Your LTV" info={`${desiredLtv}%`} />
         </div>
       </div>

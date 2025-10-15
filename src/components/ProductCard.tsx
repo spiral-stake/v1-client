@@ -38,7 +38,7 @@ const ProductCard = ({
             <div className="flex gap-1">
               <p className="text-[20px] text-[#68EA6A]">{collateralToken.defaultLeverageApy}%</p>
               <p className="hidden group-hover:flex text-[20px] text-[#68EA6A]">
-                APR
+                APY
               </p>
             </div>
           </div>

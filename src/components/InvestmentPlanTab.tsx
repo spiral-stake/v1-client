@@ -31,7 +31,7 @@ const InvestmentPlanTab = ({
         </div>
         <div className="text-[12px] lg:text-[16px] font-[500] text-[#D7D7D7]">{`${collateralToken.symbol}`}</div>
         <div>
-          <BtnGreen text={`${leverageApy}% APR`} />
+          <BtnGreen text={`${leverageApy}% APY`} />
         </div>
         <div className="flex items-end gap-[8px] text-[12px] lg:text-[16px] text-[#68EA6A]">
           <p>
@@ -40,7 +40,7 @@ const InvestmentPlanTab = ({
               ? `${((Number(leverageApy) / 100) * amountInUsd).toFixed(2)}`
               : `${((Number(leverageApy) / 100) * 10000).toFixed(2)}`}
           </p>
-          <p className="text-[12px]">(Annually)</p>
+          <p className="hidden lg:block"><BtnGreen text="Annually" /></p>
         </div>
         <div className="p-[6px] lg:p-[12px]">
           <img src={arrowRight} alt="" className="w-[20px] lg:w-[24px]" />

@@ -271,7 +271,7 @@ export default class FlashLeverage extends Base {
     );
 
     // Filter out null values and return the result
-    return positions;
+    return positions.filter((pos) => pos.open);
   }
 
   async getPositionYieldInLoanToken(user: string, positionId: number) {

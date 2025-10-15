@@ -21,7 +21,7 @@ const LeverageBreakdown = ({ collateralTokenApy, borrowApy, leverage }: { collat
                         <span className="text-white font-[500]">{leveragedYield.toFixed(2)}%</span>
                     </div>
                     <div className="text-[12px] text-[#8E8E8E] font-[400]">
-                        Token APR  <span className="text-white/80">( {tokenApy.toFixed(2)}% )</span>  x  Leverage <span className="font-medium text-white/80">( {BigNumber(leverage).toFixed(2)} )</span>
+                        Token APY  <span className="text-white/80">( {tokenApy.toFixed(2)}% )</span>  x  Leverage <span className="font-medium text-white/80">( {BigNumber(leverage).toFixed(2)} )</span>
                     </div>
                 </div>
 
@@ -31,14 +31,14 @@ const LeverageBreakdown = ({ collateralTokenApy, borrowApy, leverage }: { collat
                         <span className="text-white font-[500]">{leveragedBorrowCost.toFixed(2)}%</span>
                     </div>
                     <div className="text-[12px] text-[#8E8E8E] font-[400]">
-                        Borrow APR <span className="text-white/80">( {_borrowApy.toFixed(2)}% )</span>  ×  Borrowed <span className="font-medium text-white/80">( {borrowMultiplier.toFixed(2)} )</span>
+                        Borrow APY <span className="text-white/80">( {_borrowApy.toFixed(2)}% )</span>  ×  Borrowed <span className="font-medium text-white/80">( {borrowMultiplier.toFixed(2)} )</span>
                     </div>
                 </div>
 
                 <div className="border-t border-white/10 my-3" />
 
                 <div className="flex justify-between text-base">
-                    <span className="font-medium text-white/80">Net APR</span>
+                    <span className="font-medium text-white/80">Net APY</span>
                     <span className="font-[500] text-white">{netApy.toFixed(2)}%</span>
                 </div>
             </div>

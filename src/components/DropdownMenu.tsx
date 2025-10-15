@@ -58,7 +58,7 @@ const DropdownMenu = ({
               <div className="self-stretch inline-flex justify-between items-center">
                 <div className="flex-1 inline-flex flex-col justify-start items-start gap-3">
                   <div className="justify-center text-neutral-200 text-sm font-['Outfit'] cursor-pointer">
-                    Learn
+                    Docs
                   </div>
                 </div>
               </div>

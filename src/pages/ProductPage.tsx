@@ -139,65 +139,71 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   useEffect(() => {
     if (!collateralToken) return;
 
-    const updateActionBtn = async () => {
-      if (amountCollateral == "" || BigNumber(amountCollateral).isZero()) {
+    const updateActionBtn = () => {
+      const collateral = new BigNumber(amountCollateral || 0);
+      const userBalance = new BigNumber(userFromTokenBalance || 0);
+      const leverageValue = new BigNumber(leverage || 1);
+      const liquidityUsd = new BigNumber(collateralToken.liquidityAssetsUsd || 0);
+
+      // Case 1: Empty or zero input
+      if (amountCollateral === "" || collateral.isZero()) {
         return setActionBtn((prev) => ({
           ...prev,
           disabled: true,
           error: "",
+          warning: "",
         }));
-      } else if (
-        BigNumber(amountCollateral).isGreaterThan(userFromTokenBalance)
-      ) {
-        return setActionBtn((prev) => ({
-          ...prev,
-          disabled: true,
-          error: "Amount exceeds your available balance",
-        }));
-      } else if (
-        BigNumber(amountCollateral).isGreaterThan(
-          BigNumber.max(
-            0,
-            new BigNumber(collateralToken?.liquidityAssetsUsd)
-              .dividedBy(BigNumber(leverage).minus(1))
-              .minus(1000)
-          )
-        )
-      ) {
+      }
+
+      // // Case 2: Amount exceeds user balance
+      // if (collateral.isGreaterThan(userBalance)) {
+      //   return setActionBtn((prev) => ({
+      //     ...prev,
+      //     disabled: true,
+      //     error: "Amount exceeds your available balance",
+      //     warning: "",
+      //   }));
+      // }
+
+      // Case 3: Amount exceeds max leverage limit
+      const maxLeverageAmount = BigNumber.max(
+        new BigNumber(0),
+        liquidityUsd.dividedBy(leverageValue.minus(1)).minus(1000)
+      );
+
+      if (collateral.isGreaterThan(maxLeverageAmount)) {
         return setActionBtn((prev) => ({
           ...prev,
           disabled: true,
           error: "Exceeds Max Leverage Amount",
+          warning: "",
         }));
-      } else if (BigNumber(amountCollateral).lt(BigNumber(5000))) {
+      }
+
+      // Case 4: Recommended minimum warning
+      if (collateral.lt(new BigNumber(5000))) {
         return setActionBtn((prev) => ({
           ...prev,
           text: "Leverage",
           disabled: false,
           warning: "We recommend depositing a minimum amount of $5,000",
-        }));
-      } else {
-        return setActionBtn((prev) => ({
-          ...prev,
-          text: "Leverage",
-          disabled: false,
           error: "",
         }));
       }
+
+      // Case 5: All good — enable action
+      return setActionBtn((prev) => ({
+        ...prev,
+        text: "Leverage",
+        disabled: false,
+        error: "",
+        warning: "",
+      }));
     };
 
-    //  else if (BigNumber(amountCollateral).isGreaterThan(100)) {
-    //   return setActionBtn((prev) => ({
-    //     ...prev,
-    //     disabled: true,
-    //     error: `Deposit amount is capped at ${displayTokenAmount(
-    //       BigNumber(100),
-    //       collateralToken
-    //     )}`,
-    //   }));
-
     updateActionBtn();
-  }, [collateralToken, desiredLtv, amountCollateral, userFromTokenBalance]);
+  }, [collateralToken, leverage, amountCollateral, userFromTokenBalance]);
+
 
   useEffect(() => {
     if (!collateralToken || !fromToken) return;
@@ -333,21 +339,21 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
       const { positionId, amountDepositedInUsd } = await (isSameToken
         ? flashLeverage.leverage(
-            address,
-            desiredLtv,
-            fromToken as CollateralToken,
-            amountCollateral,
-            internalSwapData
-          )
+          address,
+          desiredLtv,
+          fromToken as CollateralToken,
+          amountCollateral,
+          internalSwapData
+        )
         : flashLeverage.swapAndLeverage(
-            address,
-            desiredLtv,
-            fromToken,
-            amountCollateral,
-            externalSwapData!,
-            collateralToken,
-            internalSwapData
-          ));
+          address,
+          desiredLtv,
+          fromToken,
+          amountCollateral,
+          externalSwapData!,
+          collateralToken,
+          internalSwapData
+        ));
 
       // Single toast success message
       toastSuccess(
@@ -370,7 +376,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           atBorrowApy: collateralToken.borrowApy,
           desiredLtv,
         });
-      } catch (e) {}
+      } catch (e) { }
 
       navigate("/portfolio");
     } catch (e) {
@@ -428,7 +434,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                     }
                   />
                 </div>
-                <p className="text-[14px] text-[#8E8E8E]">Max APR</p>
+                <p className="text-[14px] text-[#8E8E8E]">Max APY</p>
               </div>
             </div>
 
@@ -504,7 +510,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   }
                 />
               </div>
-              <p className="text-[14px] text-[#8E8E8E]">Max APR</p>
+              <p className="text-[14px] text-[#8E8E8E]">Max APY</p>
             </div>
             <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
             <div className="pr-[0px]">
@@ -557,7 +563,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           {/* mobile deposit section */}
           <div className="w-full flex flex-col gap-[16px] lg:hidden">
             <PoolInfo collateralToken={collateralToken} leverage={leverage} />
-            <div className="bg-white flex flex-col lg:hidden w-full h-fit items-center gap-[24px] bg-opacity-[2%] rounded-xl p-[32px]">
+            <div className="bg-white flex flex-col lg:hidden w-full h-fit items-center gap-[24px] bg-opacity-[2%] rounded-xl p-[20px] lg:p-[32px]">
               <div className="flex w-full justify-between items-center">
                 <div className="flex flex-col">
                   <p className="text-[24px] text-[#FFFFFF] font-normal">
@@ -629,7 +635,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 onClick={actionBtn.onClick}
               />
 
-              <div className="flex flex-col w-full gap-[8px] test-[16px] font-[400] text-[#8E8E8E]">
+              <div className="flex flex-col w-full gap-[8px] text-[14px] lg:text-[16px] font-[400] text-[#8E8E8E]">
                 <div className="flex justify-between items-center">
                   <p>Current price</p>
                   <p>${Number(collateralToken.valueInUsd).toFixed(4)}</p>

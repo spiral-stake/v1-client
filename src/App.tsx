@@ -11,14 +11,11 @@ import DropdownMenu from "./components/DropdownMenu";
 import Loader from "./components/low-level/Loader";
 import axios from "axios";
 import ProductPage from "./pages/ProductPage";
-import Feedback from "./components/Feedback";
-import Help from "./components/low-level/Help";
 import NewHelp from "./components/low-level/NewHelp";
 
 function App() {
   const [flashLeverage, setFlashLeverage] = useState<FlashLeverage>();
   const [dropdown, setDropDown] = useState(false);
-  const [showFeedback, setShowFeedback] = useState(false);
   const [overlay, setOverlay] = useState<React.ReactNode>();
   const [showHelpTabs, setShowHelpTabs] = useState(false);
 
@@ -55,11 +52,10 @@ function App() {
   const showDropdown = (bool: boolean) => setDropDown(bool);
 
   return (
-    <div onClick={()=>{setShowHelpTabs(false)}} className="app font-[Outfit] font-[340] relative overflow-hidden ">
-      {/* <Help onClick={() => setShowFeedback(true)} /> */}
-      <div onClick={(e)=>e.stopPropagation()}>
-        <NewHelp setShowHelpTabs={setShowHelpTabs} showHelpTabs={showHelpTabs}/>
-      </div>
+    <div onClick={() => { setShowHelpTabs(false) }} className="app font-[Outfit] font-[340] relative overflow-hidden ">
+      {/* <div onClick={(e) => e.stopPropagation()}>
+        <NewHelp setShowHelpTabs={setShowHelpTabs} showHelpTabs={showHelpTabs} />
+      </div> */}
       <Toaster />
       {!dropdown ? (
         <Navbar showDropdown={showDropdown} />
