@@ -144,7 +144,7 @@ const TokenAmount = ({
           </p>
         </div>
         <div className="flex items-center gap-1">
-          <p className="text-[#8E8E8E]">${formatNumber(maxLeverageAmount)}</p>
+          {/* <p className="text-[#8E8E8E]">${formatNumber(maxLeverageAmount)}</p> */}
           <p
             className="cursor-pointer"
             onClick={() => setAmountToMax(maxLeverageAmount)}

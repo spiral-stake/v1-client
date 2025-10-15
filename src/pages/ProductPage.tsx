@@ -8,9 +8,17 @@ import ERC20 from "../contract-hooks/ERC20";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import LeverageBreakdown from "../components/LeverageBreakdown";
 import Action from "../components/Action";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import setting from "../assets/icons/setting.svg";
-import { getExternalSwapData, getInternalSwapData } from "../api-services/swapAggregator";
+import {
+  getExternalSwapData,
+  getInternalSwapData,
+} from "../api-services/swapAggregator";
 import axios from "axios";
 import arrowBack from "../assets/icons/arrowBack.svg";
 import pencil from "../assets/icons/pencil.svg";
@@ -26,6 +34,10 @@ import { getSlippage } from "../utils/getSlippage";
 import { formatNumber } from "../utils/formatNumber";
 import DepositReviewOverlay from "../components/DepositReviewOverlay";
 import ProductTitle from "../components/low-level/ProductTitle.tsx";
+import PoolInfoTab from "../components/low-level/PoolInfoTab.tsx";
+import borrow from "../assets/icons/borrow.svg";
+import maxLeverage from "../assets/icons/maxLeverage.svg";
+import PoolInfo from "../components/low-level/PoolInfo.tsx";
 
 const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [showSlippage, setShowSlippage] = useState(false);
@@ -33,14 +45,19 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [collateralToken, setCollateralToken] = useState<CollateralToken>();
   const [fromToken, setFromToken] = useState<Token>();
   const [amountCollateral, setAmountCollateral] = useState("");
-  const [slippage, setSlippage] = useState(getSlippage(Number(amountCollateral)));
+  const [slippage, setSlippage] = useState(
+    getSlippage(Number(amountCollateral))
+  );
   const [autoMode, setAutoMode] = useState(true);
   const [desiredLtv, setDesiredLtv] = useState("");
   const [leverage, setLeverage] = useState("");
-  const [leverageApy, setLeverageApy] = useState("")
+  const [leverageApy, setLeverageApy] = useState("");
   const [showSummary, setShowSummary] = useState(false);
-  const [userFromTokenBalance, setUserFromTokenBalance] = useState<BigNumber>(BigNumber(0));
-  const [userFromTokenAllowance, setUserFromTokenAllowance] = useState<BigNumber>(BigNumber(0));
+  const [userFromTokenBalance, setUserFromTokenBalance] = useState<BigNumber>(
+    BigNumber(0)
+  );
+  const [userFromTokenAllowance, setUserFromTokenAllowance] =
+    useState<BigNumber>(BigNumber(0));
   const [actionBtn, setActionBtn] = useState({
     text: "Leverage",
     onClick: () => {
@@ -73,7 +90,11 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       setCollateralToken({ ...collateralToken });
       setFromToken({ ...flashLeverage.usdc });
 
-      setDesiredLtv(Number(initialLeverage) > 0 ? String(initialLeverage) : collateralToken.safeLtv);
+      setDesiredLtv(
+        Number(initialLeverage) > 0
+          ? String(initialLeverage)
+          : collateralToken.safeLtv
+      );
     }
 
     initialize();
@@ -83,8 +104,14 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     if (!collateralToken) return;
 
     setLeverage(calcLeverage(desiredLtv));
-    setLeverageApy(calcLeverageApy(collateralToken.impliedApy, collateralToken.borrowApy, desiredLtv));
-  }, [desiredLtv, collateralToken])
+    setLeverageApy(
+      calcLeverageApy(
+        collateralToken.impliedApy,
+        collateralToken.borrowApy,
+        desiredLtv
+      )
+    );
+  }, [desiredLtv, collateralToken]);
 
   useEffect(() => {
     if (autoMode) {
@@ -96,12 +123,13 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     if (!fromToken || !address) return;
 
     const getFromTokenBalance = async () => {
-      const _userFromTokenBalance = await new ERC20(fromToken).balanceOf(address);
+      const _userFromTokenBalance = await new ERC20(fromToken).balanceOf(
+        address
+      );
       setUserFromTokenBalance(_userFromTokenBalance);
     };
     getFromTokenBalance();
   }, [fromToken, address]);
-
 
   useEffect(() => {
     updateUserCollateralBalance();
@@ -118,7 +146,9 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           disabled: true,
           error: "",
         }));
-      } else if (BigNumber(amountCollateral).isGreaterThan(userFromTokenBalance)) {
+      } else if (
+        BigNumber(amountCollateral).isGreaterThan(userFromTokenBalance)
+      ) {
         return setActionBtn((prev) => ({
           ...prev,
           disabled: true,
@@ -232,7 +262,10 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
   useEffect(() => {
     function handleSlippageClickOutside(event: MouseEvent) {
-      if (slippageRef.current && !slippageRef.current.contains(event.target as Node)) {
+      if (
+        slippageRef.current &&
+        !slippageRef.current.contains(event.target as Node)
+      ) {
         setShowSlippage(false);
       }
     }
@@ -257,7 +290,10 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const updateUserCollateralAllowance = async () => {
     if (!address || !collateralToken || !fromToken) return;
 
-    let allowance = await new ERC20(fromToken).allowance(address, flashLeverage.address);
+    let allowance = await new ERC20(fromToken).allowance(
+      address,
+      flashLeverage.address
+    );
 
     setUserFromTokenAllowance(allowance);
   };
@@ -280,7 +316,14 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   }
 
   async function handleLeverage() {
-    if (!flashLeverage || !fromToken || !address || !collateralToken || !internalSwapData) return;
+    if (
+      !flashLeverage ||
+      !fromToken ||
+      !address ||
+      !collateralToken ||
+      !internalSwapData
+    )
+      return;
 
     try {
       const isSameToken = collateralToken.address === fromToken.address;
@@ -290,21 +333,21 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
       const { positionId, amountDepositedInUsd } = await (isSameToken
         ? flashLeverage.leverage(
-          address,
-          desiredLtv,
-          fromToken as CollateralToken,
-          amountCollateral,
-          internalSwapData
-        )
+            address,
+            desiredLtv,
+            fromToken as CollateralToken,
+            amountCollateral,
+            internalSwapData
+          )
         : flashLeverage.swapAndLeverage(
-          address,
-          desiredLtv,
-          fromToken,
-          amountCollateral,
-          externalSwapData!,
-          collateralToken,
-          internalSwapData
-        ));
+            address,
+            desiredLtv,
+            fromToken,
+            amountCollateral,
+            externalSwapData!,
+            collateralToken,
+            internalSwapData
+          ));
 
       // Single toast success message
       toastSuccess(
@@ -313,7 +356,10 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       );
 
       // Single API call with dynamic base URL
-      const baseUrl = chainId !== 31337 ? "https://api.spiralstake.xyz" : "http://localhost:5000";
+      const baseUrl =
+        chainId !== 31337
+          ? "https://api.spiralstake.xyz"
+          : "http://localhost:5000";
 
       try {
         await axios.post(`${baseUrl}/leverage/open`, {
@@ -324,7 +370,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           atBorrowApy: collateralToken.borrowApy,
           desiredLtv,
         });
-      } catch (e) { }
+      } catch (e) {}
 
       navigate("/portfolio");
     } catch (e) {
@@ -370,8 +416,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               <div className="flex flex-col">
                 <div className="flex items-center gap-1">
                   <p className="text-[20px] text-[#E4E4E4] font-normal">
-                    {leverageApy}
-                    %
+                    {leverageApy}%
                   </p>
                   <HoverInfo
                     content={
@@ -416,11 +461,15 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 </div>
               </div>
 
-              <p className="text-[14px] text-[#8E8E8E] cursor-default">Leverage</p>
+              <p className="text-[14px] text-[#8E8E8E] cursor-default">
+                Leverage
+              </p>
             </div>
 
             <div className="pr-[60px]">
-              <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">{desiredLtv}%</p>
+              <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">
+                {desiredLtv}%
+              </p>
               <p className="text-[14px] text-[#8E8E8E]">Your LTV</p>
             </div>
 
@@ -429,7 +478,9 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">
                 {collateralToken.liqLtv}%
               </p>
-              <p className="text-[14px] text-[#8E8E8E] cursor-default">Liquidation LTV</p>
+              <p className="text-[14px] text-[#8E8E8E] cursor-default">
+                Liquidation LTV
+              </p>
             </div>
           </div>
 
@@ -441,8 +492,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             <div className="flex flex-col pr-[60px]">
               <div className="flex items-center gap-1">
                 <p className="text-[20px] text-[#E4E4E4] font-normal">
-                  {leverageApy}
-                  %
+                  {leverageApy}%
                 </p>
                 <HoverInfo
                   content={
@@ -482,11 +532,15 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 </div>
               </div>
 
-              <p className="text-[14px] text-[#8E8E8E] cursor-default">Leverage</p>
+              <p className="text-[14px] text-[#8E8E8E] cursor-default">
+                Leverage
+              </p>
             </div>
             <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%]"></div>
             <div className="pr-[60px]">
-              <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">{desiredLtv}%</p>
+              <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">
+                {desiredLtv}%
+              </p>
               <p className="text-[14px] text-[#8E8E8E]">Your LTV</p>
             </div>
             <div className="w-[2px] h-[24px] bg-white bg-opacity-[10%] font-normal"></div>
@@ -494,25 +548,200 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               <p className="text-[20px] text-[#E4E4E4] min-w-[70px] font-normal">
                 {collateralToken.liqLtv}%
               </p>
-              <p className="text-[14px] text-[#8E8E8E] cursor-default">Liquidation LTV</p>
+              <p className="text-[14px] text-[#8E8E8E] cursor-default">
+                Liquidation LTV
+              </p>
             </div>
           </div>
 
           {/* mobile deposit section */}
-          <div className="bg-white flex flex-col lg:hidden w-full h-fit items-center gap-[24px] bg-opacity-[2%] rounded-xl p-[32px]">
+          <div className="w-full flex flex-col gap-[16px] lg:hidden">
+            <PoolInfo collateralToken={collateralToken} leverage={leverage} />
+            <div className="bg-white flex flex-col lg:hidden w-full h-fit items-center gap-[24px] bg-opacity-[2%] rounded-xl p-[32px]">
+              <div className="flex w-full justify-between items-center">
+                <div className="flex flex-col">
+                  <p className="text-[24px] text-[#FFFFFF] font-normal">
+                    Deposit
+                  </p>
+                  <p className="text-[15px] text-[#8B8B8B]">
+                    Deposit assets, earn max yield
+                  </p>
+                </div>
+                <div className="bg-white bg-opacity-[4%] p-[6px] px-[8px] rounded-[999px] flex items-center gap-[8px]">
+                  <div className="flex items-center gap-[4px]">
+                    <p className="text-[14px] font-[400] text-[#8B8B8B]">
+                      {parseFloat((slippage * 100).toFixed(3))}%
+                    </p>{" "}
+                    {autoMode && <img src={auto} alt="" className="w-[24px]" />}
+                  </div>
+                  <div className="flex items-center gap-[8px]">
+                    <img
+                      src={setting}
+                      alt=""
+                      className="w-[36px] cursor-pointer shadow-lg rounded-full shadow-gray-900"
+                      onClick={() => setShowSlippage(!showSlippage)}
+                    />
+                    {showSlippage && (
+                      <Overlay
+                        onClose={() => setShowSlippage(false)}
+                        overlay={
+                          <SlippageRange
+                            autoMode={autoMode}
+                            setAutoMode={setAutoMode}
+                            amountCollateral={amountCollateral}
+                            slippage={slippage}
+                            setSlippage={setSlippage}
+                          />
+                        }
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <TokenAmount
+                tokens={[flashLeverage.usdc, collateralToken]}
+                selectedToken={fromToken}
+                handleTokenChange={handleFromTokenChange}
+                amount={amountCollateral}
+                handleAmountChange={setAmountCollateral}
+                amountInUsd={BigNumber(amountCollateral).multipliedBy(
+                  fromToken.valueInUsd
+                )}
+                warning={actionBtn.warning}
+                error={actionBtn.error}
+                balance={userFromTokenBalance}
+                setAmountToMax={setAmountToMax}
+                maxLeverageAmount={BigNumber.max(
+                  0,
+                  BigNumber(collateralToken?.liquidityAssetsUsd)
+                    .dividedBy(BigNumber(leverage).minus(1))
+                    .minus(1000)
+                )}
+              />
+
+              {/* old deposit button */}
+              <ActionBtn
+                btnLoading={false}
+                text={actionBtn.text}
+                disabled={actionBtn.disabled}
+                expectedChainId={Number(chainId)}
+                onClick={actionBtn.onClick}
+              />
+
+              <div className="flex flex-col w-full gap-[8px] test-[16px] font-[400] text-[#8E8E8E]">
+                <div className="flex justify-between items-center">
+                  <p>Current price</p>
+                  <p>${Number(collateralToken.valueInUsd).toFixed(4)}</p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p>Liquidation price</p>
+                  <p>
+                    $
+                    {(
+                      (Number(desiredLtv) / Number(collateralToken.liqLtv)) *
+                      Number(collateralToken.valueInUsd)
+                    ).toFixed(4)}
+                  </p>
+                </div>
+                {/* <div className="flex justify-between items-center">
+                  <p>Available Borrow</p>
+                  <p>
+                    ${`${formatNumber(collateralToken.liquidityAssetsUsd)}`}
+                  </p>
+                </div> */}
+                <div className="flex justify-between items-center">
+                  <p>Borrow Market</p>
+                  <a
+                    className="text-white underline"
+                    target="_blank"
+                    href={`https://app.morpho.org/ethereum/market/${collateralToken.morphoMarketId}`}
+                  >
+                    {" "}
+                    <p>{`${collateralToken.symbol} / ${collateralToken.loanToken.symbol}`}</p>
+                  </a>
+                </div>
+              </div>
+
+              {/* review section */}
+              {showSummary && (
+                <Overlay
+                  overlay={
+                    <div className="flex flex-col gap-[16px] z-50 backdrop-blur-2xl">
+                      <DepositReviewOverlay
+                        token={fromToken}
+                        handleApprove={handleApprove}
+                        completed={userFromTokenAllowance?.gte(
+                          BigNumber(amountCollateral)
+                        )}
+                        setShowSummary={setShowSummary}
+                        amountCollateral={amountCollateral}
+                        collateralToken={collateralToken}
+                        desiredLtv={desiredLtv}
+                        leverage={leverage}
+                        leverageApy={leverageApy}
+                      />
+                      <div className="">
+                        {userFromTokenAllowance.gte(amountCollateral) && (
+                          <Action
+                            text={
+                              internalSwapData
+                                ? "Deposit"
+                                : "Fetching Routes..."
+                            }
+                            token={fromToken}
+                            amountToken={amountCollateral}
+                            actionHandler={handleLeverage}
+                            disabled={!internalSwapData}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  }
+                />
+              )}
+            </div>
+          </div>
+
+          {/* investment plans */}
+          <div>
+            <InvestmentPlans
+              collateralToken={collateralToken}
+              leverage={leverage}
+              leverageApy={leverageApy}
+              amountInUsd={Number(
+                BigNumber(amountCollateral).multipliedBy(fromToken.valueInUsd)
+              )}
+              desiredLtv={desiredLtv}
+              flashLeverage={flashLeverage}
+            />
+          </div>
+        </div>
+
+        {/* desktop second half */}
+        <div className="hidden w-full lg:flex flex-col gap-[16px]">
+          {/* pool info part */}
+          <PoolInfo collateralToken={collateralToken} leverage={leverage} />
+
+          {/* deposit part */}
+          <div className="bg-white hidden lg:flex flex-col w-full h-fit items-center gap-[24px] bg-opacity-[2%] rounded-xl p-[32px]">
             <div className="flex w-full justify-between items-center">
               <div className="flex flex-col">
-                <p className="text-[24px] text-[#FFFFFF] font-normal">Deposit</p>
-                <p className="text-[15px] text-[#8B8B8B]">Deposit assets, earn max yield</p>
+                <p className="text-[24px] text-[#FFFFFF] font-normal">
+                  Deposit
+                </p>
+                <p className="text-[15px] text-[#8B8B8B]">
+                  Deposit assets, earn max yield
+                </p>
               </div>
               <div className="bg-white bg-opacity-[4%] p-[6px] px-[8px] rounded-[999px] flex items-center gap-[8px]">
                 <div className="flex items-center gap-[4px]">
                   <p className="text-[14px] font-[400] text-[#8B8B8B]">
                     {parseFloat((slippage * 100).toFixed(3))}%
-                  </p>{" "}
+                  </p>
                   {autoMode && <img src={auto} alt="" className="w-[24px]" />}
                 </div>
-                <div className="flex items-center gap-[8px]">
+                <div ref={slippageRef} className="flex items-center gap-[8px]">
                   <img
                     src={setting}
                     alt=""
@@ -520,18 +749,15 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                     onClick={() => setShowSlippage(!showSlippage)}
                   />
                   {showSlippage && (
-                    <Overlay
-                      onClose={() => setShowSlippage(false)}
-                      overlay={
-                        <SlippageRange
-                          autoMode={autoMode}
-                          setAutoMode={setAutoMode}
-                          amountCollateral={amountCollateral}
-                          slippage={slippage}
-                          setSlippage={setSlippage}
-                        />
-                      }
-                    />
+                    <div className="absolute  top-[215px] z-50 right-[97px]">
+                      <SlippageRange
+                        autoMode={autoMode}
+                        setAutoMode={setAutoMode}
+                        amountCollateral={amountCollateral}
+                        slippage={slippage}
+                        setSlippage={setSlippage}
+                      />
+                    </div>
                   )}
                 </div>
               </div>
@@ -543,19 +769,20 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               handleTokenChange={handleFromTokenChange}
               amount={amountCollateral}
               handleAmountChange={setAmountCollateral}
-              amountInUsd={BigNumber(amountCollateral).multipliedBy(fromToken.valueInUsd)}
+              amountInUsd={BigNumber(amountCollateral).multipliedBy(
+                fromToken.valueInUsd
+              )}
               warning={actionBtn.warning}
               error={actionBtn.error}
               balance={userFromTokenBalance}
               setAmountToMax={setAmountToMax}
               maxLeverageAmount={BigNumber.max(
                 0,
-                BigNumber(collateralToken?.liquidityAssetsUsd)
+                new BigNumber(collateralToken?.liquidityAssetsUsd)
                   .dividedBy(BigNumber(leverage).minus(1))
                   .minus(1000)
               )}
             />
-
             {/* old deposit button */}
             <ActionBtn
               btnLoading={false}
@@ -565,7 +792,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               onClick={actionBtn.onClick}
             />
 
-            <div className="flex flex-col w-full gap-[8px] test-[16px] font-[400] text-[#8E8E8E]">
+            <div className="flex flex-col w-full gap-[8px] text-[15px] text-[#8E8E8E]">
               <div className="flex justify-between items-center">
                 <p>Current price</p>
                 <p>${Number(collateralToken.valueInUsd).toFixed(4)}</p>
@@ -580,10 +807,10 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   ).toFixed(4)}
                 </p>
               </div>
-              <div className="flex justify-between items-center">
+              {/* <div className="flex justify-between items-center">
                 <p>Available Borrow</p>
                 <p>${`${formatNumber(collateralToken.liquidityAssetsUsd)}`}</p>
-              </div>
+              </div> */}
               <div className="flex justify-between items-center">
                 <p>Borrow Market</p>
                 <a
@@ -592,8 +819,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   href={`https://app.morpho.org/ethereum/market/${collateralToken.morphoMarketId}`}
                 >
                   {" "}
-                  <p>{`${collateralToken.symbol} / ${collateralToken.loanToken.symbol
-                    }`}</p>
+                  <p>{`${collateralToken.symbol} / ${collateralToken.loanToken.symbol}`}</p>
                 </a>
               </div>
             </div>
@@ -606,7 +832,9 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                     <DepositReviewOverlay
                       token={fromToken}
                       handleApprove={handleApprove}
-                      completed={userFromTokenAllowance?.gte(BigNumber(amountCollateral))}
+                      completed={userFromTokenAllowance?.gte(
+                        BigNumber(amountCollateral)
+                      )}
                       setShowSummary={setShowSummary}
                       amountCollateral={amountCollateral}
                       collateralToken={collateralToken}
@@ -614,10 +842,12 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                       leverage={leverage}
                       leverageApy={leverageApy}
                     />
-                    <div className="">
+                    <div>
                       {userFromTokenAllowance.gte(amountCollateral) && (
                         <Action
-                          text={internalSwapData ? "Deposit" : "Fetching Routes..."}
+                          text={
+                            internalSwapData ? "Deposit" : "Fetching Routes..."
+                          }
                           token={fromToken}
                           amountToken={amountCollateral}
                           actionHandler={handleLeverage}
@@ -630,147 +860,6 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               />
             )}
           </div>
-
-          {/* investment plans */}
-          <div>
-            <InvestmentPlans
-              collateralToken={collateralToken}
-              leverage={leverage}
-              leverageApy={leverageApy}
-              amountInUsd={Number(BigNumber(amountCollateral).multipliedBy(fromToken.valueInUsd))}
-              desiredLtv={desiredLtv}
-              flashLeverage={flashLeverage}
-            />
-          </div>
-        </div>
-
-        {/* deposit part */}
-        <div className="bg-white hidden lg:flex flex-col w-full h-fit items-center gap-[24px] bg-opacity-[2%] rounded-xl p-[32px]">
-          <div className="flex w-full justify-between items-center">
-            <div className="flex flex-col">
-              <p className="text-[24px] text-[#FFFFFF] font-normal">Deposit</p>
-              <p className="text-[15px] text-[#8B8B8B]">Deposit assets, earn max yield</p>
-            </div>
-            <div className="bg-white bg-opacity-[4%] p-[6px] px-[8px] rounded-[999px] flex items-center gap-[8px]">
-              <div className="flex items-center gap-[4px]">
-                <p className="text-[14px] font-[400] text-[#8B8B8B]">
-                  {parseFloat((slippage * 100).toFixed(3))}%
-                </p>
-                {autoMode && <img src={auto} alt="" className="w-[24px]" />}
-              </div>
-              <div ref={slippageRef} className="flex items-center gap-[8px]">
-                <img
-                  src={setting}
-                  alt=""
-                  className="w-[36px] cursor-pointer shadow-lg rounded-full shadow-gray-900"
-                  onClick={() => setShowSlippage(!showSlippage)}
-                />
-                {showSlippage && (
-                  <div className="absolute  top-[215px] z-50 right-[97px]">
-                    <SlippageRange
-                      autoMode={autoMode}
-                      setAutoMode={setAutoMode}
-                      amountCollateral={amountCollateral}
-                      slippage={slippage}
-                      setSlippage={setSlippage}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <TokenAmount
-            tokens={[flashLeverage.usdc, collateralToken]}
-            selectedToken={fromToken}
-            handleTokenChange={handleFromTokenChange}
-            amount={amountCollateral}
-            handleAmountChange={setAmountCollateral}
-            amountInUsd={BigNumber(amountCollateral).multipliedBy(fromToken.valueInUsd)}
-            warning={actionBtn.warning}
-            error={actionBtn.error}
-            balance={userFromTokenBalance}
-            setAmountToMax={setAmountToMax}
-            maxLeverageAmount={BigNumber.max(
-              0,
-              new BigNumber(collateralToken?.liquidityAssetsUsd)
-                .dividedBy(BigNumber(leverage).minus(1))
-                .minus(1000)
-            )}
-          />
-          {/* old deposit button */}
-          <ActionBtn
-            btnLoading={false}
-            text={actionBtn.text}
-            disabled={actionBtn.disabled}
-            expectedChainId={Number(chainId)}
-            onClick={actionBtn.onClick}
-          />
-
-          <div className="flex flex-col w-full gap-[8px] text-[15px] text-[#8E8E8E]">
-            <div className="flex justify-between items-center">
-              <p>Current price</p>
-              <p>${Number(collateralToken.valueInUsd).toFixed(4)}</p>
-            </div>
-            <div className="flex justify-between items-center">
-              <p>Liquidation price</p>
-              <p>
-                $
-                {(
-                  (Number(desiredLtv) / Number(collateralToken.liqLtv)) *
-                  Number(collateralToken.valueInUsd)
-                ).toFixed(4)}
-              </p>
-            </div>
-            <div className="flex justify-between items-center">
-              <p>Available Borrow</p>
-              <p>${`${formatNumber(collateralToken.liquidityAssetsUsd)}`}</p>
-            </div>
-            <div className="flex justify-between items-center">
-              <p>Borrow Market</p>
-              <a
-                className="text-white underline"
-                target="_blank"
-                href={`https://app.morpho.org/ethereum/market/${collateralToken.morphoMarketId}`}
-              >
-                {" "}
-                <p>{`${collateralToken.symbol} / ${collateralToken.loanToken.symbol
-                  }`}</p>
-              </a>
-            </div>
-          </div>
-
-          {/* review section */}
-          {showSummary && (
-            <Overlay
-              overlay={
-                <div className="flex flex-col gap-[16px] z-50 backdrop-blur-2xl">
-                  <DepositReviewOverlay
-                    token={fromToken}
-                    handleApprove={handleApprove}
-                    completed={userFromTokenAllowance?.gte(BigNumber(amountCollateral))}
-                    setShowSummary={setShowSummary}
-                    amountCollateral={amountCollateral}
-                    collateralToken={collateralToken}
-                    desiredLtv={desiredLtv}
-                    leverage={leverage}
-                    leverageApy={leverageApy}
-                  />
-                  <div>
-                    {userFromTokenAllowance.gte(amountCollateral) && (
-                      <Action
-                        text={internalSwapData ? "Deposit" : "Fetching Routes..."}
-                        token={fromToken}
-                        amountToken={amountCollateral}
-                        actionHandler={handleLeverage}
-                        disabled={!internalSwapData}
-                      />
-                    )}
-                  </div>
-                </div>
-              }
-            />
-          )}
         </div>
       </div>
     )
