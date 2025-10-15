@@ -143,7 +143,9 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       const collateral = new BigNumber(amountCollateral || 0);
       const userBalance = new BigNumber(userFromTokenBalance || 0);
       const leverageValue = new BigNumber(leverage || 1);
-      const liquidityUsd = new BigNumber(collateralToken.liquidityAssetsUsd || 0);
+      const liquidityUsd = new BigNumber(
+        collateralToken.liquidityAssetsUsd || 0
+      );
 
       // Case 1: Empty or zero input
       if (amountCollateral === "" || collateral.isZero()) {
@@ -203,7 +205,6 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
     updateActionBtn();
   }, [collateralToken, leverage, amountCollateral, userFromTokenBalance]);
-
 
   useEffect(() => {
     if (!collateralToken || !fromToken) return;
@@ -339,21 +340,21 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
       const { positionId, amountDepositedInUsd } = await (isSameToken
         ? flashLeverage.leverage(
-          address,
-          desiredLtv,
-          fromToken as CollateralToken,
-          amountCollateral,
-          internalSwapData
-        )
+            address,
+            desiredLtv,
+            fromToken as CollateralToken,
+            amountCollateral,
+            internalSwapData
+          )
         : flashLeverage.swapAndLeverage(
-          address,
-          desiredLtv,
-          fromToken,
-          amountCollateral,
-          externalSwapData!,
-          collateralToken,
-          internalSwapData
-        ));
+            address,
+            desiredLtv,
+            fromToken,
+            amountCollateral,
+            externalSwapData!,
+            collateralToken,
+            internalSwapData
+          ));
 
       // Single toast success message
       toastSuccess(
@@ -376,7 +377,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           atBorrowApy: collateralToken.borrowApy,
           desiredLtv,
         });
-      } catch (e) { }
+      } catch (e) {}
 
       navigate("/portfolio");
     } catch (e) {
@@ -413,6 +414,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               title={collateralToken.symbol}
               maturity={collateralToken.maturityDate}
               subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${collateralToken.symbol} for maximized returns on your idle holdings.`}
+              collateralToken={collateralToken}
             />
           </div>
 
@@ -656,7 +658,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                     ${`${formatNumber(collateralToken.liquidityAssetsUsd)}`}
                   </p>
                 </div> */}
-                <div className="flex justify-between items-center">
+                {/* <div className="flex justify-between items-center">
                   <p>Borrow Market</p>
                   <a
                     className="text-white underline"
@@ -666,7 +668,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                     {" "}
                     <p>{`${collateralToken.symbol} / ${collateralToken.loanToken.symbol}`}</p>
                   </a>
-                </div>
+                </div> */}
               </div>
 
               {/* review section */}
@@ -817,7 +819,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 <p>Available Borrow</p>
                 <p>${`${formatNumber(collateralToken.liquidityAssetsUsd)}`}</p>
               </div> */}
-              <div className="flex justify-between items-center">
+              {/* <div className="flex justify-between items-center">
                 <p>Borrow Market</p>
                 <a
                   className="text-white underline"
@@ -827,7 +829,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   {" "}
                   <p>{`${collateralToken.symbol} / ${collateralToken.loanToken.symbol}`}</p>
                 </a>
-              </div>
+              </div> */}
             </div>
 
             {/* review section */}
