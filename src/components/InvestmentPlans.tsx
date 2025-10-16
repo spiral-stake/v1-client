@@ -39,7 +39,7 @@ const InvestmentPlans = ({
               <div className="flex items-center gap-[8px] text-[#68EA6A]">
                 <p className="text-[16px] lg:text-[24px] font-[500]">
                   +$
-                  {getNetYieldUsd(amountInUsd, leverageApy, leverage, collateralToken.maturityDaysLeft)}
+                  {Math.max(Number(getNetYieldUsd(amountInUsd, leverageApy, leverage, collateralToken.maturityDaysLeft)), 0)}
                 </p>
                 <BtnGreen
                   text={`in ${collateralToken.maturityDaysLeft} Days`}

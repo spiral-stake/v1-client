@@ -112,7 +112,7 @@ export async function getInternalReswapData(
 ): Promise<InternalReswapData> {
   if (chainId == 31337) chainId = 1;
 
-  if (isMatured(collateralToken)) {
+  if (!isMatured(collateralToken)) {
     const params = {
       receiver: flashLeverage.flashLeverageCore.address,
       slippage,

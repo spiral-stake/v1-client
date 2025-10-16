@@ -266,12 +266,13 @@ export default class FlashLeverage extends Base {
             pos.amountCollateralInLoanToken,
             collateralToken.decimals
           ),
+          amountDepositedInUsd: BigNumber(0),
         };
       })
     );
 
     // Filter out null values and return the result
-    return positions;
+    return positions.filter((pos) => pos.open);
   }
 
   async getPositionYieldInLoanToken(user: string, positionId: number) {
