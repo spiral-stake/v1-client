@@ -1,5 +1,5 @@
 import { CollateralToken } from "../../types";
-import MorphoLink from "./morphoLink";
+import MorphoLink from "./MorphoLink";
 
 const ProductTitle = ({
   title,
@@ -20,11 +20,11 @@ const ProductTitle = ({
         <img src={icon} alt="" className="w-[30px] h-[30px] lg:w-[36px] lg:h-[36px]" />
         <div className="flex items-baseline gap-[12px]">
           <div className="flex items-baseline gap-[4px]">
-          <p>{title}</p>
-          <p className="text-[15px] lg:text-[20px] h-fit font-normal">( {maturity} )</p>
-          
-        </div>
-        <MorphoLink link={`https://app.morpho.org/ethereum/market/${collateralToken.morphoMarketId}`}/>
+            <p>{title}</p>
+            <p className="text-[15px] lg:text-[20px] h-fit font-normal">( {maturity} )</p>
+
+          </div>
+          <MorphoLink link={`https://app.morpho.org/ethereum/market/${collateralToken.morphoMarketId}`} />
         </div>
       </div>
       <div className="justify-start text-[15px] mt-2 text-[#B3B3B3] font-[Outfit] leading-normal">
