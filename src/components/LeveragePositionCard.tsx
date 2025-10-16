@@ -133,7 +133,7 @@ const LeveragePositionCard = ({
             </div>
             <div className="text-[#68EA6A] flex items-center gap-1">
               <BtnGreen
-                text={`${leveragePosition.open ? `${calcLeverageApy(
+                text={`${leveragePosition.open && !isMatured(leveragePosition.collateralToken) ? `${calcLeverageApy(
                   leveragePosition.collateralToken.impliedApy,
                   leveragePosition.collateralToken.borrowApy,
                   leveragePosition.ltv

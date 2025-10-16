@@ -2,9 +2,12 @@ import BigNumber from "bignumber.js";
 import { CollateralToken } from "./../types/index";
 import axios from "axios";
 import { formatUnits } from "../utils/formatUnits";
+import { isMatured } from "../utils";
 
 export const getMarketData = async (chainId: number, collateralToken: CollateralToken) => {
   if (chainId === 31337) chainId = 1;
+  if (isMatured(collateralToken))
+    return { borrowApy: BigNumber(0).toFixed(2), liquidityAssetsUsd: 0 };
 
   const query = `
     query {
