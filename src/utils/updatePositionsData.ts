@@ -17,22 +17,28 @@ export const updatePositionsData = (
         {
           impliedApy: pos.atImpliedApy,
           amountDepositedInUsd: pos.amountDepositedInUsd,
+          amountReturnedInUsd: pos.amountReturnedInUsd,
         },
       ])
   );
 
   return leveragePositions.map((pos) => {
-    const matched = positionsLookup[pos.id];
+    const position = positionsLookup[pos.id];
 
     return {
       ...pos,
+
       collateralToken: {
         ...pos.collateralToken,
-        impliedApy: matched?.impliedApy ?? pos.collateralToken.impliedApy,
+        impliedApy: position?.impliedApy ?? pos.collateralToken.impliedApy,
       },
+
       amountDepositedInUsd:
-        BigNumber(matched?.amountDepositedInUsd) ??
+        BigNumber(position?.amountDepositedInUsd) ??
         pos.amountCollateral.multipliedBy(pos.collateralToken.valueInUsd),
+
+      amountReturnedInUsd:
+        position?.amountReturnedInUsd && BigNumber(position?.amountReturnedInUsd),
     };
   });
 };
