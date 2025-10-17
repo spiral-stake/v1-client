@@ -49,6 +49,11 @@ export interface LeveragePosition {
   amountCollateralInLoanToken: BigNumber;
   amountDepositedInUsd: BigNumber;
   amountReturnedInUsd?: BigNumber;
+  isMatured: boolean;
+  leverage: string;
+  leverageApy?: string;
+  positionValueInUsd: BigNumber;
+  yieldGenerated?: BigNumber;
 }
 
 export interface InternalSwapData {

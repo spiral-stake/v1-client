@@ -23,7 +23,7 @@ import { getInternalReswapData } from "../api-services/swapAggregator";
 
 const LeveragePositionCard = ({
   flashLeverage,
-  leveragePosition,
+  leveragePosition: pos,
   deleteLeveragePosition,
 }: {
   flashLeverage: FlashLeverage;
@@ -42,48 +42,22 @@ const LeveragePositionCard = ({
   const chainId = useChainId();
   const appChainId = useChainId();
 
-  // Derived / memoized values for render and logic
-  const matured = useMemo(() => isMatured(leveragePosition.collateralToken), [leveragePosition]);
-  const leverageApy = useMemo(() => {
-    if (!leveragePosition.open) return undefined;
-    return calcLeverageApy(
-      leveragePosition.collateralToken.impliedApy,
-      leveragePosition.collateralToken.borrowApy,
-      leveragePosition.ltv
-    );
-  }, [leveragePosition]);
-  const leverageMultiplier = useMemo(
-    () => calcLeverage(leveragePosition.ltv),
-    [leveragePosition.ltv]
-  );
-  const computedYieldGenerated = useMemo(() => {
-    // (leveragedCollateral * valueInUsd) - loan - deposited
-    try {
-      return BigNumber.max(leveragePosition.amountLeveragedCollateral
-        .multipliedBy(leveragePosition.collateralToken.valueInUsd)
-        .minus(leveragePosition.amountLoan)
-        .minus(leveragePosition.amountDepositedInUsd || 0), 0);
-    } catch (e) {
-      return new BigNumber(0);
-    }
-  }, [leveragePosition]);
-
   const fetchAndSimulateClose = async () => {
     setLoading(true);
     try {
-      const autoSlippage = getSlippage(Number(leveragePosition.amountLeveragedCollateral));
+      const autoSlippage = getSlippage(Number(pos.amountLeveragedCollateral));
 
       const _internalReswapData = await getInternalReswapData(
         appChainId,
         autoSlippage,
         flashLeverage,
-        leveragePosition.collateralToken,
-        leveragePosition.amountLeveragedCollateral
+        pos.collateralToken,
+        pos.amountLeveragedCollateral
       );
 
       const simulation = await flashLeverage.simulate("unleverage", [
         address,
-        leveragePosition.id,
+        pos.id,
         _internalReswapData.pendleSwap,
         _internalReswapData.tokenRedeemSy,
         _internalReswapData.minTokenOut,
@@ -94,7 +68,7 @@ const LeveragePositionCard = ({
       const rawReturned = (simulation?.result ?? 0) as unknown as bigint;
       const normalized = formatUnits(
         rawReturned,
-        leveragePosition.collateralToken.loanToken.decimals
+        pos.collateralToken.loanToken.decimals
       );
 
       setInternalReswapData(_internalReswapData);
@@ -114,7 +88,7 @@ const LeveragePositionCard = ({
 
     const amountReturned = await flashLeverage.unleverage(
       address as string,
-      leveragePosition,
+      pos,
       internalReswapData.pendleSwap,
       internalReswapData.tokenRedeemSy,
       internalReswapData.minTokenOut,
@@ -124,25 +98,25 @@ const LeveragePositionCard = ({
 
     if (chainId && Number(chainId) !== 31337) {
       axios.put("https://dapi.spiralstake.xyz/leverage/close", {
-        user: leveragePosition.owner.toLowerCase(),
-        positionId: leveragePosition.id,
+        user: pos.owner.toLowerCase(),
+        positionId: pos.id,
       });
     }
 
-    deleteLeveragePosition(leveragePosition.id);
+    deleteLeveragePosition(pos.id);
 
     toastSuccess(
       "Position Closed",
       `Received ${displayTokenAmount(
         amountReturned as BigNumber,
-        leveragePosition.collateralToken.loanToken
+        pos.collateralToken.loanToken
       )}`
     );
   };
 
   const renderStatusChip = useMemo(() => {
-    if (!leveragePosition.open) return <StatusChip label="Closed" />;
-    if (leveragePosition.liquidated) return <StatusChip label="Liquidated" />;
+    if (!pos.open) return <StatusChip label="Closed" />;
+    if (pos.liquidated) return <StatusChip label="Liquidated" />;
 
     return (
       <BtnFull
@@ -151,11 +125,11 @@ const LeveragePositionCard = ({
         onClick={fetchAndSimulateClose}
       />
     );
-  }, [leveragePosition, matured, showCloseReview, loading, fetchAndSimulateClose]);
+  }, [pos, pos.isMatured, showCloseReview, loading, fetchAndSimulateClose]);
 
   return (
     <div>
-      {matured && leveragePosition.open && (
+      {pos.isMatured && pos.open && (
         <div className="py-[5px] w-full text-center lg:text-start lg:w-fit px-[24px] bg-[#20374a] rounded-xl rounded-b-none">
           <p className="text-[#68EA6A] text-[14px]">Position Matured</p>
         </div>
@@ -164,7 +138,7 @@ const LeveragePositionCard = ({
       <div
         className="bg-white bg-opacity-[4%] rounded-xl w-full flex flex-col p-[24px] gap-[24px]"
         style={
-          matured && leveragePosition.open
+          pos.isMatured && pos.open
             ? { borderTopLeftRadius: 0, borderTopRightRadius: 0 }
             : {}
         }
@@ -174,33 +148,33 @@ const LeveragePositionCard = ({
             <div>
               <img
                 className="w-[48px]"
-                src={`/tokens/${leveragePosition.collateralToken.symbolExtended}.svg`}
-                alt={`${leveragePosition.collateralToken.symbol} token`}
+                src={`/tokens/${pos.collateralToken.symbolExtended}.svg`}
+                alt={`${pos.collateralToken.symbol} token`}
               />
             </div>
 
             <div>
-              <div className="text-[24px] font-semibold">{`${leveragePosition.collateralToken.symbol.split("-")[1]
+              <div className="text-[24px] font-semibold">{`${pos.collateralToken.symbol.split("-")[1]
                 }`}</div>
             </div>
 
             <div className="text-[#68EA6A] flex items-center gap-1">
               <BtnGreen
                 text={
-                  leveragePosition.open && !matured
-                    ? `${leverageApy}% APY (${leveragePosition.collateralToken.maturityDate})`
-                    : `${leveragePosition.collateralToken.maturityDate}`
+                  pos.open && !pos.isMatured
+                    ? `${pos.leverageApy}% APY (${pos.collateralToken.maturityDate})`
+                    : `${pos.collateralToken.maturityDate}`
                 }
               />
 
               <div className="hidden lg:block">
-                {leveragePosition.open ? (
+                {pos.open ? (
                   <HoverInfo
                     content={
                       <LeverageBreakdown
-                        collateralTokenApy={leveragePosition.collateralToken.impliedApy}
-                        borrowApy={leveragePosition.collateralToken.borrowApy}
-                        leverage={leverageMultiplier}
+                        collateralTokenApy={pos.collateralToken.impliedApy}
+                        borrowApy={pos.collateralToken.borrowApy}
+                        leverage={pos.leverage}
                       />
                     }
                   />
@@ -213,22 +187,22 @@ const LeveragePositionCard = ({
             <div className="w-full flex items-center gap-[8px]">
               <div> {renderStatusChip}</div>
               <MorphoLink
-                link={`https://app.morpho.org/ethereum/market/${leveragePosition.collateralToken.morphoMarketId}`}
+                link={`https://app.morpho.org/ethereum/market/${pos.collateralToken.morphoMarketId}`}
               />
             </div>
           </div>
         </div>
 
         <div className="flex flex-col gap-y-[8px] lg:grid grid-cols-[auto,auto] lg:gap-y-[14px] grid-rows-2 lg:grid-rows-1 lg:grid-cols-[1fr,1fr,1fr,1fr,1fr,1fr]">
-          {leveragePosition.open && !matured ? (
+          {pos.open && !pos.isMatured ? (
             <OpenPositionView
-              leveragePosition={leveragePosition}
-              computedYieldGenerated={computedYieldGenerated}
+              pos={pos}
+              yieldGenerated={pos.yieldGenerated || BigNumber(0)}
             />
           ) : (
             <ClosedOrMaturedView
-              leveragePosition={leveragePosition}
-              computedYieldGenerated={computedYieldGenerated}
+              pos={pos}
+              yieldGenerated={pos.yieldGenerated || BigNumber(0)}
             />
           )}
         </div>
@@ -236,8 +210,8 @@ const LeveragePositionCard = ({
         {/* mobile close button */}
         <div className="inline-flex lg:hidden">
           <div className="w-full flex items-center gap-[8px]">
-            {leveragePosition.open ? (
-              !leveragePosition.liquidated ? (
+            {pos.open ? (
+              !pos.liquidated ? (
                 <BtnFull
                   btnLoading={!showCloseReview && loading}
                   text="Close"
@@ -255,7 +229,7 @@ const LeveragePositionCard = ({
             )}
 
             <MorphoLink
-              link={`https://app.morpho.org/ethereum/market/${leveragePosition.collateralToken.morphoMarketId}`}
+              link={`https://app.morpho.org/ethereum/market/${pos.collateralToken.morphoMarketId}`}
             />
           </div>
         </div>
@@ -265,8 +239,8 @@ const LeveragePositionCard = ({
             {/* Desktop Close Review */}
             <div className="hidden z-10 fixed top-0 left-0 bg-black bg-opacity-[70%] lg:flex flex-col gap-[24px] justify-center items-end lg:items-center w-[100vw] h-[100vh]">
               <CloseReviewOverlay
-                amountCollateral={Number(leveragePosition.amountCollateral)}
-                leveragePosition={leveragePosition}
+                amountCollateral={Number(pos.amountCollateral)}
+                pos={pos}
                 setShowCloseReview={setShowCloseReview}
                 amountReturnedSimulated={amountReturnedSimulated}
               />
@@ -288,8 +262,8 @@ const LeveragePositionCard = ({
                 overlay={
                   <div className="flex flex-col gap-[24px] pb-[70px] rounded-[16px] rounded-b-none bg-white bg-opacity-[10%] backdrop-blur-2xl">
                     <CloseReviewOverlay
-                      amountCollateral={Number(leveragePosition.amountCollateral)}
-                      leveragePosition={leveragePosition}
+                      amountCollateral={Number(pos.amountCollateral)}
+                      pos={pos}
                       setShowCloseReview={setShowCloseReview}
                       amountReturnedSimulated={amountReturnedSimulated}
                     />
@@ -328,21 +302,21 @@ function StatusChip({ label }: { label: string }) {
 }
 
 function OpenPositionView({
-  leveragePosition,
-  computedYieldGenerated,
+  pos,
+  yieldGenerated,
 }: {
-  leveragePosition: LeveragePosition;
-  computedYieldGenerated: BigNumber;
+  pos: LeveragePosition;
+  yieldGenerated: BigNumber;
 }) {
   return (
     <>
       <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
         <p className="text-[14px] text-gray-400">Amount Deposited</p>
         <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
-          {displayTokenAmount(leveragePosition.amountCollateral)}{" "}
-          {leveragePosition.collateralToken.symbol}
+          {displayTokenAmount(pos.amountCollateral)}{" "}
+          {pos.collateralToken.symbol}
           <div className="text-[14px] text-[#D7D7D7]">
-            ${displayTokenAmount(leveragePosition.amountDepositedInUsd)}
+            ${displayTokenAmount(pos.amountDepositedInUsd)}
           </div>
         </div>
       </div>
@@ -351,17 +325,17 @@ function OpenPositionView({
         <div className="flex items-center gap-[8px]">
           <p className="text-[14px] text-gray-400">Long amount</p>
           <p className="text-[12px] text-[#68EA6A] font-[500]">
-            {calcLeverage(leveragePosition.ltv)}x
+            {calcLeverage(pos.ltv)}x
           </p>
         </div>
         <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
-          {displayTokenAmount(leveragePosition.amountLeveragedCollateral)}{" "}
-          {leveragePosition.collateralToken.symbol}
+          {displayTokenAmount(pos.amountLeveragedCollateral)}{" "}
+          {pos.collateralToken.symbol}
           <div className="text-[14px] text-[#D7D7D7]">
             $
             {displayTokenAmount(
-              leveragePosition.amountLeveragedCollateral.multipliedBy(
-                leveragePosition.collateralToken.valueInUsd
+              pos.amountLeveragedCollateral.multipliedBy(
+                pos.collateralToken.valueInUsd
               )
             )}
           </div>
@@ -372,11 +346,11 @@ function OpenPositionView({
         <p className="text-[14px] text-gray-400">Loan amount</p>
         <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px] truncate">
           <div>
-            {displayTokenAmount(leveragePosition.amountLoan)}{" "}
-            {leveragePosition.collateralToken.loanToken.symbol}
+            {displayTokenAmount(pos.amountLoan)}{" "}
+            {pos.collateralToken.loanToken.symbol}
           </div>
           <div className="text-[14px] text-[#D7D7D7]">
-            ${displayTokenAmount(leveragePosition.amountLoan)}
+            ${displayTokenAmount(pos.amountLoan)}
           </div>
         </div>
       </div>
@@ -384,11 +358,11 @@ function OpenPositionView({
       {/* <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
         <p className="text-[14px] text-gray-400">Yield Generated</p>
         <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
-          ${displayTokenAmount(computedYieldGenerated)}{" "}
-          {leveragePosition.collateralToken.loanToken.symbol}
+          {displayTokenAmount(yieldGenerated)}{" "}
+          {pos.collateralToken.loanToken.symbol}
           <div className="text-[14px] text-[#D7D7D7]">
             {" "}
-            ${displayTokenAmount(computedYieldGenerated)}
+            ${displayTokenAmount(yieldGenerated)}
           </div>
         </div>
       </div> */}
@@ -396,9 +370,9 @@ function OpenPositionView({
       <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
         <p className="text-[14px] text-gray-400">LTV</p>
         <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px] truncate">
-          <div>{leveragePosition.ltv}%</div>
+          <div>{pos.ltv}%</div>
           <div className="text-[14px] text-[#D7D7D7]">
-            liq. {leveragePosition.collateralToken.liqLtv}%
+            liq. {pos.collateralToken.liqLtv}%
           </div>
         </div>
       </div>
@@ -407,12 +381,12 @@ function OpenPositionView({
         <p className="text-[14px] text-gray-400">Price</p>
         <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
           <BtnGreen
-            text={`Current: $${Number(leveragePosition.collateralToken.valueInUsd).toFixed(3)}`}
+            text={`Current: $${Number(pos.collateralToken.valueInUsd).toFixed(3)}`}
           />
           <BtnGreen
             text={`Liquidation: $${(
-              (Number(leveragePosition.ltv) / Number(leveragePosition.collateralToken.liqLtv)) *
-              Number(leveragePosition.collateralToken.valueInUsd)
+              (Number(pos.ltv) / Number(pos.collateralToken.liqLtv)) *
+              Number(pos.collateralToken.valueInUsd)
             ).toFixed(3)}`}
           />
         </div>
@@ -422,44 +396,44 @@ function OpenPositionView({
 }
 
 function ClosedOrMaturedView({
-  leveragePosition,
-  computedYieldGenerated,
+  pos,
+  yieldGenerated,
 }: {
-  leveragePosition: LeveragePosition;
-  computedYieldGenerated: BigNumber;
+  pos: LeveragePosition;
+  yieldGenerated: BigNumber;
 }) {
   return (
     <>
       <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
         <p className="text-[14px] text-gray-400">Amount Deposited</p>
         <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
-          ${displayTokenAmount(leveragePosition.amountDepositedInUsd)}
+          ${displayTokenAmount(pos.amountDepositedInUsd)}
           <div className="text-[14px] text-[#D7D7D7]">
-            {displayTokenAmount(leveragePosition.amountCollateral)}{" "}
-            {leveragePosition.collateralToken.symbol}
+            {displayTokenAmount(pos.amountCollateral)}{" "}
+            {pos.collateralToken.symbol}
           </div>
         </div>
       </div>
 
-      {leveragePosition.open ? (
+      {pos.open ? (
         <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
           <p className="text-[14px] text-gray-400">Yield Generated</p>
           <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
-            {displayTokenAmount(computedYieldGenerated)} {leveragePosition.collateralToken.loanToken.symbol}
+            {displayTokenAmount(yieldGenerated)} {pos.collateralToken.loanToken.symbol}
             <div className="text-[14px] text-[#D7D7D7]">
-              ${displayTokenAmount(computedYieldGenerated)}
+              ${displayTokenAmount(yieldGenerated)}
             </div>
           </div>
         </div>
       ) : (
-        leveragePosition.amountReturnedInUsd ? <>
+        pos.amountReturnedInUsd ? <>
           <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
             <p className="text-[14px] text-gray-400">Amount Returned</p>
             <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
               <div className="text-[14px] text-[#D7D7D7]">
-                {displayTokenAmount(leveragePosition.amountReturnedInUsd)} {leveragePosition.collateralToken.loanToken.symbol}
+                {displayTokenAmount(pos.amountReturnedInUsd)} {pos.collateralToken.loanToken.symbol}
               </div>
-              ${displayTokenAmount(leveragePosition.amountReturnedInUsd)}
+              ${displayTokenAmount(pos.amountReturnedInUsd)}
             </div>
           </div>
 
@@ -469,14 +443,14 @@ function ClosedOrMaturedView({
               <div className="text-[14px] text-[#D7D7D7]">
                 {displayTokenAmount(
                   BigNumber.max(
-                    leveragePosition.amountReturnedInUsd.minus(leveragePosition.amountDepositedInUsd)
+                    pos.amountReturnedInUsd.minus(pos.amountDepositedInUsd)
                   )
-                )} {leveragePosition.collateralToken.loanToken.symbol}
+                )} {pos.collateralToken.loanToken.symbol}
               </div>
               $
               {displayTokenAmount(
                 BigNumber.max(
-                  leveragePosition.amountReturnedInUsd.minus(leveragePosition.amountDepositedInUsd)
+                  pos.amountReturnedInUsd.minus(pos.amountDepositedInUsd)
                 )
               )}
             </div>

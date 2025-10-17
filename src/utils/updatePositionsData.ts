@@ -1,5 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { LeveragePosition } from "../types/index";
+import { calcLeverageApy } from "./index";
 
 export const updatePositionsData = (
   allLeveragePositions: any[],
@@ -33,12 +34,27 @@ export const updatePositionsData = (
         impliedApy: position?.impliedApy ?? pos.collateralToken.impliedApy,
       },
 
-      amountDepositedInUsd:
-        BigNumber(position?.amountDepositedInUsd) ??
-        pos.amountCollateral.multipliedBy(pos.collateralToken.valueInUsd),
+      amountDepositedInUsd: BigNumber(
+        position?.amountDepositedInUsd ??
+          pos.amountCollateral.multipliedBy(pos.collateralToken.valueInUsd)
+      ),
 
-      amountReturnedInUsd:
-        position?.amountReturnedInUsd && BigNumber(position?.amountReturnedInUsd),
+      amountReturnedInUsd: position?.amountReturnedInUsd
+        ? BigNumber(position.amountReturnedInUsd)
+        : undefined,
+
+      yieldGenerated: pos.positionValueInUsd.minus(
+        BigNumber(
+          position?.amountDepositedInUsd ??
+            pos.amountCollateral.multipliedBy(pos.collateralToken.valueInUsd)
+        )
+      ),
+
+      leverageApy: calcLeverageApy(
+        position?.impliedApy ?? pos.collateralToken.impliedApy,
+        pos.collateralToken.borrowApy,
+        pos.ltv
+      ),
     };
   });
 };

@@ -16,14 +16,6 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const { address } = useAccount();
   const chainId = useChainId();
 
-  const sum = leveragePositions.reduce(
-    (total, current) =>
-      current.open
-        ? total + Number(current.amountCollateral.multipliedBy(current.collateralToken.valueInUsd))
-        : total,
-    0
-  );
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowLoader(false);
@@ -71,9 +63,38 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           {/* chart */}
           <div className="w-full flex p-[24px] gap-[100px] bg-white bg-opacity-[4%] rounded-[20px] border-[1px] border-white border-opacity-[6%]">
             <div className="flex flex-col">
-              <p className="text-[14px] text-[#B6B6B6]">Position Value</p>
-              <p className="text-[24px] font-[500] text-[#E4E4E4]">${sum.toFixed(2)}</p>
+              <p className="text-[14px] text-[#B6B6B6]">Total Amount Deposited</p>
+              <p className="text-[24px] font-[500] text-[#E4E4E4]">${leveragePositions.reduce(
+                (total, current) =>
+                  current.open
+                    ? total + Number(current.amountDepositedInUsd)
+                    : total,
+                0
+              ).toFixed(2)}</p>
             </div>
+            {/* <div className="flex flex-col">
+              <p className="text-[14px] text-[#B6B6B6]">Total Position Value</p>
+              <p className="text-[24px] font-[500] text-[#E4E4E4]">
+                ${leveragePositions.reduce((total, current) =>
+                  current.open
+                    ? total + Number(current.positionValueInUsd)
+                    : total,
+                  0
+                ).toFixed(2)}
+              </p>
+            </div>
+            <div className="flex flex-col">
+              <p className="text-[14px] text-[#B6B6B6]">Total Yield Generated</p>
+              <p className="text-[24px] font-[500] text-[#E4E4E4]">
+                ${leveragePositions.reduce((total, current) =>
+                  current.open
+                    ? total + Number(current.yieldGenerated)
+                    : total,
+                  0
+                ).toFixed(2)}
+              </p>
+            </div> */}
+
             <div className="flex flex-col">
               <p className="text-[14px] text-[#B6B6B6]">Open positions</p>
               <p className="text-center text-[24px] font-[500] text-[#E4E4E4]">
