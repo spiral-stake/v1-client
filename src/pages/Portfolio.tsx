@@ -9,7 +9,6 @@ import axios from "axios";
 import { updatePositionsData } from "../utils/updatePositionsData.ts";
 
 const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
-
   const [leveragePositions, setLeveragePositions] = useState<LeveragePosition[]>([]);
   const [showLoader, setShowLoader] = useState(true);
 

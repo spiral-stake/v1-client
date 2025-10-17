@@ -14,7 +14,7 @@ const ProductCard = ({
 
   return (
     <>
-      {Number(collateralToken.defaultLeverageApy) && (
+      {Number(collateralToken.defaultLeverageApy) > 0 && (
         <div className="group flex flex-col cursor-default w-full border-[1px] border-white border-opacity-[6%] gap-[16px] bg-white p-[16px]  rounded-[16px] bg-opacity-[4%] hover:bg-opacity-[10%] transition-all duration-300">
           {/* first part */}
           <div className="flex justify-between items-center pb-[16px] border-b-[1px] border-white border-opacity-[6%]">

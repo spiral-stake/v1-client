@@ -215,7 +215,6 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           setSwapData(
             await getInternalSwapData(
               appChainId,
-              slippage,
               flashLeverage,
               collateralToken,
               desiredLtv,
@@ -234,7 +233,6 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           setSwapData(
             await getInternalSwapData(
               appChainId,
-              slippage,
               flashLeverage,
               collateralToken,
               desiredLtv,

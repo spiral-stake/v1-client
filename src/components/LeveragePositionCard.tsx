@@ -49,7 +49,6 @@ const LeveragePositionCard = ({
 
       const _internalReswapData = await getInternalReswapData(
         appChainId,
-        autoSlippage,
         flashLeverage,
         pos.collateralToken,
         pos.amountLeveragedCollateral
@@ -416,18 +415,20 @@ function ClosedOrMaturedView({
       </div>
 
       {pos.open ? (
-        <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
-          <p className="text-[14px] text-gray-400">Yield Generated</p>
-          <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
-            {displayTokenAmount(yieldGenerated)} {pos.collateralToken.loanToken.symbol}
-            <div className="text-[14px] text-[#D7D7D7]">
-              ${displayTokenAmount(yieldGenerated)}
+        <>
+          {/* <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
+            <p className="text-[14px] text-gray-400">Yield Generated</p>
+            <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
+              {displayTokenAmount(yieldGenerated)} {pos.collateralToken.loanToken.symbol}
+              <div className="text-[14px] text-[#D7D7D7]">
+                ${displayTokenAmount(yieldGenerated)}
+              </div>
             </div>
-          </div>
-        </div>
+          </div> */}
+        </>
       ) : (
         pos.amountReturnedInUsd ? <>
-          <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
+          {/* <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
             <p className="text-[14px] text-gray-400">Amount Returned</p>
             <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
               <div className="text-[14px] text-[#D7D7D7]">
@@ -435,9 +436,9 @@ function ClosedOrMaturedView({
               </div>
               ${displayTokenAmount(pos.amountReturnedInUsd)}
             </div>
-          </div>
+          </div> */}
 
-          <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
+          {/* <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
             <p className="text-[14px] text-gray-400">Yield Generated</p>
             <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
               <div className="text-[14px] text-[#D7D7D7]">
@@ -454,7 +455,7 @@ function ClosedOrMaturedView({
                 )
               )}
             </div>
-          </div>
+          </div> */}
         </> : null
       )}
     </>
