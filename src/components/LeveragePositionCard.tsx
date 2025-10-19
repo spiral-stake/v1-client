@@ -5,7 +5,7 @@ import { useAccount, useChainId } from "wagmi";
 
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import { InternalReswapData, LeveragePosition } from "../types/index";
-import { calcLeverage, calcLeverageApy, isMatured } from "../utils";
+import { calcLeverage } from "../utils";
 import { displayTokenAmount } from "../utils/displayTokenAmounts";
 import { getSlippage } from "../utils/getSlippage";
 import { handleAsync } from "../utils/handleAsyncFunction";
@@ -99,6 +99,7 @@ const LeveragePositionCard = ({
       axios.put("https://dapi.spiralstake.xyz/leverage/close", {
         user: pos.owner.toLowerCase(),
         positionId: pos.id,
+        amountReturnedInUsd: amountReturned
       });
     }
 
