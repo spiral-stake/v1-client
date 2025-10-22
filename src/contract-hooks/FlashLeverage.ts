@@ -8,7 +8,7 @@ import { readCollateralTokens, readToken } from "../api-services/contractsData.t
 import FlashLeverageCore from "./FlashLeverageCore.ts";
 import { getImpliedApy } from "../api-services/pendle.ts";
 import { getMarketData } from "../api-services/morpho.ts";
-import { calcLeverage, calcLeverageApy } from "../utils/index.ts";
+import { calcLeverage, calcLeverageApy, isMatured } from "../utils/index.ts";
 import Morpho from "./Morpho.ts";
 import BigNumber from "bignumber.js";
 
@@ -235,7 +235,7 @@ export default class FlashLeverage extends Base {
         ])) as [{ amountCollateral: bigint; sharesBorrowed: bigint }, string];
 
         const amountLeveragedCollateral = formatUnits(
-          coreLeveragePosition.amountCollateral,
+          pos.amountLeveragedCollateral,
           collateralToken.decimals
         );
         const amountLeveragedCollateralInUsd = amountLeveragedCollateral.multipliedBy(
@@ -243,12 +243,11 @@ export default class FlashLeverage extends Base {
         );
 
         const [amountLoan, { collateral: morphoCollateral }] = await Promise.all([
-          this.flashLeverageCore.calcUnleverageFlashLoan(
-            collateralToken,
-            coreLeveragePosition.sharesBorrowed
-          ),
+          this.flashLeverageCore.calcUnleverageFlashLoan(collateralToken, pos.sharesBorrowed),
           this.morpho.position(collateralToken.morphoMarketId, userProxy),
         ]);
+
+        const ltv = amountLoan.multipliedBy(100).div(amountLeveragedCollateralInUsd).toFixed(2);
 
         return {
           open: pos.open,
@@ -261,11 +260,17 @@ export default class FlashLeverage extends Base {
           amountLeveragedCollateral,
           amountLoan,
           sharesBorrowed: pos.sharesBorrowed,
-          ltv: amountLoan.multipliedBy(100).div(amountLeveragedCollateralInUsd).toFixed(2),
+          ltv,
           amountCollateralInLoanToken: formatUnits(
             pos.amountCollateralInLoanToken,
             collateralToken.decimals
           ),
+          amountDepositedInUsd: BigNumber(0),
+          isMatured: isMatured(collateralToken),
+          leverage: calcLeverage(ltv),
+          positionValueInUsd: amountLeveragedCollateral
+            .multipliedBy(collateralToken.valueInUsd)
+            .minus(amountLoan),
         };
       })
     );

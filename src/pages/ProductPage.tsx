@@ -157,15 +157,15 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
         }));
       }
 
-      // // Case 2: Amount exceeds user balance
-      // if (collateral.isGreaterThan(userBalance)) {
-      //   return setActionBtn((prev) => ({
-      //     ...prev,
-      //     disabled: true,
-      //     error: "Amount exceeds your available balance",
-      //     warning: "",
-      //   }));
-      // }
+      // Case 2: Amount exceeds user balance
+      if (collateral.isGreaterThan(userBalance)) {
+        return setActionBtn((prev) => ({
+          ...prev,
+          disabled: true,
+          error: "Amount exceeds your available balance",
+          warning: "",
+        }));
+      }
 
       // Case 3: Amount exceeds max leverage limit
       const maxLeverageAmount = BigNumber.max(
@@ -215,7 +215,6 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           setSwapData(
             await getInternalSwapData(
               appChainId,
-              slippage,
               flashLeverage,
               collateralToken,
               desiredLtv,
@@ -234,7 +233,6 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           setSwapData(
             await getInternalSwapData(
               appChainId,
-              slippage,
               flashLeverage,
               collateralToken,
               desiredLtv,
@@ -340,21 +338,21 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
       const { positionId, amountDepositedInUsd } = await (isSameToken
         ? flashLeverage.leverage(
-            address,
-            desiredLtv,
-            fromToken as CollateralToken,
-            amountCollateral,
-            internalSwapData
-          )
+          address,
+          desiredLtv,
+          fromToken as CollateralToken,
+          amountCollateral,
+          internalSwapData
+        )
         : flashLeverage.swapAndLeverage(
-            address,
-            desiredLtv,
-            fromToken,
-            amountCollateral,
-            externalSwapData!,
-            collateralToken,
-            internalSwapData
-          ));
+          address,
+          desiredLtv,
+          fromToken,
+          amountCollateral,
+          externalSwapData!,
+          collateralToken,
+          internalSwapData
+        ));
 
       // Single toast success message
       toastSuccess(
@@ -377,7 +375,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           atBorrowApy: collateralToken.borrowApy,
           desiredLtv,
         });
-      } catch (e) {}
+      } catch (e) { }
 
       navigate("/portfolio");
     } catch (e) {
@@ -643,7 +641,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   <p>${Number(collateralToken.valueInUsd).toFixed(4)}</p>
                 </div>
                 <div className="flex justify-between items-center">
-                  <p>Liquidation price</p>
+                  <p>Your Liquidation Price</p>
                   <p>
                     $
                     {(
@@ -806,7 +804,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 <p>${Number(collateralToken.valueInUsd).toFixed(4)}</p>
               </div>
               <div className="flex justify-between items-center">
-                <p>Liquidation price</p>
+                <p>Your Liquidation Price</p>
                 <p>
                   $
                   {(

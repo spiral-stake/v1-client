@@ -8,6 +8,7 @@ import allRisk from "../assets/icons/allRisk.svg";
 import highRisk from "../assets/icons/highRisk.svg";
 import mediumRisk from "../assets/icons/mediumRisk.svg";
 import lowRisk from "../assets/icons/lowRisk.svg";
+import { isMatured } from "../utils";
 
 const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [risk, setRisk] = useState<string>("all");
@@ -59,8 +60,10 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           {flashLeverage.collateralTokens
             .filter((collateralToken) => {
               if (risk === "all") return true;
+
               return collateralToken.info.riskProfile === risk;
             })
+            .filter((collateralToken) => !isMatured(collateralToken))
             .sort(
               (a, b) =>
                 Number(b.defaultLeverageApy) -

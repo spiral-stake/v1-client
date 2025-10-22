@@ -58,5 +58,15 @@
     "underlyingCollateral": "USDC",
     "yieldSource": "Bluechip DeFi Strategies",
     "riskProfile": "medium"
+  },
+  "0x5510B080449d5E3Bf345b6635eD40A35B36b081f": {
+    "underlyingCollateral": "USDC",
+    "yieldSource": "Bluechip DeFi Strategies",
+    "riskProfile": "medium"
+  },
+  "0x1Fb3C5c35D95F48e48FFC8e36bCCe5CB5f29F57c": {
+    "underlyingCollateral": "USDe",
+    "yieldSource": "Staking Pooled USDe",
+    "riskProfile": "low"
   }
 }

@@ -43,7 +43,7 @@ export async function getExternalSwapData(
     tokenOut: collateralToken.address,
     amountIn: parseUnits(amount, fromToken.decimals),
     enableAggregator: true,
-    aggregators: "kyberswap, okx",
+    aggregators: "kyberswap, okx, paraswap",
   };
 
   const res = await callSDK<InternalSwapData>(
@@ -61,9 +61,9 @@ export async function getExternalSwapData(
   };
 }
 
+// Slippage hardcoded to 0.1%
 export async function getInternalSwapData(
   chainId: number,
-  slippage: number,
   flashLeverage: FlashLeverage,
   collateralToken: CollateralToken,
   desiredLtv: string,
@@ -80,12 +80,12 @@ export async function getInternalSwapData(
 
   const params = {
     receiver: flashLeverage.flashLeverageCore.address,
-    slippage,
+    slippage: 0.001, // hardcoded to 0.1%
     tokenIn: collateralToken.loanToken.address,
     tokenOut: collateralToken.address,
     amountIn: amountLoan,
     enableAggregator: true,
-    aggregators: "kyberswap, okx",
+    aggregators: "kyberswap, okx, paraswap",
   };
 
   const res = await callSDK(
@@ -103,24 +103,24 @@ export async function getInternalSwapData(
   };
 }
 
+// Slippage hardcoded to 0.1%
 export async function getInternalReswapData(
   chainId: number,
-  slippage: number,
   flashLeverage: FlashLeverage,
   collateralToken: CollateralToken,
   amountLeveragedCollateral: BigNumber
 ): Promise<InternalReswapData> {
   if (chainId == 31337) chainId = 1;
 
-  if (isMatured(collateralToken)) {
+  if (!isMatured(collateralToken)) {
     const params = {
       receiver: flashLeverage.flashLeverageCore.address,
-      slippage,
+      slippage: 0.001, // hardcoded to 0.1%
       tokenIn: collateralToken.address,
       tokenOut: collateralToken.loanToken.address,
       amountIn: String(parseUnits(String(amountLeveragedCollateral), collateralToken.decimals)),
       enableAggregator: true,
-      aggregators: "kyberswap, okx",
+      aggregators: "kyberswap, okx, paraswap",
     };
 
     const res = await callSDK(
@@ -138,12 +138,12 @@ export async function getInternalReswapData(
   } else {
     const params = {
       receiver: flashLeverage.flashLeverageCore.address,
-      slippage,
+      slippage: 0.001, // hardcoded to 0.1%
       yt: collateralToken.YT,
       tokenOut: collateralToken.loanToken.address,
       amountIn: String(parseUnits(String(amountLeveragedCollateral), collateralToken.decimals)),
       enableAggregator: true,
-      aggregators: "kyberswap, okx",
+      aggregators: "kyberswap, okx, paraswap",
     };
 
     const res = await callSDK(`/v2/sdk/${chainId}/redeem`, params);

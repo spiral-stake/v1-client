@@ -10,7 +10,12 @@ const transports: Record<number, ReturnType<typeof http>> = {};
 
 // Assign depending on env
 if (isProd) {
-  transports[mainnet.id] = http(`https://mainnet.infura.io/v3/${import.meta.env.VITE_INFURA_ID}`);
+  const infuraId = import.meta.env.VITE_INFURA_ID;
+  if (infuraId) {
+    transports[mainnet.id] = http(`https://mainnet.infura.io/v3/${infuraId}`);
+  } else {
+    transports[mainnet.id] = http(mainnet.rpcUrls.default.http[0]);
+  }
 } else {
   transports[anvil.id] = http("http://127.0.0.1:8545");
 }
