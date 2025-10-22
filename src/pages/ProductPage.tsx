@@ -641,7 +641,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   <p>${Number(collateralToken.valueInUsd).toFixed(4)}</p>
                 </div>
                 <div className="flex justify-between items-center">
-                  <p>Liquidation price</p>
+                  <p>Your Liquidation Price</p>
                   <p>
                     $
                     {(
@@ -804,7 +804,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 <p>${Number(collateralToken.valueInUsd).toFixed(4)}</p>
               </div>
               <div className="flex justify-between items-center">
-                <p>Liquidation price</p>
+                <p>Your Liquidation Price</p>
                 <p>
                   $
                   {(
