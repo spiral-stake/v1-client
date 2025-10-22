@@ -6,7 +6,6 @@ import { getInternalReswapData } from "../api-services/swapAggregator";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import { LeveragePosition } from "../types";
 import { calcLeverage, calcLeverageApy, isMatured } from "../utils";
-import { calcLeverage, calcLeverageApy, isMatured } from "../utils";
 import { displayTokenAmount } from "../utils/displayTokenAmounts";
 import { getSlippage } from "../utils/getSlippage";
 import { handleAsync } from "../utils/handleAsyncFunction";
@@ -19,8 +18,6 @@ import CloseReviewOverlay from "./CloseReviewOverlay";
 import LeverageBreakdown from "./LeverageBreakdown";
 import { HoverInfo } from "./low-level/HoverInfo";
 import MorphoLink from "./low-level/morphoLink";
-import morpho from "../assets/icons/morpho.svg";
-import externalLink from "../assets/icons/externalLink.svg";
 
 const LeveragePositionCard = ({
   flashLeverage,
