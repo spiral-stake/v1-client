@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { CollateralToken } from "../types";
 import BigNumber from "bignumber.js";
 import { formatNumber } from "../utils/formatNumber";
+import { calcLeverage } from "../utils";
 
 const ProductCard = ({
   collateralToken,
@@ -82,7 +83,7 @@ const ProductCard = ({
                     BigNumber.max(
                       0,
                       new BigNumber(collateralToken?.liquidityAssetsUsd)
-                        .dividedBy(BigNumber(collateralToken.maxLtv).minus(1))
+                        .dividedBy(BigNumber(calcLeverage(collateralToken.maxLtv)).minus(1))
                         .minus(1000)
                     )
                   )}`}

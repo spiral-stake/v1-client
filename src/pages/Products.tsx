@@ -8,7 +8,7 @@ import allRisk from "../assets/icons/allRisk.svg";
 import highRisk from "../assets/icons/highRisk.svg";
 import mediumRisk from "../assets/icons/mediumRisk.svg";
 import lowRisk from "../assets/icons/lowRisk.svg";
-import { isMatured } from "../utils";
+import { calcLeverage, isMatured } from "../utils";
 import BigNumber from "bignumber.js";
 import Sort from "../components/low-level/sort";
 
@@ -101,12 +101,12 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   ? Number(b.defaultLeverageApy) - Number(a.defaultLeverageApy)
                   : Number(
                       BigNumber(b.liquidityAssetsUsd)
-                        .dividedBy(BigNumber(9.1).minus(1))
+                        .dividedBy(BigNumber(calcLeverage(b.maxLtv)).minus(1))
                         .minus(1000)
                     ) -
                     Number(
                       BigNumber(a.liquidityAssetsUsd)
-                        .dividedBy(BigNumber(9.1).minus(1))
+                        .dividedBy(BigNumber(calcLeverage(a.maxLtv)).minus(1))
                         .minus(1000)
                     )
               )
