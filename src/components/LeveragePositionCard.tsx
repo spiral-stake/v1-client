@@ -5,7 +5,7 @@ import { useAccount, useChainId } from "wagmi";
 
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import { InternalReswapData, LeveragePosition } from "../types/index";
-import { calcLeverage } from "../utils";
+import { calcLeverage, daysAgo } from "../utils";
 import { displayTokenAmount } from "../utils/displayTokenAmounts";
 import { getSlippage } from "../utils/getSlippage";
 import { handleAsync } from "../utils/handleAsyncFunction";
@@ -20,6 +20,8 @@ import { HoverInfo } from "./low-level/HoverInfo";
 import MorphoLink from "./low-level/MorphoLink";
 import { formatUnits } from "../utils/formatUnits";
 import { getInternalReswapData } from "../api-services/swapAggregator";
+import { getNetYieldUsd } from "../utils/getNetYieldUsd";
+import AutoDeleverage from "./low-level/AutoLeverage";
 
 const LeveragePositionCard = ({
   flashLeverage,
@@ -33,10 +35,10 @@ const LeveragePositionCard = ({
   const [showCloseReview, setShowCloseReview] = useState(false);
   const [loading, setLoading] = useState(false);
   // Result of simulation
-  const [internalReswapData, setInternalReswapData] = useState<InternalReswapData | null>(null);
-  const [amountReturnedSimulated, setAmountReturnedSimulated] = useState<BigNumber>(
-    new BigNumber(0)
-  );
+  const [internalReswapData, setInternalReswapData] =
+    useState<InternalReswapData | null>(null);
+  const [amountReturnedSimulated, setAmountReturnedSimulated] =
+    useState<BigNumber>(new BigNumber(0));
 
   const { address } = useAccount();
   const chainId = useChainId();
@@ -99,7 +101,7 @@ const LeveragePositionCard = ({
       axios.put("https://dapi.spiralstake.xyz/leverage/close", {
         user: pos.owner.toLowerCase(),
         positionId: pos.id,
-        amountReturnedInUsd: amountReturned
+        amountReturnedInUsd: amountReturned,
       });
     }
 
@@ -144,30 +146,57 @@ const LeveragePositionCard = ({
         }
       >
         <div className="w-full flex items-center justify-between pb-[16px] lg:pb-0 lg:border-none border-b-[1px] border-white border-opacity-[6%]">
-          <div className="flex items-center gap-[10px]">
-            <div>
-              <img
-                className="w-[48px]"
-                src={`/tokens/${pos.collateralToken.symbolExtended}.svg`}
-                alt={`${pos.collateralToken.symbol} token`}
-              />
+          <div className="w-full lg:w-auto flex lg:flex-row flex-col lg:items-center gap-[16px] lg:gap-[10px]">
+            <div className="w-full lg:w-auto flex items-center justify-between">
+              <div className="flex items-center gap-[10px]">
+                <div>
+                  <img
+                    className="w-[48px]"
+                    src={`/tokens/${pos.collateralToken.symbolExtended}.svg`}
+                    alt={`${pos.collateralToken.symbol} token`}
+                  />
+                </div>
+
+                <div>
+                  <div className="text-[24px] font-semibold">{`${
+                    pos.collateralToken.symbol.split("-")[1]
+                  }`}</div>
+                </div>
+              </div>
+              {pos.open && (
+                <div className="lg:hidden">
+                 <AutoDeleverage/>
+                </div>
+              )}
+              
             </div>
 
-            <div>
-              <div className="text-[24px] font-semibold">{`${pos.collateralToken.symbol.split("-")[1]
-                }`}</div>
-            </div>
+            <div className="text-[#68EA6A] flex items-center justify-between lg:justify-normal lg:gap-1">
+              <div
+                className="hidden lg:visible"
+                style={pos.open ? { color: "#68EA6A" } : { color: "gray" }}
+              >
+                <BtnGreen text={`${pos.openedOn} days ago`} />
+              </div>
 
-            <div className="text-[#68EA6A] flex items-center gap-1">
-              <BtnGreen
-                text={
-                  pos.open && !pos.isMatured
-                    ? `${pos.leverageApy}% APY (${pos.collateralToken.maturityDate})`
-                    : `${pos.collateralToken.maturityDate}`
-                }
-              />
+              <div style={pos.open ? { color: "#68EA6A" } : { color: "gray" }}>
+                <BtnGreen
+                  text={
+                    pos.open && !pos.isMatured
+                      ? `${pos.leverageApy}% APY (${pos.collateralToken.maturityDate})`
+                      : `${pos.collateralToken.maturityDate}`
+                  }
+                />
+              </div>
 
-              <div className="hidden lg:block">
+              <div
+                className="lg:hidden"
+                style={pos.open ? { color: "#68EA6A" } : { color: "gray" }}
+              >
+                <BtnGreen text={`${pos.openedOn} days ago`} />
+              </div>
+
+              <div className="hidden lg:inline-flex">
                 {pos.open ? (
                   <HoverInfo
                     content={
@@ -185,6 +214,9 @@ const LeveragePositionCard = ({
 
           <div className="hidden lg:inline-flex">
             <div className="w-full flex items-center gap-[8px]">
+              {pos.open && (
+                <AutoDeleverage/>
+              )}
               <div> {renderStatusChip}</div>
               <MorphoLink
                 link={`https://app.morpho.org/ethereum/market/${pos.collateralToken.morphoMarketId}`}
@@ -272,7 +304,10 @@ const LeveragePositionCard = ({
                       <ActionBtn
                         btnLoading={loading}
                         text="Close"
-                        onClick={handleAsync(handleCloseLeveragePosition, setLoading)}
+                        onClick={handleAsync(
+                          handleCloseLeveragePosition,
+                          setLoading
+                        )}
                         expectedChainId={Number(chainId)}
                       />
                     </div>
@@ -356,13 +391,63 @@ function OpenPositionView({
       </div>
 
       <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
-        <p className="text-[14px] text-gray-400">Yield Generated</p>
+        <div className="flex items-center gap-[4px]">
+          <p className="text-[14px] text-gray-400">Projected Yield</p>
+          <HoverInfo
+            content={
+              <div className="flex justify-between bg-white bg-opacity-[4%] border-[1px] border-white border-opacity-[10%] p-[12px] rounded-[12px] items-start lg:flex-col gap-[4px] lg:gap-[8px]">
+                <p className="text-[14px] text-gray-400">Yield Generated</p>
+                <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
+                  {displayTokenAmount(yieldGenerated)}{" "}
+                  {pos.collateralToken.loanToken.symbol}
+                  <div className="text-[14px] text-[#D7D7D7]">
+                    {" "}
+                    ${displayTokenAmount(yieldGenerated)}
+                  </div>
+                </div>
+              </div>
+            }
+          />
+        </div>
         <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
-          {displayTokenAmount(yieldGenerated)}{" "}
+          {Math.max(
+            Number(
+              displayTokenAmount(
+                BigNumber(
+                  getNetYieldUsd(
+                    Number(pos.amountDepositedInUsd),
+                    pos.leverageApy,
+                    pos.leverage,
+                    pos.collateralToken.maturityDaysLeft,
+                    false,
+                    false
+                  ).toString()
+                ).plus(BigNumber(pos.yieldGenerated))
+              )
+            ),
+            0
+          )}{" "}
+          {""}
           {pos.collateralToken.loanToken.symbol}
           <div className="text-[14px] text-[#D7D7D7]">
-            {" "}
-            ${displayTokenAmount(yieldGenerated)}
+            $
+            {Math.max(
+              Number(
+                displayTokenAmount(
+                  BigNumber(
+                    getNetYieldUsd(
+                      Number(pos.amountDepositedInUsd),
+                      pos.leverageApy,
+                      pos.leverage,
+                      pos.collateralToken.maturityDaysLeft,
+                      false,
+                      false
+                    ).toString()
+                  ).plus(BigNumber(pos.yieldGenerated))
+                )
+              ),
+              0
+            )}
           </div>
         </div>
       </div>
@@ -381,7 +466,9 @@ function OpenPositionView({
         <p className="text-[14px] text-gray-400">Price</p>
         <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
           <BtnGreen
-            text={`Current: $${Number(pos.collateralToken.valueInUsd).toFixed(3)}`}
+            text={`Current: $${Number(pos.collateralToken.valueInUsd).toFixed(
+              3
+            )}`}
           />
           <BtnGreen
             text={`Liquidation: $${(
@@ -420,20 +507,22 @@ function ClosedOrMaturedView({
           <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
             <p className="text-[14px] text-gray-400">Yield Generated</p>
             <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
-              {displayTokenAmount(BigNumber.max(yieldGenerated, 0))} {pos.collateralToken.loanToken.symbol}
+              {displayTokenAmount(BigNumber.max(yieldGenerated, 0))}{" "}
+              {pos.collateralToken.loanToken.symbol}
               <div className="text-[14px] text-[#D7D7D7]">
                 ${displayTokenAmount(BigNumber.max(yieldGenerated, 0))}
               </div>
             </div>
           </div>
         </>
-      ) : (
-        pos.amountReturnedInUsd ? <>
+      ) : pos.amountReturnedInUsd ? (
+        <>
           <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
             <p className="text-[14px] text-gray-400">Amount Returned</p>
             <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
               <div className="text-[14px] text-[#D7D7D7]">
-                {displayTokenAmount(pos.amountReturnedInUsd)} {pos.collateralToken.loanToken.symbol}
+                {displayTokenAmount(pos.amountReturnedInUsd)}{" "}
+                {pos.collateralToken.loanToken.symbol}
               </div>
               ${displayTokenAmount(pos.amountReturnedInUsd)}
             </div>
@@ -445,20 +534,23 @@ function ClosedOrMaturedView({
               <div className="text-[14px] text-[#D7D7D7]">
                 {displayTokenAmount(
                   BigNumber.max(
-                    pos.amountReturnedInUsd.minus(pos.amountDepositedInUsd), 0
+                    pos.amountReturnedInUsd.minus(pos.amountDepositedInUsd),
+                    0
                   )
-                )} {pos.collateralToken.loanToken.symbol}
+                )}{" "}
+                {pos.collateralToken.loanToken.symbol}
               </div>
               $
               {displayTokenAmount(
                 BigNumber.max(
-                  pos.amountReturnedInUsd.minus(pos.amountDepositedInUsd), 0
+                  pos.amountReturnedInUsd.minus(pos.amountDepositedInUsd),
+                  0
                 )
               )}
             </div>
           </div>
-        </> : null
-      )}
+        </>
+      ) : null}
     </>
   );
 }
