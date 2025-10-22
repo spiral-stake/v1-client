@@ -17,7 +17,7 @@ import BtnGreen from "./low-level/BtnGreen";
 import CloseReviewOverlay from "./CloseReviewOverlay";
 import LeverageBreakdown from "./LeverageBreakdown";
 import { HoverInfo } from "./low-level/HoverInfo";
-import MorphoLink from "./low-level/morphoLink";
+import MorphoLink from "./low-level/MorphoLink";
 
 const LeveragePositionCard = ({
   flashLeverage,
