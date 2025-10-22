@@ -395,9 +395,9 @@ function OpenPositionView({
           <p className="text-[14px] text-gray-400">Projected Yield</p>
           <HoverInfo
             content={
-              <div className="flex justify-between bg-white bg-opacity-[4%] border-[1px] border-white border-opacity-[10%] p-[12px] rounded-[12px] items-start lg:flex-col gap-[4px] lg:gap-[8px]">
+              <div className="flex justify-between bg-white bg-opacity-[4%] border-[1px] border-white border-opacity-[10%] p-[16px] rounded-[12px] items-start flex-col gap-[12px] lg:gap-[24px]">
                 <p className="text-[14px] text-gray-400">Yield Generated</p>
-                <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
+                <div className="flex flex-col items-start gap-[6px] lg:gap-[14px] text-[14px] lg:text-[16px]">
                   {displayTokenAmount(yieldGenerated)}{" "}
                   {pos.collateralToken.loanToken.symbol}
                   <div className="text-[14px] text-[#D7D7D7]">
