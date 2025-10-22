@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { LeveragePosition } from "../types/index";
-import { calcLeverageApy } from "./index";
+import { calcLeverageApy, daysAgo } from "./index";
 
 export const updatePositionsData = (
   allLeveragePositions: any[],
@@ -19,6 +19,7 @@ export const updatePositionsData = (
           impliedApy: pos.atImpliedApy,
           amountDepositedInUsd: pos.amountDepositedInUsd,
           amountReturnedInUsd: pos.amountReturnedInUsd,
+          createdAt: pos.createdAt, 
         },
       ])
   );
@@ -55,6 +56,8 @@ export const updatePositionsData = (
         pos.collateralToken.borrowApy,
         pos.ltv
       ),
+
+      openedOn: daysAgo(position.createdAt)
     };
   });
 };

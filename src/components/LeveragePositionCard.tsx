@@ -173,7 +173,7 @@ const LeveragePositionCard = ({
 
             <div className="text-[#68EA6A] flex items-center justify-between lg:justify-normal lg:gap-1">
               <div
-                className="hidden lg:visible"
+                className="hidden lg:inline-flex"
                 style={pos.open ? { color: "#68EA6A" } : { color: "gray" }}
               >
                 <BtnGreen text={`${pos.openedOn} days ago`} />

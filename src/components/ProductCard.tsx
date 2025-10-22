@@ -82,7 +82,7 @@ const ProductCard = ({
                     BigNumber.max(
                       0,
                       new BigNumber(collateralToken?.liquidityAssetsUsd)
-                        .dividedBy(BigNumber(9.1).minus(1))
+                        .dividedBy(BigNumber(collateralToken.maxLtv).minus(1))
                         .minus(1000)
                     )
                   )}`}

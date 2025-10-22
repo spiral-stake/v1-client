@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Loader from "../components/low-level/Loader";
 import PageTitle from "../components/low-level/PageTitle";
 import ProductCard from "../components/ProductCard";
@@ -9,9 +9,31 @@ import highRisk from "../assets/icons/highRisk.svg";
 import mediumRisk from "../assets/icons/mediumRisk.svg";
 import lowRisk from "../assets/icons/lowRisk.svg";
 import { isMatured } from "../utils";
+import BigNumber from "bignumber.js";
+import Sort from "../components/low-level/sort";
 
 const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [risk, setRisk] = useState<string>("all");
+  const [sortMethod, setSortMethod] = useState<string>("APY");
+  const [showSorts, setShowSorts] = useState(false);
+
+  const sortRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleLTVClickOutside(event: MouseEvent) {
+      if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
+        setShowSorts(false);
+      }
+    }
+    if (window.innerWidth >= 1024) {
+      document.addEventListener("mousedown", handleLTVClickOutside);
+    }
+    return () => {
+      if (window.innerWidth >= 1024) {
+        document.removeEventListener("mousedown", handleLTVClickOutside);
+      }
+    };
+  }, []);
 
   return flashLeverage ? (
     <div className="flex flex-col gap-[32px] lg:gap-[48px] py-[16px] lg:py-[48px]">
@@ -56,25 +78,42 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             color="rgba(63, 255, 20, 0.1)"
           />
         </div>
-        <div className="flex flex-col lg:grid grid-cols-2 gap-[16px] lg:gap-x-[24px] lg:gap-y-[34px] lg:px-6 w-full">
-          {flashLeverage.collateralTokens
-            .filter((collateralToken) => {
-              if (risk === "all") return true;
 
-              return collateralToken.info.riskProfile === risk;
-            })
-            .filter((collateralToken) => !isMatured(collateralToken))
-            .sort(
-              (a, b) =>
-                Number(b.defaultLeverageApy) -
-                Number(a.defaultLeverageApy)
-            )
-            .map((collateralToken, index) => (
-              <ProductCard
-                key={index}
-                collateralToken={collateralToken}
-              />
-            ))}
+        <div className="w-full flex flex-col gap-[16px]">
+          <div ref={sortRef} className="self-end">
+            <Sort
+              sortMethod={sortMethod}
+              setSortMethod={setSortMethod}
+              showSorts={showSorts}
+              setShowSorts={setShowSorts}
+            />
+          </div>
+          <div className="flex flex-col lg:grid grid-cols-2 gap-[16px] lg:gap-x-[24px] lg:gap-y-[34px] lg:px-6 w-full">
+            {flashLeverage.collateralTokens
+              .filter((collateralToken) => {
+                if (risk === "all") return true;
+
+                return collateralToken.info.riskProfile === risk;
+              })
+              .filter((collateralToken) => !isMatured(collateralToken))
+              .sort((a, b) =>
+                sortMethod == "APY"
+                  ? Number(b.defaultLeverageApy) - Number(a.defaultLeverageApy)
+                  : Number(
+                      BigNumber(b.liquidityAssetsUsd)
+                        .dividedBy(BigNumber(9.1).minus(1))
+                        .minus(1000)
+                    ) -
+                    Number(
+                      BigNumber(a.liquidityAssetsUsd)
+                        .dividedBy(BigNumber(9.1).minus(1))
+                        .minus(1000)
+                    )
+              )
+              .map((collateralToken, index) => (
+                <ProductCard key={index} collateralToken={collateralToken} />
+              ))}
+          </div>
         </div>
       </div>
     </div>
