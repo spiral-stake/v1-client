@@ -271,6 +271,12 @@ export default class FlashLeverage extends Base {
           positionValueInUsd: amountLeveragedCollateral
             .multipliedBy(collateralToken.valueInUsd)
             .minus(amountLoan),
+
+          // will be added from the server
+          leverageApy: "",
+          amountReturnedInUsd: BigNumber(0),
+          yieldGenerated: BigNumber(0),
+          openedOn: 0,
         };
       })
     );

@@ -31,12 +31,8 @@ import InvestmentPlans from "../components/InvestmentPlans";
 import SlippageRange from "../components/new-components/slippageRange";
 import auto from "../assets/icons/auto.svg";
 import { getSlippage } from "../utils/getSlippage";
-import { formatNumber } from "../utils/formatNumber";
 import DepositReviewOverlay from "../components/DepositReviewOverlay";
 import ProductTitle from "../components/low-level/ProductTitle.tsx";
-import PoolInfoTab from "../components/low-level/PoolInfoTab.tsx";
-import borrow from "../assets/icons/borrow.svg";
-import maxLeverage from "../assets/icons/maxLeverage.svg";
 import PoolInfo from "../components/low-level/PoolInfo.tsx";
 
 const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
@@ -357,7 +353,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       // Single toast success message
       toastSuccess(
         `Deposited successfully!`,
-        `You've leveraged ${amountCollateral} ${fromToken.symbol}. Your leveraged position is now earning yield.`
+        `You've leveraged ${amountCollateral} ${fromToken.symbol}. Please collect ${collateralToken.symbol} returned from slippage`
       );
 
       // Single API call with dynamic base URL

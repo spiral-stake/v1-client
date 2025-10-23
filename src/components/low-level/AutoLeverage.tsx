@@ -4,7 +4,7 @@ const AutoDeleverage = () => {
   return (
     <div className="relative group">
       <div className="flex items-center gap-[4px] text-[14px] text-[#68EA6A] py-[4px] px-[8px] rounded-[12px] bg-[#68EA6A] bg-opacity-[4%]">
-        <img src={auto} alt="" className="w-[20px]"/>
+        <img src={auto} alt="" className="w-[20px]" />
         <p>Auto-deleverage</p>
       </div>
 
@@ -13,8 +13,7 @@ const AutoDeleverage = () => {
           <div className="self-stretch justify-start text-xs font-normal font-['Outfit'] leading-none">
             <div className=" bg-white bg-opacity-[4%] p-3 rounded-[14px] w-[160px] lg:w-full text-sm text-white/90 shadow-lg border border-white/10">
               <p className="text-[14px] text-[#D7D7D7] ">
-                Your position will auto-deleverage at maturity with 0.1%
-                slippage
+                Your position will auto-deleverage at maturity with 0.1% slippage
               </p>
             </div>
           </div>

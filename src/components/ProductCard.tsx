@@ -79,7 +79,7 @@ const ProductCard = ({
               <div>
                 <p className="text-[12px] text-[#CCCCCC]">Max Leverage</p>
                 <p className="text-[16px] text-[#E4E4E4] font-normal">
-                  {`< $${formatNumber(
+                  {`$${formatNumber(
                     BigNumber.max(
                       0,
                       new BigNumber(collateralToken?.liquidityAssetsUsd)

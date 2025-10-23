@@ -5,9 +5,8 @@ import { useAccount, useChainId } from "wagmi";
 
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import { InternalReswapData, LeveragePosition } from "../types/index";
-import { calcLeverage, daysAgo } from "../utils";
+import { calcLeverage } from "../utils";
 import { displayTokenAmount } from "../utils/displayTokenAmounts";
-import { getSlippage } from "../utils/getSlippage";
 import { handleAsync } from "../utils/handleAsyncFunction";
 import { toastSuccess, toastError } from "../utils/toastWrapper";
 import ActionBtn from "./ActionBtn";
@@ -47,8 +46,6 @@ const LeveragePositionCard = ({
   const fetchAndSimulateClose = async () => {
     setLoading(true);
     try {
-      const autoSlippage = getSlippage(Number(pos.amountLeveragedCollateral));
-
       const _internalReswapData = await getInternalReswapData(
         appChainId,
         flashLeverage,
@@ -158,43 +155,43 @@ const LeveragePositionCard = ({
                 </div>
 
                 <div>
-                  <div className="text-[24px] font-semibold">{`${
-                    pos.collateralToken.symbol.split("-")[1]
-                  }`}</div>
+                  <div className="text-[24px] font-semibold">{`${pos.collateralToken.symbol.split("-")[1]
+                    }`}</div>
                 </div>
               </div>
               {pos.open && (
                 <div className="lg:hidden">
-                 <AutoDeleverage/>
+                  <AutoDeleverage />
                 </div>
               )}
-              
+
             </div>
 
-            <div className="text-[#68EA6A] flex items-center justify-between lg:justify-normal lg:gap-1">
+            <div className="text-[#68EA6A] flex items-center justify-normal gap-1">
               <div
                 className="hidden lg:inline-flex"
                 style={pos.open ? { color: "#68EA6A" } : { color: "gray" }}
               >
-                <BtnGreen text={`${pos.openedOn} days ago`} />
-              </div>
-
-              <div style={pos.open ? { color: "#68EA6A" } : { color: "gray" }}>
-                <BtnGreen
-                  text={
-                    pos.open && !pos.isMatured
-                      ? `${pos.leverageApy}% APY (${pos.collateralToken.maturityDate})`
-                      : `${pos.collateralToken.maturityDate}`
-                  }
-                />
+                <BtnGreen text={`${pos.open ? "Open" : "Held"} for ${pos.openedOn} Days`} />
               </div>
 
               <div
                 className="lg:hidden"
                 style={pos.open ? { color: "#68EA6A" } : { color: "gray" }}
               >
-                <BtnGreen text={`${pos.openedOn} days ago`} />
+                <BtnGreen text={`${pos.open ? "Open" : "Held"} for ${pos.openedOn} Days`} />
               </div>
+
+              <div style={pos.open ? { color: "#68EA6A" } : { color: "gray" }}>
+                <BtnGreen
+                  text={
+                    pos.open && !pos.isMatured
+                      ? `${pos.leverageApy}% APY (${pos.collateralToken.maturityDate} - ${pos.collateralToken.maturityDaysLeft} Days)`
+                      : `${pos.collateralToken.maturityDate}`
+                  }
+                />
+              </div>
+
 
               <div className="hidden lg:inline-flex">
                 {pos.open ? (
@@ -215,7 +212,7 @@ const LeveragePositionCard = ({
           <div className="hidden lg:inline-flex">
             <div className="w-full flex items-center gap-[8px]">
               {pos.open && (
-                <AutoDeleverage/>
+                <AutoDeleverage />
               )}
               <div> {renderStatusChip}</div>
               <MorphoLink

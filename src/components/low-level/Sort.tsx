@@ -24,19 +24,17 @@ const Sort = ({
         <div className="absolute flex w-[150px] text-[14px] flex-col gap-[8px] rounded-[16px] bg-white bg-opacity-[8%] p-[10px] right-[20px] top-[42px] backdrop-blur-md">
           <div
             onClick={() => setSortMethod("APY")}
-            className={`p-[8px] cursor-pointer rounded-[8px]  ${
-              sortMethod == "APY" ? "bg-white bg-opacity-[10%]" : ""
-            }`}
+            className={`p-[8px] cursor-pointer rounded-[8px]  ${sortMethod == "APY" ? "bg-white bg-opacity-[10%]" : ""
+              }`}
           >
-            <p>APY (high-low)</p>
+            <p>APY</p>
           </div>
           <div
             onClick={() => setSortMethod("leverage")}
-            className={`p-[8px] cursor-pointer rounded-[8px] ${
-              sortMethod == "leverage" ? "bg-white bg-opacity-[10%]" : ""
-            }`}
+            className={`p-[8px] cursor-pointer rounded-[8px] ${sortMethod == "leverage" ? "bg-white bg-opacity-[10%]" : ""
+              }`}
           >
-            <p>max leverage amt</p>
+            <p>Max Leverage - $</p>
           </div>
         </div>
       )}
