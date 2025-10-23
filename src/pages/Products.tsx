@@ -10,7 +10,7 @@ import mediumRisk from "../assets/icons/mediumRisk.svg";
 import lowRisk from "../assets/icons/lowRisk.svg";
 import { calcLeverage, isMatured } from "../utils";
 import BigNumber from "bignumber.js";
-import Sort from "../components/low-level/sort";
+import Sort from "../components/low-level/Sort";
 
 const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [risk, setRisk] = useState<string>("all");
@@ -100,15 +100,15 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 sortMethod == "APY"
                   ? Number(b.defaultLeverageApy) - Number(a.defaultLeverageApy)
                   : Number(
-                      BigNumber(b.liquidityAssetsUsd)
-                        .dividedBy(BigNumber(calcLeverage(b.maxLtv)).minus(1))
-                        .minus(1000)
-                    ) -
-                    Number(
-                      BigNumber(a.liquidityAssetsUsd)
-                        .dividedBy(BigNumber(calcLeverage(a.maxLtv)).minus(1))
-                        .minus(1000)
-                    )
+                    BigNumber(b.liquidityAssetsUsd)
+                      .dividedBy(BigNumber(calcLeverage(b.maxLtv)).minus(1))
+                      .minus(1000)
+                  ) -
+                  Number(
+                    BigNumber(a.liquidityAssetsUsd)
+                      .dividedBy(BigNumber(calcLeverage(a.maxLtv)).minus(1))
+                      .minus(1000)
+                  )
               )
               .map((collateralToken, index) => (
                 <ProductCard key={index} collateralToken={collateralToken} />
