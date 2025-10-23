@@ -155,9 +155,8 @@ const LeveragePositionCard = ({
                 </div>
 
                 <div>
-                  <div className="text-[24px] font-semibold">{`${
-                    pos.collateralToken.symbol.split("-")[1]
-                  }`}</div>
+                  <div className="text-[24px] font-semibold">{`${pos.collateralToken.symbol.split("-")[1]
+                    }`}</div>
                 </div>
               </div>
               {pos.open && (
@@ -409,7 +408,6 @@ function OpenPositionView({
           />
         </div>
         <div className="flex flex-col items-end lg:items-start lg:gap-[8px] text-[14px] lg:text-[16px]">
-          ~
           {Math.max(
             Number(
               displayTokenAmount(
