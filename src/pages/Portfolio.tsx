@@ -7,10 +7,14 @@ import FlashLeverage from "../contract-hooks/FlashLeverage";
 import LeveragePositionCard from "../components/LeveragePositionCard.tsx";
 import axios from "axios";
 import { updatePositionsData } from "../utils/updatePositionsData.ts";
+import arrow from "../assets/icons/arrowDown.svg";
 
 const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
-  const [leveragePositions, setLeveragePositions] = useState<LeveragePosition[]>([]);
+  const [leveragePositions, setLeveragePositions] = useState<
+    LeveragePosition[]
+  >([]);
   const [showLoader, setShowLoader] = useState(true);
+  const [showClosed, setShowClosed] = useState(false);
 
   const { address } = useAccount();
   const chainId = useChainId();
@@ -27,15 +31,24 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     async function getUserPositions() {
       if (!chainId || !address) return;
 
-      const baseUrl = chainId !== 31337 ? "https://api.spiralstake.xyz" : "http://localhost:5000";
+      const baseUrl =
+        chainId !== 31337
+          ? "https://api.spiralstake.xyz"
+          : "http://localhost:5000";
 
       if (flashLeverage) {
         let [_leveragePositions, allLeveragePositions] = await Promise.all([
           flashLeverage.getUserLeveragePositions(address),
-          axios.get<any[]>(`${baseUrl}/leveragePositions`).then(res => res.data)
-        ])
+          axios
+            .get<any[]>(`${baseUrl}/leveragePositions`)
+            .then((res) => res.data),
+        ]);
 
-        _leveragePositions = updatePositionsData(allLeveragePositions, address, _leveragePositions);
+        _leveragePositions = updatePositionsData(
+          allLeveragePositions,
+          address,
+          _leveragePositions
+        );
         setLeveragePositions(_leveragePositions);
       }
     }
@@ -44,7 +57,9 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   }, [address, flashLeverage]);
 
   function deleteLeveragePosition(positionId: number) {
-    setLeveragePositions((prev) => prev.filter((position) => position.id !== positionId));
+    setLeveragePositions((prev) =>
+      prev.filter((position) => position.id !== positionId)
+    );
   }
 
   return flashLeverage ? (
@@ -62,14 +77,21 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           {/* chart */}
           <div className="w-full flex p-[24px] gap-[100px] bg-white bg-opacity-[4%] rounded-[20px] border-[1px] border-white border-opacity-[6%]">
             <div className="flex flex-col">
-              <p className="text-[14px] text-[#B6B6B6]">Total Amount Deposited</p>
-              <p className="text-[24px] font-[500] text-[#E4E4E4]">${leveragePositions.reduce(
-                (total, current) =>
-                  current.open
-                    ? total + Number(current.amountDepositedInUsd)
-                    : total,
-                0
-              ).toFixed(2)}</p>
+              <p className="text-[14px] text-[#B6B6B6]">
+                Total Amount Deposited
+              </p>
+              <p className="text-[24px] font-[500] text-[#E4E4E4]">
+                $
+                {leveragePositions
+                  .reduce(
+                    (total, current) =>
+                      current.open
+                        ? total + Number(current.amountDepositedInUsd)
+                        : total,
+                    0
+                  )
+                  .toFixed(2)}
+              </p>
             </div>
             {/* <div className="flex flex-col">
               <p className="text-[14px] text-[#B6B6B6]">Total Position Value</p>
@@ -83,7 +105,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               </p>
             </div>
             <div className="flex flex-col">
-              <p className="text-[14px] text-[#B6B6B6]">Total Yield Generated</p>
+              <p className="text-[14px] text-[#B6B6B6]">Total Projected yeild</p>
               <p className="text-[24px] font-[500] text-[#E4E4E4]">
                 ${leveragePositions.reduce((total, current) =>
                   current.open
@@ -97,40 +119,110 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             <div className="flex flex-col">
               <p className="text-[14px] text-[#B6B6B6]">Open positions</p>
               <p className="text-center text-[24px] font-[500] text-[#E4E4E4]">
-                {leveragePositions.reduce((count, pos) => (pos.open ? count + 1 : count), 0)}
+                {leveragePositions.reduce(
+                  (count, pos) => (pos.open ? count + 1 : count),
+                  0
+                )}
               </p>
             </div>
           </div>
 
           {/* mobile */}
-          <div className="flex flex-col gap-[24px] lg:hidden">
-            {leveragePositions.map(
-              (leveragePosition: LeveragePosition, index: number) => (
-                <LeveragePositionCard
-                  key={index}
-                  leveragePosition={leveragePosition}
-                  flashLeverage={flashLeverage}
-                  deleteLeveragePosition={deleteLeveragePosition}
+          <div className="lg:hidden flex flex-col gap-[48px]">
+            <div className="flex flex-col gap-[14px]">
+              {leveragePositions
+                // .sort((a, b) => Number(b.open) - Number(a.open))
+                .filter((a) => a.open)
+                .map((leveragePosition: LeveragePosition, index: number) => (
+                  <LeveragePositionCard
+                    key={index}
+                    leveragePosition={leveragePosition}
+                    flashLeverage={flashLeverage}
+                    deleteLeveragePosition={deleteLeveragePosition}
+                  />
+                ))}
+            </div>
+            <div className="flex flex-col gap-[14px]">
+              <div
+                onClick={() => setShowClosed(!showClosed)}
+                className="flex bg-white bg-opacity-[4%] rounded-[16px] justify-between py-[12px] px-[24px] cursor-pointer"
+              >
+                <p className="text-lg font-[400] text-gray-300">
+                  Closed Positions
+                </p>
+                <img
+                  src={arrow}
+                  alt=""
+                  className={`w-[24px] cursor-pointer transition-transform duration-300 ${
+                    showClosed ? "rotate-180" : ""
+                  }`}
                 />
-              )
-            )}
+              </div>
+              {showClosed &&
+                leveragePositions
+                  // .sort((a, b) => Number(b.open) - Number(a.open))
+                  .filter((a) => a.open == false)
+                  .map((leveragePosition: LeveragePosition, index: number) => (
+                    <LeveragePositionCard
+                      key={index}
+                      leveragePosition={leveragePosition}
+                      flashLeverage={flashLeverage}
+                      deleteLeveragePosition={deleteLeveragePosition}
+                    />
+                  ))}
+            </div>
           </div>
 
           {/* desktop */}
-          <div className="lg:flex flex-col gap-[14px] hidden">
-            {leveragePositions.sort((a, b) => Number(b.open) - Number(a.open)).map((leveragePosition: LeveragePosition, index: number) => (
-              <LeveragePositionCard
-                key={index}
-                leveragePosition={leveragePosition}
-                flashLeverage={flashLeverage}
-                deleteLeveragePosition={deleteLeveragePosition}
-              />
-            ))}
+          <div className="hidden lg:flex flex-col gap-[48px]">
+            <div className="lg:flex flex-col gap-[14px] hidden">
+              {leveragePositions
+                // .sort((a, b) => Number(b.open) - Number(a.open))
+                .filter((a) => a.open)
+                .map((leveragePosition: LeveragePosition, index: number) => (
+                  <LeveragePositionCard
+                    key={index}
+                    leveragePosition={leveragePosition}
+                    flashLeverage={flashLeverage}
+                    deleteLeveragePosition={deleteLeveragePosition}
+                  />
+                ))}
+            </div>
+            <div className="lg:flex flex-col gap-[14px] hidden">
+              <div
+                onClick={() => setShowClosed(!showClosed)}
+                className="flex bg-white bg-opacity-[4%] rounded-[16px] justify-between p-[24px] cursor-pointer"
+              >
+                <p className="text-xl font-[400] text-gray-300">
+                  Closed Positions
+                </p>
+                <img
+                  src={arrow}
+                  alt=""
+                  className={`w-[32px] cursor-pointer transition-transform duration-300 ${
+                    showClosed ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+              {showClosed &&
+                leveragePositions
+                  // .sort((a, b) => Number(b.open) - Number(a.open))
+                  .filter((a) => a.open == false)
+                  .map((leveragePosition: LeveragePosition, index: number) => (
+                    <LeveragePositionCard
+                      key={index}
+                      leveragePosition={leveragePosition}
+                      flashLeverage={flashLeverage}
+                      deleteLeveragePosition={deleteLeveragePosition}
+                    />
+                  ))}
+            </div>
           </div>
-
         </>
       ) : (
-        <h1 className="text-3xl w-full text-center text-gray-300">No Open Positions</h1>
+        <h1 className="text-3xl w-full text-center text-gray-300">
+          No Open Positions
+        </h1>
       )}
     </div>
   ) : (

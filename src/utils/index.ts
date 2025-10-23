@@ -66,3 +66,20 @@ export function getMaturityDaysLeft(dateString: string): number {
 export function currentTimestamp() {
   return Math.floor(Date.now() / 1000);
 }
+
+export function daysAgo(timestamp:string) {
+  const givenDate = new Date(timestamp);
+  const now = new Date();
+
+  // Check if the date is invalid
+  if (isNaN(givenDate.getTime())) {
+    return 0;
+  }
+
+  // Calculate difference in milliseconds
+  const diffMs = Number(now) - Number(givenDate);
+
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  return diffDays;
+}
