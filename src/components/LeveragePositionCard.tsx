@@ -155,8 +155,9 @@ const LeveragePositionCard = ({
                 </div>
 
                 <div>
-                  <div className="text-[24px] font-semibold">{`${pos.collateralToken.symbol.split("-")[1]
-                    }`}</div>
+                  <div className="text-[24px] font-semibold">{`${
+                    pos.collateralToken.symbol.split("-")[1]
+                  }`}</div>
                 </div>
               </div>
               {pos.open && (
@@ -164,22 +165,20 @@ const LeveragePositionCard = ({
                   <AutoDeleverage />
                 </div>
               )}
-
             </div>
 
             <div className="text-[#68EA6A] flex items-center justify-normal gap-1">
               <div
-                className="hidden lg:inline-flex"
+                className="inline-flex"
                 style={pos.open ? { color: "#68EA6A" } : { color: "gray" }}
               >
-                <BtnGreen text={`${pos.open ? "Open" : "Held"} for ${pos.openedOn} Days`} />
-              </div>
-
-              <div
-                className="lg:hidden"
-                style={pos.open ? { color: "#68EA6A" } : { color: "gray" }}
-              >
-                <BtnGreen text={`${pos.open ? "Open" : "Held"} for ${pos.openedOn} Days`} />
+                {pos.open ? (
+                  <BtnGreen text={`Opened ${pos.openedOn} Days ago`} />
+                ) : (
+                  Number(pos.heldFor) > 0 && (
+                    <BtnGreen text={`Held for ${pos.heldFor} Days`} />
+                  )
+                )}
               </div>
 
               <div style={pos.open ? { color: "#68EA6A" } : { color: "gray" }}>
@@ -191,7 +190,6 @@ const LeveragePositionCard = ({
                   }
                 />
               </div>
-
 
               <div className="hidden lg:inline-flex">
                 {pos.open ? (
@@ -211,9 +209,7 @@ const LeveragePositionCard = ({
 
           <div className="hidden lg:inline-flex">
             <div className="w-full flex items-center gap-[8px]">
-              {pos.open && (
-                <AutoDeleverage />
-              )}
+              {pos.open && <AutoDeleverage />}
               <div> {renderStatusChip}</div>
               <MorphoLink
                 link={`https://app.morpho.org/ethereum/market/${pos.collateralToken.morphoMarketId}`}
@@ -222,7 +218,7 @@ const LeveragePositionCard = ({
           </div>
         </div>
 
-        <div className="flex flex-col gap-y-[8px] lg:grid grid-cols-[auto,auto] lg:gap-y-[14px] grid-rows-2 lg:grid-rows-1 lg:grid-cols-[1fr,1fr,1fr,1fr,1fr,1fr]">
+        <div className="flex flex-col gap-y-[12px] lg:grid grid-cols-[auto,auto] lg:gap-y-[14px] grid-rows-2 lg:grid-rows-1 lg:grid-cols-[1fr,1fr,1fr,1fr,1fr,1fr]">
           {pos.open && !pos.isMatured ? (
             <OpenPositionView
               pos={pos}
@@ -344,7 +340,7 @@ function OpenPositionView({
     <>
       <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
         <p className="text-[14px] text-gray-400">Amount Deposited</p>
-        <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
+        <div className="flex flex-col items-end lg:items-start lg:gap-[8px] text-[14px] lg:text-[16px]">
           {displayTokenAmount(pos.amountCollateral)}{" "}
           {pos.collateralToken.symbol}
           <div className="text-[14px] text-[#D7D7D7]">
@@ -360,7 +356,7 @@ function OpenPositionView({
             {calcLeverage(pos.ltv)}x
           </p>
         </div>
-        <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
+        <div className="flex flex-col items-end lg:items-start lg:gap-[8px] text-[14px] lg:text-[16px]">
           {displayTokenAmount(pos.amountLeveragedCollateral)}{" "}
           {pos.collateralToken.symbol}
           <div className="text-[14px] text-[#D7D7D7]">
@@ -376,7 +372,7 @@ function OpenPositionView({
 
       <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
         <p className="text-[14px] text-gray-400">Loan amount</p>
-        <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px] truncate">
+        <div className="flex flex-col items-end lg:items-start lg:gap-[8px] text-[14px] lg:text-[16px] truncate">
           <div>
             {displayTokenAmount(pos.amountLoan)}{" "}
             {pos.collateralToken.loanToken.symbol}
@@ -392,21 +388,28 @@ function OpenPositionView({
           <p className="text-[14px] text-gray-400">Projected Yield</p>
           <HoverInfo
             content={
-              <div className="flex justify-between bg-white bg-opacity-[4%] border-[1px] border-white border-opacity-[10%] p-[16px] rounded-[12px] items-start flex-col gap-[12px] lg:gap-[24px]">
-                <p className="text-[14px] text-gray-400">Yield Generated</p>
-                <div className="flex flex-col items-start gap-[6px] lg:gap-[14px] text-[14px] lg:text-[16px]">
-                  {displayTokenAmount(yieldGenerated)}{" "}
-                  {pos.collateralToken.loanToken.symbol}
-                  <div className="text-[14px] text-[#D7D7D7]">
-                    {" "}
-                    ${displayTokenAmount(yieldGenerated)}
+              <div className="max-w-[200px] lg:max-w-[350px] flex flex-col gap-[14px] border-[1px] border-white border-opacity-[10%] py-[12px] px-[16px]  bg-white bg-opacity-[4%] rounded-[16px]">
+                <p className="text-[14px] font-[400] text-gray-300">
+                  Projected yields vary dynamically based on the borrow APY
+                  shifts across Morpho pools
+                </p>
+                <div className="flex flex-col lg:flex-row justify-between items-start gap-[12px] lg:gap-[6px]">
+                  <p className="text-[14px] text-gray-400">Yield Generated</p>
+                  <div className="flex flex-col lg:flex-row items-start gap-[6px] lg:gap-[4px] text-[14px] lg:text-[14px]">
+                    {displayTokenAmount(yieldGenerated)}{" "}
+                    {pos.collateralToken.loanToken.symbol}
+                    <div className="text-[12px] text-[#D7D7D7]">
+                      {" "}
+                      (${displayTokenAmount(yieldGenerated)})
+                    </div>
                   </div>
                 </div>
               </div>
             }
           />
         </div>
-        <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
+        <div className="flex flex-col items-end lg:items-start lg:gap-[8px] text-[14px] lg:text-[16px]">
+          ~
           {Math.max(
             Number(
               displayTokenAmount(
@@ -451,7 +454,7 @@ function OpenPositionView({
 
       <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
         <p className="text-[14px] text-gray-400">LTV</p>
-        <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px] truncate">
+        <div className="flex flex-col items-end lg:items-start lg:gap-[8px] text-[14px] lg:text-[16px] truncate">
           <div>{pos.ltv}%</div>
           <div className="text-[14px] text-[#D7D7D7]">
             liq. {pos.collateralToken.liqLtv}%
@@ -461,7 +464,7 @@ function OpenPositionView({
 
       <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
         <p className="text-[14px] text-gray-400">Price</p>
-        <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
+        <div className="flex flex-col items-end lg:items-start lg:gap-[4px] gap-[4px] text-[14px] lg:text-[16px]">
           <BtnGreen
             text={`Current: $${Number(pos.collateralToken.valueInUsd).toFixed(
               3
@@ -490,7 +493,7 @@ function ClosedOrMaturedView({
     <>
       <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
         <p className="text-[14px] text-gray-400">Amount Deposited</p>
-        <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
+        <div className="flex lg:flex-col items-end lg:items-start lg:gap-[8px] text-[14px] lg:text-[16px]">
           ${displayTokenAmount(pos.amountDepositedInUsd)}
           <div className="text-[14px] text-[#D7D7D7]">
             {displayTokenAmount(pos.amountCollateral)}{" "}
@@ -503,7 +506,7 @@ function ClosedOrMaturedView({
         <>
           <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
             <p className="text-[14px] text-gray-400">Yield Generated</p>
-            <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
+            <div className="flex lg:flex-col items-end lg:items-start lg:gap-[8px] text-[14px] lg:text-[16px]">
               {displayTokenAmount(BigNumber.max(yieldGenerated, 0))}{" "}
               {pos.collateralToken.loanToken.symbol}
               <div className="text-[14px] text-[#D7D7D7]">
@@ -516,7 +519,7 @@ function ClosedOrMaturedView({
         <>
           <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
             <p className="text-[14px] text-gray-400">Amount Returned</p>
-            <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
+            <div className="flex lg:flex-col items-end lg:items-start lg:gap-[8px] text-[14px] lg:text-[16px]">
               <div className="text-[14px] text-[#D7D7D7]">
                 {displayTokenAmount(pos.amountReturnedInUsd)}{" "}
                 {pos.collateralToken.loanToken.symbol}
@@ -527,7 +530,7 @@ function ClosedOrMaturedView({
 
           <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
             <p className="text-[14px] text-gray-400">Yield Generated</p>
-            <div className="flex lg:flex-col items-end lg:items-start gap-[8px] text-[14px] lg:text-[16px]">
+            <div className="flex lg:flex-col items-end lg:items-start lg:gap-[8px] text-[14px] lg:text-[16px]">
               <div className="text-[14px] text-[#D7D7D7]">
                 {displayTokenAmount(
                   BigNumber.max(

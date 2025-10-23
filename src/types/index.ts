@@ -55,6 +55,7 @@ export interface LeveragePosition {
   amountReturnedInUsd: BigNumber;
   yieldGenerated: BigNumber;
   openedOn: Number;
+  heldFor: Number;
 }
 
 export interface InternalSwapData {

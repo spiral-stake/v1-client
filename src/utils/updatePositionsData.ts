@@ -20,6 +20,7 @@ export const updatePositionsData = (
           amountDepositedInUsd: pos.amountDepositedInUsd,
           amountReturnedInUsd: pos.amountReturnedInUsd,
           createdAt: pos.createdAt, 
+          updatedAt: pos.updatedAt
         },
       ])
   );
@@ -57,7 +58,9 @@ export const updatePositionsData = (
         pos.ltv
       ),
 
-      openedOn: daysAgo(position.createdAt)
+      openedOn: daysAgo(position.createdAt),
+
+      heldFor: daysAgo(position.createdAt)-daysAgo(position.updatedAt)
     };
   });
 };
