@@ -166,8 +166,56 @@
       "name": "PT Ethena sUSDE 27NOV2025",
       "pendleMarket": "0xb6aC3d5da138918aC4E84441e924a20daA60dBdd",
       "symbol": "PT-sUSDE-27NOV2025"
+    },
+    "0xb44cdBEF3145C1c1E772e8228E1154c80e70618e": {
+      "YT": "0xBF678e1828AE2Fb3c1e4cfBCE00ba595542513E3",
+      "address": "0xb44cdBEF3145C1c1E772e8228E1154c80e70618e",
+      "decimals": 18,
+      "loanToken": {
+        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "decimals": 6,
+        "name": "USD Coin",
+        "symbol": "USDC"
+      },
+      "maturityTimestamp": 1764806400,
+      "morphoMarketId": "0x21b67f89513da0b0c94af8778134a1ba3f762f944f16208b42cc0663b07eaf05",
+      "name": "PT infiniFi USD 4DEC2025",
+      "pendleMarket": "0x6524421041a33a559831A6d305936361B6e4D217",
+      "symbol": "PT-iUSD-4DEC2025"
+    },
+    "0x5510B080449d5E3Bf345b6635eD40A35B36b081f": {
+      "YT": "0xEBd2FfAe57CE0F2B4b2b486Aa7b8dc30fB434706",
+      "address": "0x5510B080449d5E3Bf345b6635eD40A35B36b081f",
+      "decimals": 18,
+      "loanToken": {
+        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "decimals": 6,
+        "name": "USD Coin",
+        "symbol": "USDC"
+      },
+      "maturityTimestamp": 1767830400,
+      "morphoMarketId": "0x32b4a75db50a20f7435dfdcf54593a2e96fc97901321d3ab07268941dee93edb",
+      "name": "PT Staked infiniFi USD 8JAN2026",
+      "pendleMarket": "0x126b8f10B8a6f3D3Dbe5dc991cEB14ABa6345E04",
+      "symbol": "PT-siUSD-8JAN2026"
+    },
+    "0x1Fb3C5c35D95F48e48FFC8e36bCCe5CB5f29F57c": {
+      "YT": "0xbB9a3D650959386D40e52E6E9E5f242738b1AC76",
+      "address": "0x1Fb3C5c35D95F48e48FFC8e36bCCe5CB5f29F57c",
+      "decimals": 18,
+      "loanToken": {
+        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "decimals": 6,
+        "name": "USD Coin",
+        "symbol": "USDC"
+      },
+      "maturityTimestamp": 1768435200,
+      "morphoMarketId": "0x79b4e55cef9e7c214b5cc965e1984229ada26a66051e35366a75c4d92b776735",
+      "name": "PT Strata Senior USDe 15JAN2026",
+      "pendleMarket": "0xa83174F1dD8475378abCa9d676DaD3cE97409E0a",
+      "symbol": "PT-srUSDe-15JAN2026"
     }
   },
-  "flashLeverageAddress": "0x3907e0Ebb70c4e556a9DFAC210ACE0B7b6c9c3c4",
-  "flashLeverageCoreAddress": "0x00a66377e109B1348Ac65B31d8729a55EfEa75f4"
+  "flashLeverageAddress": "0xcAcCfC3168402668DBDCc054947Dea0101812cca",
+  "flashLeverageCoreAddress": "0xD245f4C50a8de2542138084eAafA37572B178d64"
 }

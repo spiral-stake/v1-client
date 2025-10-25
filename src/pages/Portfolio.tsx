@@ -153,9 +153,8 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 <img
                   src={arrow}
                   alt=""
-                  className={`w-[24px] cursor-pointer transition-transform duration-300 ${
-                    showClosed ? "rotate-180" : ""
-                  }`}
+                  className={`w-[24px] cursor-pointer transition-transform duration-300 ${showClosed ? "rotate-180" : ""
+                    }`}
                 />
               </div>
               {showClosed &&
@@ -199,9 +198,8 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 <img
                   src={arrow}
                   alt=""
-                  className={`w-[32px] cursor-pointer transition-transform duration-300 ${
-                    showClosed ? "rotate-180" : ""
-                  }`}
+                  className={`w-[32px] cursor-pointer transition-transform duration-300 ${showClosed ? "rotate-180" : ""
+                    }`}
                 />
               </div>
               {showClosed &&

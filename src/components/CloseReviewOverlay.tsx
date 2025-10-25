@@ -11,7 +11,7 @@ const CloseReviewOverlay = ({
   pos,
   amountCollateral,
   setShowCloseReview,
-  amountReturnedSimulated,
+  amountReturnedSimulated
 }: {
   amountCollateral: number;
   setShowCloseReview: React.Dispatch<React.SetStateAction<boolean>>;
@@ -44,12 +44,13 @@ const CloseReviewOverlay = ({
             <div className="flex items-start gap-2 rounded-xl">
               <img src={warning} alt="Warning" className="w-10" />
               <p className="text-sm leading-relaxed text-amber-500">
-                Yields spike at maturity — that’s how bonds work. PTs reach full value only then —
-                positions should be strictly unleveraged at maturity. Leverage or unwinding actions
-                face at least <span className="font-medium">0.1% slippage</span>. <br />
+                <span className="font-medium"> Yields spike at maturity. </span>
+                PTs reach full value only then, so positions
+                should only be unleveraged at maturity. Leverage or Deleveraging face{" "}
+                <span className="font-medium">~0.1% slippage atleast</span>. <br />
                 <br />
-                If APY drops, it usually recovers as borrow rates ease and utilization falls.
-                Frequent rebalancing erode returns —{" "}
+                If APY drops, it usually rebounds as borrow rates ease and utilization falls. Frequent
+                rebalancing erodes returns —{" "}
                 <span className="font-medium">holding often pays off.</span>
               </p>
             </div>
@@ -68,22 +69,41 @@ const CloseReviewOverlay = ({
             info={`${amountCollateral.toFixed(2)} ${pos.collateralToken.symbol}`}
             extraInfo={`$${displayTokenAmount(pos.amountDepositedInUsd)}`}
           />
-          {!isMatured(pos.collateralToken) ? (
-            <ReviewinfoTabs
-              title="Maturity Date"
-              info={pos.collateralToken.maturityDate}
-            />
-          ) : (
-            <ReviewinfoTabs
-              title="Effective Yield"
-              info={`$${displayTokenAmount(
-                BigNumber.max(
-                  0,
-                  amountReturnedSimulated.minus(pos.amountDepositedInUsd)
-                )
-              )}`}
-            />
-          )}
+
+          <ReviewinfoTabs
+            title="Maturity Date"
+            info={pos.collateralToken.maturityDate}
+            extraInfo={`(${pos.collateralToken.maturityDaysLeft} Days left)`}
+          />
+
+          <ReviewinfoTabs
+            title="Amount Returned"
+            info={`${displayTokenAmount(
+              BigNumber.max(
+                0,
+                amountReturnedSimulated
+              )
+            )} ${pos.collateralToken.loanToken.symbol}`}
+            extraInfo={`$${displayTokenAmount(amountReturnedSimulated)}`}
+          />
+
+          <ReviewinfoTabs
+            title="Effective Yield"
+            hoverInfo="After 0.1% Slippage & 10% Performance Fee on Yield Generated"
+            info={`${displayTokenAmount(
+              BigNumber.max(
+                amountReturnedSimulated.minus(pos.amountDepositedInUsd),
+                0
+              )
+            )} ${pos.collateralToken.loanToken.symbol}`}
+            extraInfo={`$${displayTokenAmount(
+              BigNumber.max(
+                0,
+                amountReturnedSimulated.minus(pos.amountDepositedInUsd)
+              )
+            )}`}
+          />
+
         </div>
       </div>
     </div>

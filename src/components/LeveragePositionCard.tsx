@@ -75,6 +75,7 @@ const LeveragePositionCard = ({
 
       setLoading(false);
     } catch (err: any) {
+      console.log(err)
       toastError("Simulation Error", err.shortMessage);
       setLoading(false);
     }
@@ -95,7 +96,7 @@ const LeveragePositionCard = ({
     );
 
     if (chainId && Number(chainId) !== 31337) {
-      axios.put("https://dapi.spiralstake.xyz/leverage/close", {
+      axios.put("https://api.spiralstake.xyz/leverage/close", {
         user: pos.owner.toLowerCase(),
         positionId: pos.id,
         amountReturnedInUsd: amountReturned,
@@ -395,11 +396,11 @@ function OpenPositionView({
                 <div className="flex flex-col lg:flex-row justify-between items-start gap-[12px] lg:gap-[6px]">
                   <p className="text-[14px] text-gray-400">Yield Generated</p>
                   <div className="flex flex-col lg:flex-row items-start gap-[6px] lg:gap-[4px] text-[14px] lg:text-[14px]">
-                    {displayTokenAmount(yieldGenerated)}{" "}
+                    {displayTokenAmount(BigNumber.max(yieldGenerated, 0))}{" "}
                     {pos.collateralToken.loanToken.symbol}
                     <div className="text-[12px] text-[#D7D7D7]">
                       {" "}
-                      (${displayTokenAmount(yieldGenerated)})
+                      (${displayTokenAmount(BigNumber.max(yieldGenerated, 0))})
                     </div>
                   </div>
                 </div>
