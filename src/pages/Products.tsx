@@ -11,6 +11,7 @@ import lowRisk from "../assets/icons/lowRisk.svg";
 import { calcLeverage, isMatured } from "../utils";
 import BigNumber from "bignumber.js";
 import Sort from "../components/low-level/Sort";
+import SpiralStakeVaults from "../components/low-level/SpiralStakeVaults";
 
 const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [risk, setRisk] = useState<string>("all");
@@ -37,11 +38,12 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
   return flashLeverage ? (
     <div className="flex flex-col gap-[32px] lg:gap-[48px] py-[16px] lg:py-[48px]">
-      <div className="">
+      <div className="flex justify-between mr-[24px]">
         <PageTitle
           title="Maximize your stablecoin yields"
           subheading="Our system helps you leverage safely and instantly so you earn more from the same money without extra effort."
         />
+        <SpiralStakeVaults/>
       </div>
       <div className="flex flex-col lg:flex-row w-full gap-[48px]">
         <div className="flex gap-[8px] lg:flex-col lg:gap-[16px] overflow-x-scroll no-scrollbar">
