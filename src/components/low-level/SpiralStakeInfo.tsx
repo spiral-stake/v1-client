@@ -2,7 +2,6 @@ import { LeveragePosition } from "../../types";
 import account from "../../assets/icons/account.svg";
 import barChart from "../../assets/icons/bar-chart.svg";
 import coin from "../../assets/icons/coin-line.svg";
-import { displayTokenAmount } from "../../utils/displayTokenAmounts";
 import { formatNumber } from "../../utils/formatNumber";
 
 const SpiralStakeInfo = ({

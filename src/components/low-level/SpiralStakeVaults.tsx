@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import externalLink from "../../assets/icons/externalLink.svg";
 import vault from "../../assets/vault.png";
 import { LeveragePosition } from "../../types";
@@ -14,10 +15,10 @@ const SpiralStakeVaults = () => {
             vaults—automated for <br/> peak performance.
           </p>
         </div>
-        <div className="flex items-center gap-[8px]">
+        <Link to={"https://pools.spiralstake.xyz/"} className="flex items-center gap-[8px]">
           <p className="text-[12px] lg:text-[16px]">Learn More</p>
           <img src={externalLink} alt="" className="w-[12px] lg:w-[16px]" />
-        </div>
+        </Link>
       </div>
       <div className="">
         <img src={vault} alt="" className="w-[100px] lg:w-[130px] lg:h-[130px]" />

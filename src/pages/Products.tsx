@@ -12,22 +12,19 @@ import { calcLeverage, isMatured } from "../utils";
 import BigNumber from "bignumber.js";
 import Sort from "../components/low-level/Sort";
 import SpiralStakeVaults from "../components/low-level/SpiralStakeVaults";
-import axios from "axios";
-import { ServerLeveragePosition, Metrics, LeveragePosition } from "../types";
-import { updatePositionsData } from "../utils/updatePositionsData";
+import { LeveragePosition } from "../types";
 import SpiralStakeInfo from "../components/low-level/SpiralStakeInfo";
 
-const devTeamWallet =
-  "0x386fB147faDb206fb7Af36438E6ae1f8583f99dd".toLowerCase();
-
-const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
+const Products = ({
+  flashLeverage,
+  allLeveragePositions,
+}: {
+  flashLeverage: FlashLeverage;
+  allLeveragePositions: LeveragePosition[];
+}) => {
   const [risk, setRisk] = useState<string>("all");
   const [sortMethod, setSortMethod] = useState<string>("APY");
   const [showSorts, setShowSorts] = useState(false);
-  const [metrics, setMetrics] = useState<Metrics[]>([]);
-  const [allLeveragePositions, setAllLeveragePositions] = useState<
-    LeveragePosition[]
-  >([]);
 
   const sortRef = useRef<HTMLDivElement>(null);
 
@@ -46,77 +43,6 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (!flashLeverage) return;
-
-    const fetchData = async () => {
-      try {
-        const { serverLeveragePositions, metrics } = await fetchServerData();
-        setMetrics(metrics);
-
-        // derive user addresses
-        const userAddresses = getUniqueUsers(serverLeveragePositions);
-
-        // batch fetch all users' leverage data in parallel
-        const leverageResults = await Promise.all(
-          userAddresses.map(async (address) => {
-            try {
-              const userPositions =
-                await flashLeverage.getUserLeveragePositions(address);
-              return updatePositionsData(
-                serverLeveragePositions,
-                address,
-                userPositions
-              );
-            } catch (err) {
-              console.warn(`Failed fetching positions for ${address}:`, err);
-              return [];
-            }
-          })
-        );
-
-        // flatten once
-        const merged = leverageResults.flat();
-        setAllLeveragePositions(merged);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      }
-    };
-
-    // small debounce (prevents multiple trigger loops)
-    const timeout = setTimeout(fetchData, 200);
-    return () => clearTimeout(timeout);
-  }, [flashLeverage]);
-
-  //helpers//
-
-  const fetchServerData = async () => {
-    const baseUrl =
-      import.meta.env.VITE_ENV === "prod"
-        ? "https://api.spiralstake.xyz"
-        : "http://localhost:5000";
-
-    const [levRes, metricsRes] = await Promise.all([
-      axios.get(`${baseUrl}/leveragePositions`),
-      axios.get(`${baseUrl}/metrics`),
-    ]);
-
-    return {
-      serverLeveragePositions: levRes.data as ServerLeveragePosition[],
-      metrics: metricsRes.data as Metrics[],
-    };
-  };
-
-  const getUniqueUsers = (positions: any[]): string[] => {
-    const addresses: Record<string, boolean> = {};
-    for (const p of positions) {
-      const addr = p.positionId.slice(0, 42).toLowerCase();
-      if (addr === devTeamWallet) continue;
-      addresses[addr] = true;
-    }
-    return Object.keys(addresses);
-  };
 
   return flashLeverage ? (
     <div className="flex flex-col gap-[32px] lg:gap-[48px] py-[16px] lg:py-[48px]">
