@@ -145,9 +145,9 @@ const TokenAmount = ({
           {error ? (
             error
           ) : (
-            <p className="flex gap-[4px] font-[500]">
-              <p>You have to deposit more than </p>
-              <p className="text-[#F7981DCC]">{">5000"}</p>for better return.
+            <p>
+              You have to deposit more than 
+              <span className="text-[#F7981DCC]">{" >5000 "}</span>for better returns.
             </p>
           )}
         </div>

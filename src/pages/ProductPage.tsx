@@ -34,6 +34,7 @@ import { getSlippage } from "../utils/getSlippage";
 import DepositReviewOverlay from "../components/DepositReviewOverlay";
 import ProductTitle from "../components/low-level/ProductTitle.tsx";
 import PoolInfo from "../components/low-level/PoolInfo.tsx";
+import Warning from "../components/low-level/warining.tsx";
 
 const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [showSlippage, setShowSlippage] = useState(false);
@@ -401,6 +402,10 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             </div>
           </Link>
 
+         <div className="flex flex-col gap-[16px]"> 
+             {/* 15 days warning */}
+          {collateralToken.maturityDaysLeft<15 && <Warning/>}
+
           {/* title and subtitle */}
           <div className="">
             <ProductTitle
@@ -411,6 +416,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               collateralToken={collateralToken}
             />
           </div>
+         </div>
 
           {/* deposit info mobile */}
           <div className="lg:hidden grid grid-cols-[1fr,auto,1fr] grid-rows-2 gap-[20px] items-center">
