@@ -404,7 +404,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
          <div className="flex flex-col gap-[16px]"> 
              {/* 15 days warning */}
-          {collateralToken.maturityDaysLeft<15 && <Warning/>}
+          {collateralToken.maturityDaysLeft<=15 && <Warning/>}
 
           {/* title and subtitle */}
           <div className="">
