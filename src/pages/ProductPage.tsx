@@ -184,7 +184,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           ...prev,
           text: "Leverage",
           disabled: false,
-          warning: "We recommend depositing a minimum amount of $5,000",
+          warning: "You have to deposit more than >$5,000 for better return.",
           error: "",
         }));
       }
@@ -334,21 +334,21 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
       const { positionId, amountDepositedInUsd } = await (isSameToken
         ? flashLeverage.leverage(
-          address,
-          desiredLtv,
-          fromToken as CollateralToken,
-          amountCollateral,
-          internalSwapData
-        )
+            address,
+            desiredLtv,
+            fromToken as CollateralToken,
+            amountCollateral,
+            internalSwapData
+          )
         : flashLeverage.swapAndLeverage(
-          address,
-          desiredLtv,
-          fromToken,
-          amountCollateral,
-          externalSwapData!,
-          collateralToken,
-          internalSwapData
-        ));
+            address,
+            desiredLtv,
+            fromToken,
+            amountCollateral,
+            externalSwapData!,
+            collateralToken,
+            internalSwapData
+          ));
 
       // Single toast success message
       toastSuccess(
@@ -371,7 +371,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           atBorrowApy: collateralToken.borrowApy,
           desiredLtv,
         });
-      } catch (e) { }
+      } catch (e) {}
 
       navigate("/portfolio");
     } catch (e) {
