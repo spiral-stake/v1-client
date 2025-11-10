@@ -131,3 +131,18 @@ export interface LimitOrderResponse {
   /** Bytes string for permit */
   permit: string;
 }
+
+
+
+export interface Metrics {
+  userCount: number;
+  tvl: number;
+  amountDeposited: number;
+  createdAt: number;
+}
+export interface ServerLeveragePosition {
+  positionId: string;
+  amountDepositedInUsd: number;
+  amountReturnedInUsd: number;
+  open: boolean;
+}

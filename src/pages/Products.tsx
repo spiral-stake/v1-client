@@ -12,11 +12,22 @@ import { calcLeverage, isMatured } from "../utils";
 import BigNumber from "bignumber.js";
 import Sort from "../components/low-level/Sort";
 import SpiralStakeVaults from "../components/low-level/SpiralStakeVaults";
+import axios from "axios";
+import { ServerLeveragePosition, Metrics, LeveragePosition } from "../types";
+import { updatePositionsData } from "../utils/updatePositionsData";
+import SpiralStakeInfo from "../components/low-level/SpiralStakeInfo";
+
+const devTeamWallet =
+  "0x386fB147faDb206fb7Af36438E6ae1f8583f99dd".toLowerCase();
 
 const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [risk, setRisk] = useState<string>("all");
   const [sortMethod, setSortMethod] = useState<string>("APY");
   const [showSorts, setShowSorts] = useState(false);
+  const [metrics, setMetrics] = useState<Metrics[]>([]);
+  const [allLeveragePositions, setAllLeveragePositions] = useState<
+    LeveragePosition[]
+  >([]);
 
   const sortRef = useRef<HTMLDivElement>(null);
 
@@ -36,14 +47,88 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!flashLeverage) return;
+
+    const fetchData = async () => {
+      try {
+        const { serverLeveragePositions, metrics } = await fetchServerData();
+        setMetrics(metrics);
+
+        // derive user addresses
+        const userAddresses = getUniqueUsers(serverLeveragePositions);
+
+        // batch fetch all users' leverage data in parallel
+        const leverageResults = await Promise.all(
+          userAddresses.map(async (address) => {
+            try {
+              const userPositions =
+                await flashLeverage.getUserLeveragePositions(address);
+              return updatePositionsData(
+                serverLeveragePositions,
+                address,
+                userPositions
+              );
+            } catch (err) {
+              console.warn(`Failed fetching positions for ${address}:`, err);
+              return [];
+            }
+          })
+        );
+
+        // flatten once
+        const merged = leverageResults.flat();
+        setAllLeveragePositions(merged);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+
+    // small debounce (prevents multiple trigger loops)
+    const timeout = setTimeout(fetchData, 200);
+    return () => clearTimeout(timeout);
+  }, [flashLeverage]);
+
+  //helpers//
+
+  const fetchServerData = async () => {
+    const baseUrl =
+      import.meta.env.VITE_ENV === "prod"
+        ? "https://api.spiralstake.xyz"
+        : "http://localhost:5000";
+
+    const [levRes, metricsRes] = await Promise.all([
+      axios.get(`${baseUrl}/leveragePositions`),
+      axios.get(`${baseUrl}/metrics`),
+    ]);
+
+    return {
+      serverLeveragePositions: levRes.data as ServerLeveragePosition[],
+      metrics: metricsRes.data as Metrics[],
+    };
+  };
+
+  const getUniqueUsers = (positions: any[]): string[] => {
+    const addresses: Record<string, boolean> = {};
+    for (const p of positions) {
+      const addr = p.positionId.slice(0, 42).toLowerCase();
+      if (addr === devTeamWallet) continue;
+      addresses[addr] = true;
+    }
+    return Object.keys(addresses);
+  };
+
   return flashLeverage ? (
     <div className="flex flex-col gap-[32px] lg:gap-[48px] py-[16px] lg:py-[48px]">
-      <div className="flex justify-between mr-[24px]">
-        <PageTitle
-          title="Maximize your stablecoin yields"
-          subheading="Our system helps you leverage safely and instantly so you earn more from the same money without extra effort."
-        />
-        <SpiralStakeVaults/>
+      <div className="flex flex-col lg:flex-row gap-[30px] lg:gap-0 lg:justify-between lg:mr-[24px]">
+        <div className="flex flex-col gap-[20px] lg:gap-[30px]">
+          <PageTitle
+            title="Maximize your stablecoin yields"
+            subheading="Our system helps you leverage safely and instantly so you earn more from the same money without extra effort."
+          />
+          <SpiralStakeInfo allLeveragePositions={allLeveragePositions} />
+        </div>
+        <SpiralStakeVaults />
       </div>
       <div className="flex flex-col lg:flex-row w-full gap-[48px]">
         <div className="flex gap-[8px] lg:flex-col lg:gap-[16px] overflow-x-scroll no-scrollbar">
@@ -102,15 +187,15 @@ const Products = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 sortMethod == "APY"
                   ? Number(b.defaultLeverageApy) - Number(a.defaultLeverageApy)
                   : Number(
-                    BigNumber(b.liquidityAssetsUsd)
-                      .dividedBy(BigNumber(calcLeverage(b.maxLtv)).minus(1))
-                      .minus(1000)
-                  ) -
-                  Number(
-                    BigNumber(a.liquidityAssetsUsd)
-                      .dividedBy(BigNumber(calcLeverage(a.maxLtv)).minus(1))
-                      .minus(1000)
-                  )
+                      BigNumber(b.liquidityAssetsUsd)
+                        .dividedBy(BigNumber(calcLeverage(b.maxLtv)).minus(1))
+                        .minus(1000)
+                    ) -
+                    Number(
+                      BigNumber(a.liquidityAssetsUsd)
+                        .dividedBy(BigNumber(calcLeverage(a.maxLtv)).minus(1))
+                        .minus(1000)
+                    )
               )
               .map((collateralToken, index) => (
                 <ProductCard key={index} collateralToken={collateralToken} />
