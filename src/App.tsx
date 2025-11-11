@@ -148,7 +148,7 @@ function App() {
         <DropdownMenu showDropdown={showDropdown} />
       )}
 
-      {flashLeverage && !dropdown ? (
+      {flashLeverage && !dropdown && allLeveragePositions.length ? (
         <main className="px-4 lg:px-16">
           <Routes>
             <Route
@@ -157,6 +157,7 @@ function App() {
                 <Products
                   flashLeverage={flashLeverage}
                   allLeveragePositions={allLeveragePositions}
+                  metrics={metrics}
                 />
               }
             />

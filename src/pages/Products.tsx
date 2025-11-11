@@ -12,15 +12,17 @@ import { calcLeverage, isMatured } from "../utils";
 import BigNumber from "bignumber.js";
 import Sort from "../components/low-level/Sort";
 import SpiralStakeVaults from "../components/low-level/SpiralStakeVaults";
-import { LeveragePosition } from "../types";
+import { LeveragePosition, Metrics } from "../types";
 import SpiralStakeInfo from "../components/low-level/SpiralStakeInfo";
 
 const Products = ({
   flashLeverage,
   allLeveragePositions,
+  metrics
 }: {
   flashLeverage: FlashLeverage;
   allLeveragePositions: LeveragePosition[];
+  metrics:Metrics[]
 }) => {
   const [risk, setRisk] = useState<string>("all");
   const [sortMethod, setSortMethod] = useState<string>("APY");
@@ -52,9 +54,9 @@ const Products = ({
             title="Maximize your stablecoin yields"
             subheading="Our system helps you leverage safely and instantly so you earn more from the same money without extra effort."
           />
-          {/* <SpiralStakeInfo allLeveragePositions={allLeveragePositions} /> */}
+           <SpiralStakeInfo allLeveragePositions={allLeveragePositions} metrics={metrics}/>
         </div>
-        {/* <SpiralStakeVaults /> */}
+        <SpiralStakeVaults /> 
       </div>
       <div className="flex flex-col lg:flex-row w-full gap-[48px]">
         <div className="flex gap-[8px] lg:flex-col lg:gap-[16px] overflow-x-scroll no-scrollbar">

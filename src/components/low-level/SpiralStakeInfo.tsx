@@ -1,13 +1,16 @@
-import { LeveragePosition } from "../../types";
+import { LeveragePosition, Metrics } from "../../types";
 import account from "../../assets/icons/account.svg";
 import barChart from "../../assets/icons/bar-chart.svg";
 import coin from "../../assets/icons/coin-line.svg";
 import { formatNumber } from "../../utils/formatNumber";
+import { calcLeverage } from "../../utils";
 
 const SpiralStakeInfo = ({
   allLeveragePositions,
+  metrics
 }: {
   allLeveragePositions: LeveragePosition[];
+  metrics:Metrics[]
 }) => {
   return (
     <div className="flex items-center justify-between lg:gap-[20px]">
@@ -18,13 +21,25 @@ const SpiralStakeInfo = ({
         </div>
         <div>
           <p className="text-[16px] lg:text-[20px] font-[500]">
-            $
-            {formatNumber(
-              allLeveragePositions.reduce(
-                (total, pos) => total + Number(pos.amountDepositedInUsd),
-                0
-              )
-            )}
+           $
+              {formatNumber(
+                (allLeveragePositions.reduce(
+                  (total, pos) =>
+                    total +
+                    Number(calcLeverage(pos.ltv)) *
+                      Number(pos.amountDepositedInUsd),
+                  0
+                ) /
+                  allLeveragePositions.reduce(
+                    (total, pos) => total + Number(pos.amountDepositedInUsd),
+                    0
+                  )) *
+                  allLeveragePositions.reduce(
+                    (total, current) =>
+                      total + Number(current.amountDepositedInUsd),
+                    0
+                  )
+              )}
           </p>
         </div>
       </div>
@@ -58,7 +73,7 @@ const SpiralStakeInfo = ({
         </div>
         <div>
           <p className="text-[16px] lg:text-[20px] font-[500]">
-            {formatNumber(allLeveragePositions.length, 0)}
+            {metrics && metrics[metrics.length - 1].userCount}
           </p>
         </div>
       </div>
