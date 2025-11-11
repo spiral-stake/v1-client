@@ -52,9 +52,9 @@ const Products = ({
             title="Maximize your stablecoin yields"
             subheading="Our system helps you leverage safely and instantly so you earn more from the same money without extra effort."
           />
-          <SpiralStakeInfo allLeveragePositions={allLeveragePositions} />
+          {/* <SpiralStakeInfo allLeveragePositions={allLeveragePositions} /> */}
         </div>
-        <SpiralStakeVaults />
+        {/* <SpiralStakeVaults /> */}
       </div>
       <div className="flex flex-col lg:flex-row w-full gap-[48px]">
         <div className="flex gap-[8px] lg:flex-col lg:gap-[16px] overflow-x-scroll no-scrollbar">
@@ -113,15 +113,15 @@ const Products = ({
                 sortMethod == "APY"
                   ? Number(b.defaultLeverageApy) - Number(a.defaultLeverageApy)
                   : Number(
-                      BigNumber(b.liquidityAssetsUsd)
-                        .dividedBy(BigNumber(calcLeverage(b.maxLtv)).minus(1))
-                        .minus(1000)
-                    ) -
-                    Number(
-                      BigNumber(a.liquidityAssetsUsd)
-                        .dividedBy(BigNumber(calcLeverage(a.maxLtv)).minus(1))
-                        .minus(1000)
-                    )
+                    BigNumber(b.liquidityAssetsUsd)
+                      .dividedBy(BigNumber(calcLeverage(b.maxLtv)).minus(1))
+                      .minus(10)
+                  ) -
+                  Number(
+                    BigNumber(a.liquidityAssetsUsd)
+                      .dividedBy(BigNumber(calcLeverage(a.maxLtv)).minus(1))
+                      .minus(10)
+                  )
               )
               .map((collateralToken, index) => (
                 <ProductCard key={index} collateralToken={collateralToken} />

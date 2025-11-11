@@ -33,7 +33,7 @@ export const getMarketData = async (chainId: number, collateralToken: Collateral
   let liquidityAssetsUsd = 0;
   liquidityAssetsUsd += data.marketByUniqueKey.state.liquidityAssets;
 
-  // // Public Allocater shared liquidity
+  // Public Allocater shared liquidity
   // data.marketByUniqueKey.publicAllocatorSharedLiquidity.forEach((pa: any) => {
   //   liquidityAssetsUsd += pa.assets;
   // });

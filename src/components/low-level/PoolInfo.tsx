@@ -21,7 +21,7 @@ const PoolInfo = ({
             0,
             new BigNumber(collateralToken?.liquidityAssetsUsd)
               .dividedBy(BigNumber(leverage).minus(1))
-              .minus(1000)
+              .minus(10)
           )
         )}`}
         title="Max Leverage"

@@ -493,11 +493,11 @@ function ClosedOrMaturedView({
       <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
         <p className="text-[14px] text-gray-400">Amount Deposited</p>
         <div className="flex lg:flex-col items-end lg:items-start lg:gap-[8px] text-[14px] lg:text-[16px]">
-          ${displayTokenAmount(pos.amountDepositedInUsd)}
           <div className="text-[14px] text-[#D7D7D7]">
             {displayTokenAmount(pos.amountCollateral)}{" "}
             {pos.collateralToken.symbol}
           </div>
+          ${displayTokenAmount(pos.amountDepositedInUsd)}
         </div>
       </div>
 

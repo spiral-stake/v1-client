@@ -120,7 +120,7 @@ export async function getInternalReswapData(
       tokenOut: collateralToken.loanToken.address,
       amountIn: String(parseUnits(String(amountLeveragedCollateral), collateralToken.decimals)),
       enableAggregator: true,
-      aggregators: "kyberswap, okx, paraswap",
+      aggregators: "kyberswap, okx, paraswap, odos",
     };
 
     const res = await callSDK(

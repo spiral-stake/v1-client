@@ -167,7 +167,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       // Case 3: Amount exceeds max leverage limit
       const maxLeverageAmount = BigNumber.max(
         new BigNumber(0),
-        liquidityUsd.dividedBy(leverageValue.minus(1)).minus(1000)
+        liquidityUsd.dividedBy(leverageValue.minus(1)).minus(10)
       );
 
       if (collateral.isGreaterThan(maxLeverageAmount)) {
@@ -624,7 +624,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   0,
                   BigNumber(collateralToken?.liquidityAssetsUsd)
                     .dividedBy(BigNumber(leverage).minus(1))
-                    .minus(1000)
+                    .minus(10)
                 )}
               />
 
@@ -788,7 +788,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 0,
                 new BigNumber(collateralToken?.liquidityAssetsUsd)
                   .dividedBy(BigNumber(leverage).minus(1))
-                  .minus(1000)
+                  .minus(10)
               )}
             />
             {/* old deposit button */}
