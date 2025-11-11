@@ -34,6 +34,7 @@ import { getSlippage } from "../utils/getSlippage";
 import DepositReviewOverlay from "../components/DepositReviewOverlay";
 import ProductTitle from "../components/low-level/ProductTitle.tsx";
 import PoolInfo from "../components/low-level/PoolInfo.tsx";
+import Warning from "../components/low-level/warining.tsx";
 
 const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   const [showSlippage, setShowSlippage] = useState(false);
@@ -184,7 +185,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           ...prev,
           text: "Leverage",
           disabled: false,
-          warning: "We recommend depositing a minimum amount of $5,000",
+          warning: "You have to deposit more than >$5,000 for better return.",
           error: "",
         }));
       }
@@ -334,21 +335,21 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
       const { positionId, amountDepositedInUsd } = await (isSameToken
         ? flashLeverage.leverage(
-          address,
-          desiredLtv,
-          fromToken as CollateralToken,
-          amountCollateral,
-          internalSwapData
-        )
+            address,
+            desiredLtv,
+            fromToken as CollateralToken,
+            amountCollateral,
+            internalSwapData
+          )
         : flashLeverage.swapAndLeverage(
-          address,
-          desiredLtv,
-          fromToken,
-          amountCollateral,
-          externalSwapData!,
-          collateralToken,
-          internalSwapData
-        ));
+            address,
+            desiredLtv,
+            fromToken,
+            amountCollateral,
+            externalSwapData!,
+            collateralToken,
+            internalSwapData
+          ));
 
       // Single toast success message
       toastSuccess(
@@ -371,7 +372,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           atBorrowApy: collateralToken.borrowApy,
           desiredLtv,
         });
-      } catch (e) { }
+      } catch (e) {}
 
       navigate("/portfolio");
     } catch (e) {
@@ -401,6 +402,10 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             </div>
           </Link>
 
+         <div className="flex flex-col gap-[16px]"> 
+             {/* 15 days warning */}
+          {collateralToken.maturityDaysLeft<=15 && <Warning/>}
+
           {/* title and subtitle */}
           <div className="">
             <ProductTitle
@@ -411,6 +416,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               collateralToken={collateralToken}
             />
           </div>
+         </div>
 
           {/* deposit info mobile */}
           <div className="lg:hidden grid grid-cols-[1fr,auto,1fr] grid-rows-2 gap-[20px] items-center">

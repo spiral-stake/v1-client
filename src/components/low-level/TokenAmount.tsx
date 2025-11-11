@@ -70,17 +70,19 @@ const TokenAmount = ({
           <div className="relative transition-all duration-300" ref={ref}>
             <div
               onClick={() => setIsOpen(!isOpen)}
-              className={`cursor-pointer flex w-full h-[45px] gap-[8px] items-center ${isOpen ? "rounded-b-none border-b-0" : ""
-                } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
+              className={`cursor-pointer flex w-full h-[45px] gap-[8px] items-center ${
+                isOpen ? "rounded-b-none border-b-0" : ""
+              } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
             >
               {/* Need to add Symbol */}
               <div className="flex items-center gap-[6px] w-[100px]">
                 {tokens && (
                   <img
-                    src={`/tokens/${selectedToken.symbol !== "USDC"
-                      ? selectedToken.symbolExtended
-                      : "USDC"
-                      }.svg`}
+                    src={`/tokens/${
+                      selectedToken.symbol !== "USDC"
+                        ? selectedToken.symbolExtended
+                        : "USDC"
+                    }.svg`}
                     alt=""
                     className="w-[20px]"
                   />
@@ -90,7 +92,11 @@ const TokenAmount = ({
                 </p>
               </div>
 
-              {tokens && <div className="flex items-center"><DropdownIcon isOpen={isOpen} /></div>}
+              {tokens && (
+                <div className="flex items-center">
+                  <DropdownIcon isOpen={isOpen} />
+                </div>
+              )}
             </div>
 
             {isOpen && (
@@ -107,7 +113,9 @@ const TokenAmount = ({
                   >
                     {/* Need to add token icon */}
                     <img
-                      src={`/tokens/${index == 1 ? tokens[index].symbolExtended : "USDC"}.svg`}
+                      src={`/tokens/${
+                        index == 1 ? tokens[index].symbolExtended : "USDC"
+                      }.svg`}
                       alt=""
                       className="w-[20px]"
                     />
@@ -129,9 +137,20 @@ const TokenAmount = ({
       </div>
 
       {(error || warning) && (
-        <p className={`text-sm ${error ? "text-red-600" : "text-amber-500"}`}>
-          {error || warning}
-        </p>
+        <div
+          className={`p-[8px] rounded-[12px] text-sm ${
+            error ? "bg-[#ED2A231A]" : "bg-[#F7981D1A]"
+          }`}
+        >
+          {error ? (
+            error
+          ) : (
+            <p>
+              You have to deposit more than 
+              <span className="text-[#F7981DCC]">{" >5000 "}</span>for better returns.
+            </p>
+          )}
+        </div>
       )}
 
       {/* MAX part */}

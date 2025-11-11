@@ -1,4 +1,3 @@
-import Slippage from "../components/new-components/slippage"
 
 export const getNetYieldUsd = (
   amountInUsd: number,
