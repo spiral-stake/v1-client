@@ -335,21 +335,21 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
 
       const { positionId, amountDepositedInUsd } = await (isSameToken
         ? flashLeverage.leverage(
-            address,
-            desiredLtv,
-            fromToken as CollateralToken,
-            amountCollateral,
-            internalSwapData
-          )
+          address,
+          desiredLtv,
+          fromToken as CollateralToken,
+          amountCollateral,
+          internalSwapData
+        )
         : flashLeverage.swapAndLeverage(
-            address,
-            desiredLtv,
-            fromToken,
-            amountCollateral,
-            externalSwapData!,
-            collateralToken,
-            internalSwapData
-          ));
+          address,
+          desiredLtv,
+          fromToken,
+          amountCollateral,
+          externalSwapData!,
+          collateralToken,
+          internalSwapData
+        ));
 
       // Single toast success message
       toastSuccess(
@@ -372,7 +372,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           atBorrowApy: collateralToken.borrowApy,
           desiredLtv,
         });
-      } catch (e) {}
+      } catch (e) { }
 
       navigate("/portfolio");
     } catch (e) {
@@ -402,21 +402,21 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             </div>
           </Link>
 
-         <div className="flex flex-col gap-[16px]"> 
-             {/* 15 days warning */}
-          {collateralToken.maturityDaysLeft<=15 && <Warning/>}
+          <div className="flex flex-col gap-[16px]">
+            {/* 15 days warning */}
+            {collateralToken.maturityDaysLeft <= 15 && <Warning />}
 
-          {/* title and subtitle */}
-          <div className="">
-            <ProductTitle
-              icon={`/tokens/${collateralToken.symbolExtended}.svg`}
-              title={collateralToken.symbol}
-              maturity={collateralToken.maturityDate}
-              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${collateralToken.symbol} for maximized returns on your idle holdings.`}
-              collateralToken={collateralToken}
-            />
+            {/* title and subtitle */}
+            <div className="">
+              <ProductTitle
+                icon={`/tokens/${collateralToken.symbolExtended}.svg`}
+                title={collateralToken.symbol}
+                maturity={collateralToken.maturityDate}
+                subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${collateralToken.symbol} for maximized returns on your idle holdings.`}
+                collateralToken={collateralToken}
+              />
+            </div>
           </div>
-         </div>
 
           {/* deposit info mobile */}
           <div className="lg:hidden grid grid-cols-[1fr,auto,1fr] grid-rows-2 gap-[20px] items-center">
@@ -608,7 +608,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               </div>
 
               <TokenAmount
-                tokens={[flashLeverage.usdc, collateralToken]}
+                tokens={[flashLeverage.usdc, flashLeverage.usdt, collateralToken,]}
                 selectedToken={fromToken}
                 handleTokenChange={handleFromTokenChange}
                 amount={amountCollateral}
@@ -772,7 +772,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             </div>
 
             <TokenAmount
-              tokens={[flashLeverage.usdc, collateralToken]}
+              tokens={[flashLeverage.usdc, flashLeverage.usdt, collateralToken]}
               selectedToken={fromToken}
               handleTokenChange={handleFromTokenChange}
               amount={amountCollateral}

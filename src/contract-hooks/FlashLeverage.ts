@@ -23,6 +23,14 @@ export default class FlashLeverage extends Base {
     valueInUsd: BigNumber(0),
   };
 
+  public usdt: Token = {
+    address: "",
+    name: "",
+    symbol: "",
+    decimals: 0,
+    valueInUsd: BigNumber(0),
+  };
+
   morpho: Morpho;
   flashLeverageCore: FlashLeverageCore;
   STANDARD_DECIMALS = 18;
@@ -39,10 +47,11 @@ export default class FlashLeverage extends Base {
     if (!flashLeverageCore) return;
 
     try {
-      const [{ flashLeverageAddress }, _collateralTokens, _usdc] = await Promise.all([
+      const [{ flashLeverageAddress }, _collateralTokens, _usdc, _usdt] = await Promise.all([
         import(`../addresses/${chainId}.json`),
         readCollateralTokens(chainId),
         readToken(chainId, "USDC"),
+        readToken(chainId, "USDT"),
       ]);
 
       const instance = new FlashLeverage(flashLeverageAddress);
@@ -50,6 +59,7 @@ export default class FlashLeverage extends Base {
       instance.flashLeverageCore = flashLeverageCore;
       instance.chainId = chainId;
       instance.usdc = _usdc;
+      instance.usdt = _usdt;
       instance.collateralTokens = await Promise.all(
         _collateralTokens.map(
           async (collateralToken: CollateralToken): Promise<CollateralToken> => {

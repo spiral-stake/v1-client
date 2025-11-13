@@ -42,7 +42,7 @@ const DepositReviewOverlay = ({
         <div className="flex flex-col gap-[8px]">
           <ReviewinfoTabs
             title="Deposit Amount"
-            info={`${amountCollateral} USDC`}
+            info={`${amountCollateral} ${token.symbol}`}
           />
           <ReviewinfoTabs
             title="Maturity Date"

@@ -50,9 +50,21 @@ export class Base {
       config
     ).estimateFeesPerGas();
 
-    const { request } = await this.simulate(functionName, args, value);
+    let hash;
 
-    const hash = await writeContract(config, { ...request, maxFeePerGas, maxPriorityFeePerGas });
+    try {
+      const { request } = await this.simulate(functionName, args, value);
+      hash = await writeContract(config, { ...request, maxFeePerGas, maxPriorityFeePerGas });
+    } catch {
+      hash = await writeContract(config, {
+        abi: this.abi,
+        address: this.address,
+        functionName,
+        args,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
+      });
+    }
 
     return waitForTransactionReceipt(config, { hash, confirmations: 1 });
   }

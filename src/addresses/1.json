@@ -6,6 +6,13 @@
     "symbol": "USDC",
     "valueInUsd": 1
   },
+  "USDT": {
+    "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "decimals": 6,
+    "name": "USD Tether",
+    "symbol": "USDT",
+    "valueInUsd": 1
+  },
   "collateralTokens": {
     "0x21aacE56a8F21210b7E76d8eF1a77253Db85BF0a": {
       "YT": "0x3787c19c32e727310708C0693AEC00Fb37a01E7b",

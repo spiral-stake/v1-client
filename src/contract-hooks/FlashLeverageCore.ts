@@ -14,6 +14,14 @@ export default class FlashLeverageCore extends Base {
     valueInUsd: BigNumber(0),
   };
 
+  public usdt: Token = {
+    address: "",
+    name: "",
+    symbol: "",
+    decimals: 0,
+    valueInUsd: BigNumber(0),
+  };
+
   STANDARD_DECIMALS = 18;
   PERCENT_DECIMALS = 16;
 
@@ -23,14 +31,15 @@ export default class FlashLeverageCore extends Base {
 
   static async createInstance(chainId: number) {
     try {
-      const [{ flashLeverageCoreAddress }, _usdc] = await Promise.all([
+      const [{ flashLeverageCoreAddress }, _usdc, _usdt] = await Promise.all([
         import(`../addresses/${chainId}.json`),
         readToken(chainId, "USDC"),
+        readToken(chainId, "USDT"),
       ]);
 
       const instance = new FlashLeverageCore(flashLeverageCoreAddress);
       instance.usdc = _usdc;
-
+      instance.usdt = _usdt;
       return instance;
     } catch (e) {
       console.log(e);

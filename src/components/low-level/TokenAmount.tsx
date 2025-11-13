@@ -6,7 +6,7 @@ import DropdownIcon from "./DropDownIcon.tsx";
 import Input from "./Input.tsx";
 import wallet from "../../assets/icons/wallet.svg";
 import truncateStr from "../../utils/truncateStr.ts";
-import { formatNumber } from "../../utils/formatNumber.ts";
+
 
 const TokenAmount = ({
   maxLeverageAmount,
@@ -70,19 +70,17 @@ const TokenAmount = ({
           <div className="relative transition-all duration-300" ref={ref}>
             <div
               onClick={() => setIsOpen(!isOpen)}
-              className={`cursor-pointer flex w-full h-[45px] gap-[8px] items-center ${
-                isOpen ? "rounded-b-none border-b-0" : ""
-              } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
+              className={`cursor-pointer flex w-full h-[45px] gap-[8px] items-center ${isOpen ? "rounded-b-none border-b-0" : ""
+                } rounded-[12px] p-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
             >
               {/* Need to add Symbol */}
               <div className="flex items-center gap-[6px] w-[100px]">
                 {tokens && (
                   <img
-                    src={`/tokens/${
-                      selectedToken.symbol !== "USDC"
-                        ? selectedToken.symbolExtended
-                        : "USDC"
-                    }.svg`}
+                    src={`/tokens/${selectedToken.symbol.startsWith("PT")
+                      ? selectedToken.symbolExtended
+                      : selectedToken.symbol
+                      }.svg`}
                     alt=""
                     className="w-[20px]"
                   />
@@ -113,9 +111,8 @@ const TokenAmount = ({
                   >
                     {/* Need to add token icon */}
                     <img
-                      src={`/tokens/${
-                        index == 1 ? tokens[index].symbolExtended : "USDC"
-                      }.svg`}
+                      src={`/tokens/${tokens[index].symbolExtended || tokens[index].symbol
+                        }.svg`}
                       alt=""
                       className="w-[20px]"
                     />
@@ -138,15 +135,14 @@ const TokenAmount = ({
 
       {(error || warning) && (
         <div
-          className={`p-[8px] rounded-[12px] text-sm ${
-            error ? "bg-[#ED2A231A]" : "bg-[#F7981D1A]"
-          }`}
+          className={`p-[8px] rounded-[12px] text-sm ${error ? "bg-[#ED2A231A]" : "bg-[#F7981D1A]"
+            }`}
         >
           {error ? (
             error
           ) : (
             <p>
-              You have to deposit more than 
+              You have to deposit more than
               <span className="text-[#F7981DCC]">{" >5000 "}</span>for better returns.
             </p>
           )}
