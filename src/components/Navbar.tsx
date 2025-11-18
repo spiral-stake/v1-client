@@ -4,12 +4,17 @@ import { chainConfig } from "../config/chainConfig";
 import logo from "../assets/logo.svg";
 import menuIcon from "../assets/icons/menu.svg";
 import ConnectWalletBtn from "./ConnectWalletBtn";
+import { useState } from "react";
+import arrow from "../assets/icons/arrowDown.svg";
+import polygon from "../assets/icons/polygon.svg";
 
 const Navbar = ({
   showDropdown,
 }: {
   showDropdown: (bool: boolean) => void;
 }) => {
+  const [showChains, setShowChains] = useState(Boolean);
+
   const appChainId = useChainId();
   const location = useLocation();
 
@@ -72,21 +77,50 @@ const Navbar = ({
 
           {/* chain and login */}
           <div className="flex justify-start items-center gap-3">
-            <div className="rounded-full flex justify-center items-center gap-2 overflow-hidden">
-              <div className="cursor-pointer flex justify-start items-center gap-[4px]">
-                <div className=" relative overflow-hidden">
-                  <div className="w-[21px] h-[21px]">
-                    <img
-                      className=""
-                      src={chainConfig[appChainId].logo}
-                      alt=""
-                    />
-                  </div>
+            <div className="relative transition-all duration-300">
+              <div
+                onClick={() => setShowChains(!showChains)}
+                className={`cursor-pointer flex w-full gap-[4px] h-[40px] items-center ${
+                  showChains ? "rounded-b-none border-b-0" : ""
+                } rounded-[20px] px-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
+              >
+                {/* Need to add Symbol */}
+                <div className="flex items-center gap-[6px] w-fit">
+                  <img
+                    className="w-[21px] h-[21px]"
+                    src={chainConfig[appChainId].logo}
+                    alt=""
+                  />
+
+                  <span className="hidden md:inline-flex text-[14px] font-[400]">
+                    Mainnet
+                  </span>
                 </div>
-                <span className="hidden md:inline-flex text-[14px] font-[400]">
-                  Mainnet
-                </span>
+
+                <div className="flex items-center">
+                  <img
+                    src={arrow}
+                    alt=""
+                    className={`w-[16px] transition-transform duration-300 ${
+                      showChains ? "rotate-180" : ""
+                    }`}
+                  />
+                </div>
               </div>
+
+              {showChains && (
+                <div className="absolute top-full left-0 right-0 bg-white bg-opacity-[6%] backdrop-blur-sm border-[1px] border-white border-opacity-[10%] border-t-0 rounded-t-none rounded-[20px] z-50">
+                  <Link
+                    target="blank"
+                    to={"https://polygon.spiralstake.xyz/"}
+                    className="w-full text-left px-3 py-2 text-sm text-gray-300 flex items-center gap-2"
+                  >
+                    {/* Need to add token icon */}
+                    <img className="w-[21px] h-[21px]" src={polygon} alt="" />
+                    Polygon
+                  </Link>
+                </div>
+              )}
             </div>
             <div>
               <ConnectWalletBtn />
