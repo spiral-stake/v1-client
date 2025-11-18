@@ -135,7 +135,7 @@ const TokenAmount = ({
 
       {(error || warning) && (
         <div
-          className={`p-[8px] rounded-[12px] text-sm ${error ? "bg-[#ED2A231A]" : "bg-[#F7981D1A]"
+          className={`p-[8px] rounded-[12px] text-sm ${error ? "bg-[#ED2A231A] text-red-600" : "bg-[#F7981D1A] text-orange-600"
             }`}
         >
           {error ? (

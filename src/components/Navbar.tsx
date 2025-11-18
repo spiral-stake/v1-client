@@ -7,6 +7,7 @@ import ConnectWalletBtn from "./ConnectWalletBtn";
 import { useState } from "react";
 import arrow from "../assets/icons/arrowDown.svg";
 import polygon from "../assets/icons/polygon.svg";
+import direct from "../assets/icons/externalLink.svg"
 
 const Navbar = ({
   showDropdown,
@@ -82,7 +83,7 @@ const Navbar = ({
                 onClick={() => setShowChains(!showChains)}
                 className={`cursor-pointer flex w-full gap-[4px] h-[40px] items-center ${
                   showChains ? "rounded-b-none border-b-0" : ""
-                } rounded-[20px] px-[11px] border-[1px] border-[white] border-opacity-[10%] text-white`}
+                } rounded-[20px] px-[10px] border-[1px] border-[white] border-opacity-[10%] text-white`}
               >
                 {/* Need to add Symbol */}
                 <div className="flex items-center gap-[6px] w-fit">
@@ -113,11 +114,16 @@ const Navbar = ({
                   <Link
                     target="blank"
                     to={"https://polygon.spiralstake.xyz/"}
-                    className="w-full text-left px-3 py-2 text-sm text-gray-300 flex items-center gap-2"
+                    className="w-full text-left px-[10px] h-[40px] text-sm text-gray-300 flex items-center gap-[4px]"
                   >
                     {/* Need to add token icon */}
-                    <img className="w-[21px] h-[21px]" src={polygon} alt="" />
+                    <div className="flex items-center gap-[6px]">
+                      <img className="w-[21px] h-[21px]" src={polygon} alt="" />
                     Polygon
+                    </div>
+                    <div className="flex items-center">
+                    <img src={direct} alt="" className="w-[16px] h-[16px]"/>
+                    </div>
                   </Link>
                 </div>
               )}
