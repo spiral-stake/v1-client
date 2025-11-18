@@ -7,7 +7,7 @@ import ConnectWalletBtn from "./ConnectWalletBtn";
 import { useState } from "react";
 import arrow from "../assets/icons/arrowDown.svg";
 import polygon from "../assets/icons/polygon.svg";
-import direct from "../assets/icons/externalLink.svg"
+import direct from "../assets/icons/externalLink.svg";
 
 const Navbar = ({
   showDropdown,
@@ -80,7 +80,7 @@ const Navbar = ({
           <div className="flex justify-start items-center gap-3">
             <div className="relative transition-all duration-300">
               <div
-                onClick={() => setShowChains(!showChains)}
+                // onClick={() => setShowChains(!showChains)}
                 className={`cursor-pointer flex w-full gap-[4px] h-[40px] items-center ${
                   showChains ? "rounded-b-none border-b-0" : ""
                 } rounded-[20px] px-[10px] border-[1px] border-[white] border-opacity-[10%] text-white`}
@@ -98,7 +98,7 @@ const Navbar = ({
                   </span>
                 </div>
 
-                <div className="flex items-center">
+                {/* <div className="flex items-center">
                   <img
                     src={arrow}
                     alt=""
@@ -106,27 +106,26 @@ const Navbar = ({
                       showChains ? "rotate-180" : ""
                     }`}
                   />
-                </div>
+                </div> */}
               </div>
 
-              {showChains && (
+              {/* {showChains && (
                 <div className="absolute top-full left-0 right-0 bg-white bg-opacity-[6%] backdrop-blur-sm border-[1px] border-white border-opacity-[10%] border-t-0 rounded-t-none rounded-[20px] z-50">
                   <Link
                     target="blank"
                     to={"https://polygon.spiralstake.xyz/"}
                     className="w-full text-left px-[10px] h-[40px] text-sm text-gray-300 flex items-center gap-[4px]"
                   >
-                    {/* Need to add token icon */}
                     <div className="flex items-center gap-[6px]">
                       <img className="w-[21px] h-[21px]" src={polygon} alt="" />
-                    Polygon
+                      Polygon
                     </div>
                     <div className="flex items-center">
-                    <img src={direct} alt="" className="w-[16px] h-[16px]"/>
+                      <img src={direct} alt="" className="w-[16px] h-[16px]" />
                     </div>
                   </Link>
                 </div>
-              )}
+              )} */}
             </div>
             <div>
               <ConnectWalletBtn />
