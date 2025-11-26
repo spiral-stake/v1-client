@@ -5,8 +5,6 @@ import { LeveragePosition } from "../types";
 import { useAccount, useChainId } from "wagmi";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import LeveragePositionCard from "../components/LeveragePositionCard.tsx";
-import axios from "axios";
-import { updatePositionsData } from "../utils/updatePositionsData.ts";
 import arrow from "../assets/icons/arrowDown.svg";
 
 const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
@@ -37,18 +35,10 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
           : "http://localhost:5000";
 
       if (flashLeverage) {
-        let [_leveragePositions, allLeveragePositions] = await Promise.all([
-          flashLeverage.getUserLeveragePositions(address),
-          axios
-            .get<any[]>(`${baseUrl}/leveragePositions`)
-            .then((res) => res.data),
+        let [_leveragePositions] = await Promise.all([
+          flashLeverage.getUserLeveragePositions(address)
         ]);
 
-        _leveragePositions = updatePositionsData(
-          allLeveragePositions,
-          address,
-          _leveragePositions
-        );
         setLeveragePositions(_leveragePositions);
       }
     }

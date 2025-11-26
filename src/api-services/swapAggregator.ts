@@ -43,7 +43,7 @@ export async function getExternalSwapData(
     tokenOut: collateralToken.address,
     amountIn: parseUnits(amount, fromToken.decimals),
     enableAggregator: true,
-    aggregators: "kyberswap, okx, paraswap",
+    aggregators: "kyberswap",
   };
 
   const res = await callSDK<InternalSwapData>(
@@ -85,7 +85,7 @@ export async function getInternalSwapData(
     tokenOut: collateralToken.address,
     amountIn: amountLoan,
     enableAggregator: true,
-    aggregators: "kyberswap, okx, paraswap",
+    aggregators: "kyberswap",
   };
 
   const res = await callSDK(
@@ -120,7 +120,7 @@ export async function getInternalReswapData(
       tokenOut: collateralToken.loanToken.address,
       amountIn: String(parseUnits(String(amountLeveragedCollateral), collateralToken.decimals)),
       enableAggregator: true,
-      aggregators: "kyberswap, okx, paraswap, odos",
+      aggregators: "kyberswap, odos",
     };
 
     const res = await callSDK(
@@ -143,7 +143,7 @@ export async function getInternalReswapData(
       tokenOut: collateralToken.loanToken.address,
       amountIn: String(parseUnits(String(amountLeveragedCollateral), collateralToken.decimals)),
       enableAggregator: true,
-      aggregators: "kyberswap, okx, paraswap",
+      aggregators: "kyberswap",
     };
 
     const res = await callSDK(`/v2/sdk/${chainId}/redeem`, params);
