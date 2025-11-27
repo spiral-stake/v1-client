@@ -2,7 +2,7 @@
   "0x21aacE56a8F21210b7E76d8eF1a77253Db85BF0a": {
     "underlyingCollateral": "ETH/BTC",
     "yieldSource": "fxUSD Stability Pool",
-    "riskProfile": "high"
+    "riskProfile": "medium"
   },
   "0x23e0D07095DAec91B6Ae016cA9F08222dCc64c49": {
     "underlyingCollateral": "ETH",
@@ -17,12 +17,12 @@
   "0x545A490f9ab534AdF409A2E682bc4098f49952e3": {
     "underlyingCollateral": "USD",
     "yieldSource": "Cap Operators",
-    "riskProfile": "high"
+    "riskProfile": "low"
   },
   "0x62C6E813b9589C3631Ba0Cdb013acdB8544038B7": {
     "underlyingCollateral": "ETH",
     "yieldSource": "ETH Funding Rates",
-    "riskProfile": "low"
+    "riskProfile": "medium"
   },
   "0xB10DA2F9147f9cf2B8826877Cd0c95c18A0f42dc": {
     "underlyingCollateral": "T-Bills",
@@ -32,7 +32,7 @@
   "0xC3c7E5E277d31CD24a3Ac4cC9af3B6770F30eA33": {
     "underlyingCollateral": "USD",
     "yieldSource": "Cap Operators",
-    "riskProfile": "high"
+    "riskProfile": "low"
   },
   "0xDBf6feC5A012A13c456Bac3B67C3B9CF2830A122": {
     "underlyingCollateral": "T-Bills",
@@ -52,7 +52,7 @@
   "0xe6A934089BBEe34F832060CE98848359883749B3": {
     "underlyingCollateral": "ETH",
     "yieldSource": "ETH Funding Rates",
-    "riskProfile": "low"
+    "riskProfile": "medium"
   },
   "0xb44cdBEF3145C1c1E772e8228E1154c80e70618e": {
     "underlyingCollateral": "USDC",
@@ -67,6 +67,16 @@
   "0x1Fb3C5c35D95F48e48FFC8e36bCCe5CB5f29F57c": {
     "underlyingCollateral": "USDe",
     "yieldSource": "Staking Pooled USDe",
-    "riskProfile": "low"
+    "riskProfile": "medium"
+  },
+  "0x5AA4AfE7359d5a68D193f03E013d553DEb7DbD1f": {
+    "underlyingCollateral": "RWAs & Digital Assets",
+    "yieldSource": "Reservoir Balance Sheet",
+    "riskProfile": "medium"
+  },
+  "0xfCeEB7586bab730fA400A5BF3FcF298d0DB4c7e7": {
+    "underlyingCollateral": "ETH",
+    "yieldSource": "Staking & Funding Rates",
+    "riskProfile": "medium"
   }
 }

@@ -18,7 +18,6 @@ const CloseReviewOverlay = ({
   pos: LeveragePosition;
   amountReturnedSimulated: BigNumber;
 }) => {
-  console.log(pos.amountDepositedInUsd.toString(), amountReturnedSimulated.toString());
 
   return (
     <div className="flex flex-col p-[24px] lg:backdrop-blur-2xl lg:bg-white lg:bg-opacity-[8%] rounded-[16px] rounded-b-none lg:rounded-b-[16px] gap-[20px] w-full lg:w-[500px] border-[1px] border-b-0 lg:border-b-[1px] border-white border-opacity-[4%]">
@@ -76,7 +75,7 @@ const CloseReviewOverlay = ({
             extraInfo={`(${pos.collateralToken.maturityDaysLeft} Days left)`}
           />
 
-          <ReviewinfoTabs
+          {amountReturnedSimulated.isGreaterThan(0) && <ReviewinfoTabs
             title="Amount Returned"
             info={`${displayTokenAmount(
               BigNumber.max(
@@ -85,9 +84,9 @@ const CloseReviewOverlay = ({
               )
             )} ${pos.collateralToken.loanToken.symbol}`}
             extraInfo={`$${displayTokenAmount(amountReturnedSimulated)}`}
-          />
+          />}
 
-          <ReviewinfoTabs
+          {amountReturnedSimulated.minus(pos.amountDepositedInUsd).isGreaterThan(0) && <ReviewinfoTabs
             title="Effective Yield"
             hoverInfo="After 0.1% Slippage & 10% Performance Fee on Yield Generated"
             info={`${displayTokenAmount(
@@ -102,8 +101,7 @@ const CloseReviewOverlay = ({
                 amountReturnedSimulated.minus(pos.amountDepositedInUsd)
               )
             )}`}
-          />
-
+          />}
         </div>
       </div>
     </div>

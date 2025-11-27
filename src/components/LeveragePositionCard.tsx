@@ -53,6 +53,9 @@ const LeveragePositionCard = ({
         pos.amountLeveragedCollateral
       );
 
+
+      setInternalReswapData(_internalReswapData);
+
       const simulation = await flashLeverage.simulate("unleverage", [
         address,
         pos.id,
@@ -69,14 +72,13 @@ const LeveragePositionCard = ({
         pos.collateralToken.loanToken.decimals
       );
 
-      setInternalReswapData(_internalReswapData);
       setAmountReturnedSimulated(normalized);
       setShowCloseReview(true);
 
       setLoading(false);
     } catch (err: any) {
-      console.log(err)
-      toastError("Simulation Error", err.shortMessage);
+      setShowCloseReview(true);
+      console.log(err);
       setLoading(false);
     }
   };
