@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { Token } from "../types";
 
-export const displayTokenAmount = (amount: BigNumber, token?: Token, decimalPlaces = 2): string => {
+export const displayTokenAmount = (amount: BigNumber, token?: Token, decimalPlaces = 3): string => {
   // Handle NaN
   if (amount.isNaN()) {
     return `0${token?.symbol ? ` ${token.symbol}` : ""}`;

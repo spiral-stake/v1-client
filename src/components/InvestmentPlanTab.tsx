@@ -4,13 +4,13 @@ import arrowRight from "../assets/icons/arrowRight.svg";
 import { Link } from "react-router-dom";
 
 const InvestmentPlanTab = ({
-  amountInUsd,
+  amountCollateral,
   selected,
   collateralToken,
   desiredLtv,
   leverageApy,
 }: {
-  amountInUsd: number;
+  amountCollateral: number;
   selected?: boolean;
   collateralToken: CollateralToken;
   desiredLtv: string;
@@ -24,7 +24,7 @@ const InvestmentPlanTab = ({
       >
         <div className="flex items-center justify-center p-[8px] lg:p-[12px]">
           <img
-            src={`/tokens/${collateralToken.symbolExtended}.svg`}
+            src={`/tokens/${collateralToken.symbolExtended || collateralToken.symbol}.svg`}
             alt=""
             className="w-[16px] lg:w-[24px]"
           />
@@ -36,8 +36,8 @@ const InvestmentPlanTab = ({
         <div className="flex items-end gap-[8px] text-[12px] lg:text-[16px] text-[#68EA6A]">
           <p>
             +$
-            {amountInUsd > 0
-              ? `${((Number(leverageApy) / 100) * amountInUsd).toFixed(2)}`
+            {amountCollateral > 0
+              ? `${((Number(leverageApy) / 100) * amountCollateral).toFixed(2)}`
               : `${((Number(leverageApy) / 100) * 10000).toFixed(2)}`}
           </p>
           <p className="hidden lg:block"><BtnGreen text="Annually" /></p>

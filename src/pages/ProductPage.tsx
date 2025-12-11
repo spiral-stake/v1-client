@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import BigNumber from "bignumber.js";
-import { CollateralToken, InternalSwapData, Token } from "../types";
+import { CollateralToken, ExternalSwapData, LeverageSwapData, Token } from "../types";
 import { useAccount, useChainId } from "wagmi";
 import { calcLeverageApy, calcLeverage } from "../utils";
 import ActionBtn from "../components/ActionBtn";
@@ -17,9 +17,8 @@ import {
 import setting from "../assets/icons/setting.svg";
 import {
   getExternalSwapData,
-  getInternalSwapData,
+  getLeverageSwapData,
 } from "../api-services/swapAggregator";
-import axios from "axios";
 import arrowBack from "../assets/icons/arrowBack.svg";
 import pencil from "../assets/icons/pencil.svg";
 import TokenAmount from "../components/low-level/TokenAmount";
@@ -64,8 +63,8 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     error: "",
     warning: "",
   });
-  const [externalSwapData, setExternalSwapData] = useState<InternalSwapData>(); // Only used by leverageWrapper
-  const [internalSwapData, setSwapData] = useState<InternalSwapData>();
+  const [externalSwapData, setExternalSwapData] = useState<ExternalSwapData>();
+  const [leverageSwapData, setSwapData] = useState<LeverageSwapData>();
 
   const { address: collateralTokenAddress } = useParams();
   const [searchParams] = useSearchParams();
@@ -85,7 +84,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       ) as CollateralToken;
 
       setCollateralToken({ ...collateralToken });
-      setFromToken({ ...flashLeverage.usdc });
+      setFromToken({ ...collateralToken });
 
       setDesiredLtv(
         Number(initialLeverage) > 0
@@ -103,7 +102,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
     setLeverage(calcLeverage(desiredLtv));
     setLeverageApy(
       calcLeverageApy(
-        collateralToken.impliedApy,
+        collateralToken.apy,
         collateralToken.borrowApy,
         desiredLtv
       )
@@ -141,7 +140,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       const userBalance = new BigNumber(userFromTokenBalance || 0);
       const leverageValue = new BigNumber(leverage || 1);
       const liquidityUsd = new BigNumber(
-        collateralToken.liquidityAssetsUsd || 0
+        collateralToken.liquidityAssets || 0
       );
 
       // Case 1: Empty or zero input
@@ -210,7 +209,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       if (showSummary) {
         if (collateralToken.address === fromToken.address) {
           setSwapData(
-            await getInternalSwapData(
+            await getLeverageSwapData(
               appChainId,
               flashLeverage,
               collateralToken,
@@ -228,7 +227,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             collateralToken
           );
           setSwapData(
-            await getInternalSwapData(
+            await getLeverageSwapData(
               appChainId,
               flashLeverage,
               collateralToken,
@@ -323,7 +322,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       !fromToken ||
       !address ||
       !collateralToken ||
-      !internalSwapData
+      !leverageSwapData
     )
       return;
 
@@ -333,46 +332,29 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       // Early return if external swap data is needed but missing
       if (!isSameToken && !externalSwapData) return;
 
-      const { positionId, amountDepositedInUsd } = await (isSameToken
+      await (isSameToken
         ? flashLeverage.leverage(
-            address,
-            desiredLtv,
-            fromToken as CollateralToken,
-            amountCollateral,
-            internalSwapData
-          )
+          address,
+          desiredLtv,
+          fromToken as CollateralToken,
+          amountCollateral,
+          leverageSwapData
+        )
         : flashLeverage.swapAndLeverage(
-            address,
-            desiredLtv,
-            fromToken,
-            amountCollateral,
-            externalSwapData!,
-            collateralToken,
-            internalSwapData
-          ));
+          address,
+          desiredLtv,
+          fromToken,
+          amountCollateral,
+          externalSwapData!,
+          collateralToken,
+          leverageSwapData
+        ));
 
       // Single toast success message
       toastSuccess(
         `Deposited successfully!`,
         `You've leveraged ${amountCollateral} ${fromToken.symbol}. Please collect ${collateralToken.symbol} returned from slippage`
       );
-
-      // Single API call with dynamic base URL
-      const baseUrl =
-        chainId !== 31337
-          ? "https://api.spiralstake.xyz"
-          : "http://localhost:5000";
-
-      try {
-        await axios.post(`${baseUrl}/leverage/open`, {
-          user: address.toLowerCase(),
-          positionId,
-          amountDepositedInUsd,
-          atImpliedApy: collateralToken.impliedApy,
-          atBorrowApy: collateralToken.borrowApy,
-          desiredLtv,
-        });
-      } catch (e) {}
 
       navigate("/portfolio");
     } catch (e) {
@@ -387,7 +369,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       .integerValue(BigNumber.ROUND_FLOOR) // BigNumber floor
       .div(100); // back to original scale
 
-    setAmountCollateral(BigNumber.min(truncated, maxLeverageAmount).toFixed(2));
+    setAmountCollateral(BigNumber.min(truncated, maxLeverageAmount).toFixed(4));
   };
 
   return (
@@ -402,21 +384,21 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             </div>
           </Link>
 
-         <div className="flex flex-col gap-[16px]"> 
-             {/* 15 days warning */}
-          {collateralToken.maturityDaysLeft<=15 && <Warning/>}
+          <div className="flex flex-col gap-[16px]">
+            {/* 15 days warning */}
+            {collateralToken.maturityDaysLeft <= 15 && <Warning />}
 
-          {/* title and subtitle */}
-          <div className="">
-            <ProductTitle
-              icon={`/tokens/${collateralToken.symbolExtended}.svg`}
-              title={collateralToken.symbol}
-              maturity={collateralToken.maturityDate}
-              subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${collateralToken.symbol} for maximized returns on your idle holdings.`}
-              collateralToken={collateralToken}
-            />
+            {/* title and subtitle */}
+            <div className="">
+              <ProductTitle
+                icon={`/tokens/${collateralToken.symbolExtended || collateralToken.symbol}.svg`}
+                title={collateralToken.symbol}
+                maturity={collateralToken.maturityDate}
+                subheading={`Deposit your stablecoins and automatically create a leveraged looping position with ${collateralToken.symbol} for maximized returns on your idle holdings.`}
+                collateralToken={collateralToken}
+              />
+            </div>
           </div>
-         </div>
 
           {/* deposit info mobile */}
           <div className="lg:hidden grid grid-cols-[1fr,auto,1fr] grid-rows-2 gap-[20px] items-center">
@@ -429,7 +411,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   <HoverInfo
                     content={
                       <LeverageBreakdown
-                        collateralTokenApy={collateralToken.impliedApy}
+                        collateralTokenApy={collateralToken.apy}
                         borrowApy={collateralToken.borrowApy}
                         leverage={leverage}
                       />
@@ -505,7 +487,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 <HoverInfo
                   content={
                     <LeverageBreakdown
-                      collateralTokenApy={collateralToken.impliedApy}
+                      collateralTokenApy={collateralToken.apy}
                       borrowApy={collateralToken.borrowApy}
                       leverage={leverage}
                     />
@@ -608,7 +590,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               </div>
 
               <TokenAmount
-                tokens={[flashLeverage.usdc, collateralToken]}
+                tokens={[collateralToken, collateralToken.loanToken]}
                 selectedToken={fromToken}
                 handleTokenChange={handleFromTokenChange}
                 amount={amountCollateral}
@@ -622,7 +604,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                 setAmountToMax={setAmountToMax}
                 maxLeverageAmount={BigNumber.max(
                   0,
-                  BigNumber(collateralToken?.liquidityAssetsUsd)
+                  BigNumber(collateralToken?.liquidityAssets)
                     .dividedBy(BigNumber(leverage).minus(1))
                     .minus(10)
                 )}
@@ -640,22 +622,21 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               <div className="flex flex-col w-full gap-[8px] text-[14px] lg:text-[16px] font-[400] text-[#8E8E8E]">
                 <div className="flex justify-between items-center">
                   <p>Current price</p>
-                  <p>${Number(collateralToken.valueInUsd).toFixed(4)}</p>
+                  <p>{Number(collateralToken.valueInLoanToken).toFixed(4)} {collateralToken.loanToken.symbol}</p>
                 </div>
                 <div className="flex justify-between items-center">
                   <p>Your Liquidation Price</p>
                   <p>
-                    $
                     {(
                       (Number(desiredLtv) / Number(collateralToken.liqLtv)) *
-                      Number(collateralToken.valueInUsd)
-                    ).toFixed(4)}
+                      Number(collateralToken.valueInLoanToken)
+                    ).toFixed(4)} {collateralToken.loanToken.symbol}
                   </p>
                 </div>
                 {/* <div className="flex justify-between items-center">
                   <p>Available Borrow</p>
                   <p>
-                    ${`${formatNumber(collateralToken.liquidityAssetsUsd)}`}
+                    ${`${formatNumber(collateralToken.liquidityAssets)}`}
                   </p>
                 </div> */}
                 {/* <div className="flex justify-between items-center">
@@ -693,14 +674,14 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                         {userFromTokenAllowance.gte(amountCollateral) && (
                           <Action
                             text={
-                              internalSwapData
+                              leverageSwapData
                                 ? "Deposit"
                                 : "Fetching Routes..."
                             }
                             token={fromToken}
                             amountToken={amountCollateral}
                             actionHandler={handleLeverage}
-                            disabled={!internalSwapData}
+                            disabled={!leverageSwapData}
                           />
                         )}
                       </div>
@@ -717,7 +698,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               collateralToken={collateralToken}
               leverage={leverage}
               leverageApy={leverageApy}
-              amountInUsd={Number(
+              amountCollateral={Number(
                 BigNumber(amountCollateral).multipliedBy(fromToken.valueInUsd)
               )}
               desiredLtv={desiredLtv}
@@ -772,7 +753,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             </div>
 
             <TokenAmount
-              tokens={[flashLeverage.usdc, collateralToken]}
+              tokens={[collateralToken, collateralToken.loanToken]}
               selectedToken={fromToken}
               handleTokenChange={handleFromTokenChange}
               amount={amountCollateral}
@@ -786,7 +767,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               setAmountToMax={setAmountToMax}
               maxLeverageAmount={BigNumber.max(
                 0,
-                new BigNumber(collateralToken?.liquidityAssetsUsd)
+                new BigNumber(collateralToken?.liquidityAssets)
                   .dividedBy(BigNumber(leverage).minus(1))
                   .minus(10)
               )}
@@ -803,21 +784,20 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
             <div className="flex flex-col w-full gap-[8px] text-[15px] text-[#8E8E8E]">
               <div className="flex justify-between items-center">
                 <p>Current price</p>
-                <p>${Number(collateralToken.valueInUsd).toFixed(4)}</p>
+                <p>{Number(collateralToken.valueInLoanToken).toFixed(4)} {collateralToken.loanToken.symbol}</p>
               </div>
               <div className="flex justify-between items-center">
                 <p>Your Liquidation Price</p>
                 <p>
-                  $
                   {(
                     (Number(desiredLtv) / Number(collateralToken.liqLtv)) *
-                    Number(collateralToken.valueInUsd)
-                  ).toFixed(4)}
+                    Number(collateralToken.valueInLoanToken)
+                  ).toFixed(4)} {collateralToken.loanToken.symbol}
                 </p>
               </div>
               {/* <div className="flex justify-between items-center">
                 <p>Available Borrow</p>
-                <p>${`${formatNumber(collateralToken.liquidityAssetsUsd)}`}</p>
+                <p>${`${formatNumber(collateralToken.liquidityAssets)}`}</p>
               </div> */}
               {/* <div className="flex justify-between items-center">
                 <p>Borrow Market</p>
@@ -854,12 +834,12 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                       {userFromTokenAllowance.gte(amountCollateral) && (
                         <Action
                           text={
-                            internalSwapData ? "Deposit" : "Fetching Routes..."
+                            leverageSwapData ? "Deposit" : "Fetching Routes..."
                           }
                           token={fromToken}
                           amountToken={amountCollateral}
                           actionHandler={handleLeverage}
-                          disabled={!internalSwapData}
+                          disabled={!leverageSwapData}
                         />
                       )}
                     </div>

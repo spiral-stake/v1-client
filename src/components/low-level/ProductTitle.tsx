@@ -21,7 +21,7 @@ const ProductTitle = ({
         <div className="flex items-baseline gap-[12px]">
           <div className="flex items-baseline gap-[4px]">
             <p>{title}</p>
-            <p className="text-[15px] lg:text-[20px] h-fit font-normal">( {maturity} )</p>
+            {collateralToken.isPt && <p className="text-[15px] lg:text-[20px] h-fit font-normal">( {maturity} )</p>}
 
           </div>
           <MorphoLink link={`https://app.morpho.org/ethereum/market/${collateralToken.morphoMarketId}`} />

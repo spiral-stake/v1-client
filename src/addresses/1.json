@@ -6,6 +6,13 @@
     "symbol": "USDC",
     "valueInUsd": 1
   },
+  "USDT": {
+    "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "decimals": 6,
+    "name": "USD Tether",
+    "symbol": "USDT",
+    "valueInUsd": 1
+  },
   "collateralTokens": {
     "0x21aacE56a8F21210b7E76d8eF1a77253Db85BF0a": {
       "YT": "0x3787c19c32e727310708C0693AEC00Fb37a01E7b",
@@ -214,6 +221,38 @@
       "name": "PT Strata Senior USDe 15JAN2026",
       "pendleMarket": "0xa83174F1dD8475378abCa9d676DaD3cE97409E0a",
       "symbol": "PT-srUSDe-15JAN2026"
+    },
+    "0xfCeEB7586bab730fA400A5BF3FcF298d0DB4c7e7": {
+      "YT": "0x112B56037552d9A5142493F44480BA98C2586805",
+      "address": "0xfCeEB7586bab730fA400A5BF3FcF298d0DB4c7e7",
+      "decimals": 18,
+      "loanToken": {
+        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "decimals": 6,
+        "name": "USD Coin",
+        "symbol": "USDC"
+      },
+      "maturityTimestamp": 1769644800,
+      "morphoMarketId": "0xaaef8ad6dff96217212b72dbe0d45b3f3af0c255e9b1596c018caf635869db97",
+      "name": "PT Wrapped stUSR 29JAN2026",
+      "pendleMarket": "0x39C3F8e0E7C6F44Dc8F0397FEb124517ba82e26E",
+      "symbol": "PT-wstUSR-29JAN2026"
+    },
+    "0x5AA4AfE7359d5a68D193f03E013d553DEb7DbD1f": {
+      "YT": "0x77B50ef8D55b8d6F9a632468e417bE21d5712A2E",
+      "address": "0x5AA4AfE7359d5a68D193f03E013d553DEb7DbD1f",
+      "decimals": 18,
+      "loanToken": {
+        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "decimals": 6,
+        "name": "USD Coin",
+        "symbol": "USDC"
+      },
+      "maturityTimestamp": 1772064000,
+      "morphoMarketId": "0xf982e67987ed310641bb33f1e7ebf3a0a2930f6b00d8f6b089440ace18f76c9b",
+      "name": "PT Wrapped Savings rUSD 26FEB2026",
+      "pendleMarket": "0x41b5236DF40C4718A76d4342e83153556373C072",
+      "symbol": "PT-wsrUSD-26FEB2026"
     }
   },
   "flashLeverageAddress": "0xcAcCfC3168402668DBDCc054947Dea0101812cca",

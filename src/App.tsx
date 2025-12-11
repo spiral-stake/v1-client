@@ -11,18 +11,12 @@ import DropdownMenu from "./components/DropdownMenu";
 import Loader from "./components/low-level/Loader";
 import axios from "axios";
 import ProductPage from "./pages/ProductPage";
-import { LeveragePosition, Metrics } from "./types";
-
-const devTeamWallet =
-  "0x386fB147faDb206fb7Af36438E6ae1f8583f99dd".toLowerCase();
 
 function App() {
   const [flashLeverage, setFlashLeverage] = useState<FlashLeverage>();
   const [dropdown, setDropDown] = useState(false);
   const [overlay, setOverlay] = useState<React.ReactNode>();
   const [showHelpTabs, setShowHelpTabs] = useState(false);
-  const [metrics, setMetrics] = useState<Metrics[]>([]);
-
 
   const { address, chainId } = useAccount();
   const appChainId = useChainId();
@@ -57,7 +51,6 @@ function App() {
 
   const showDropdown = (bool: boolean) => setDropDown(bool);
 
-
   return (
     <div
       onClick={() => {
@@ -83,7 +76,6 @@ function App() {
               element={
                 <Products
                   flashLeverage={flashLeverage}
-                  metrics={metrics}
                 />
               }
             />
@@ -91,15 +83,12 @@ function App() {
               path="/products/:address"
               element={<ProductPage flashLeverage={flashLeverage} />}
             />
+
             <Route
               path="/portfolio"
               element={<Portfolio flashLeverage={flashLeverage} />}
             />
             <Route path="*" element={<Navigate to={"/products"} />} />
-            {/* <Route
-              path="/test"
-              element={<Test flashLeverage={flashLeverage} />}
-            /> */}
           </Routes>
 
           <Overlay overlay={overlay} />

@@ -76,7 +76,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
                   .reduce(
                     (total, current) =>
                       current.open
-                        ? total + Number(current.amountDepositedInUsd)
+                        ? total + Number(current.amountCollateral.multipliedBy(current.collateralToken.valueInUsd))
                         : total,
                     0
                   )
@@ -88,7 +88,7 @@ const Portfolio = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
               <p className="text-[24px] font-[500] text-[#E4E4E4]">
                 ${leveragePositions.reduce((total, current) =>
                   current.open
-                    ? total + Number(current.positionValueInUsd)
+                    ? total + Number(current.positionValueInLoanToken)
                     : total,
                   0
                 ).toFixed(2)}

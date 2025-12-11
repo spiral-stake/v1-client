@@ -1,16 +1,22 @@
 import { Link, useLocation } from "react-router-dom";
-import { useChainId } from "wagmi";
+import { useChainId, useSwitchChain } from "wagmi";
 import { chainConfig } from "../config/chainConfig";
 import logo from "../assets/logo.svg";
 import menuIcon from "../assets/icons/menu.svg";
 import ConnectWalletBtn from "./ConnectWalletBtn";
+import { useState } from "react";
+import arrow from "../assets/icons/arrowDown.svg";
+import { capitalize } from "../utils";
 
 const Navbar = ({
   showDropdown,
 }: {
   showDropdown: (bool: boolean) => void;
 }) => {
+  const [showChains, setShowChains] = useState(Boolean);
+
   const appChainId = useChainId();
+  const { switchChain } = useSwitchChain();
   const location = useLocation();
 
   const isActive = (path: string) =>
@@ -72,28 +78,72 @@ const Navbar = ({
 
           {/* chain and login */}
           <div className="flex justify-start items-center gap-3">
-            <div className="rounded-full flex justify-center items-center gap-2 overflow-hidden">
-              <div className="cursor-pointer flex justify-start items-center gap-[4px]">
-                <div className=" relative overflow-hidden">
-                  <div className="w-[21px] h-[21px]">
-                    <img
-                      className=""
-                      src={chainConfig[appChainId].logo}
-                      alt=""
-                    />
+            <div className="relative transition-all duration-300 cursor-pointer">
+              <div
+                onClick={() => setShowChains(!showChains)}
+                className={`cursor-pointer flex w-full gap-[4px] h-[40px] items-center ${showChains ? "rounded-b-none border-b-0" : ""
+                  } rounded-[20px] px-[10px] border-[1px] border-[white] border-opacity-[10%] text-white`}
+              >
+
+                <div className="flex items-center gap-[6px]">
+                  <img
+                    className="w-[21px] h-[21px]"
+                    src={chainConfig[appChainId].logo}
+                    alt=""
+                  />
+
+                  <div className="hidden md:block text-[14px] font-[400] text-center">
+                    {capitalize(chainConfig[appChainId].name)}
                   </div>
                 </div>
-                <span className="hidden md:inline-flex text-[14px] font-[400]">
-                  Mainnet
-                </span>
+
+                <div className="flex items-center">
+                  <img
+                    src={arrow}
+                    alt=""
+                    className={`w-[16px] transition-transform duration-300 ${showChains ? "rotate-180" : ""
+                      }`}
+                  />
+                </div>
               </div>
+
+              {showChains && (
+                <div className="absolute top-full left-0 right-0 bg-white bg-opacity-[6%] backdrop-blur-sm border border-white border-opacity-[10%] border-t-0 rounded-t-none rounded-[20px] z-50">
+                  {Object.entries(chainConfig)
+                    .filter(([id]) => Number(id) !== appChainId)
+                    .map(([id, { logo, name }]) => {
+                      const chainIdNum = Number(id)
+
+                      return (
+                        <button
+                          key={id}
+                          onClick={() => {
+                            setShowChains(false)
+                            switchChain({ chainId: chainIdNum })
+                          }}
+                          className="cursor w-full text-left px-[10px] h-[40px] text-sm text-gray-300 flex items-center gap-[4px]"
+                        >
+                          <div className="flex items-center gap-[6px]">
+                            <img className="w-[21px] h-[21px]" src={logo} alt="" />
+
+                            <div className="hidden md:block text-[14px] font-[400] text-center">
+                              {capitalize(name)}
+                            </div>
+                          </div>
+                        </button>
+                      )
+                    })}
+                </div>
+              )}
+
+
             </div>
             <div>
               <ConnectWalletBtn />
             </div>
           </div>
         </div>
-      </div>
+      </div >
     </>
   );
 };

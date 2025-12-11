@@ -17,7 +17,7 @@ const local = defineChain({
 
 const ethereumMainnet = defineChain({
   id: 1,
-  name: "Ethereum",
+  name: "ethereum",
   logo: "/logos/mainnet.svg",
   nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
   rpcUrls: {
@@ -45,6 +45,31 @@ const ethereumMainnet = defineChain({
   },
 });
 
+const polygon = defineChain({
+  id: 137,
+  name: "polygon",
+  logo: "/logos/polygon.svg",
+  nativeCurrency: { name: "POL", symbol: "POL", decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: ["https://polygon-rpc.com"],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "PolygonScan",
+      url: "https://polygonscan.com",
+      apiUrl: "https://api.polygonscan.com/api",
+    },
+  },
+  contracts: {
+    multicall3: {
+      address: "0xca11bde05977b3631167028862be2a173976ca11",
+      blockCreated: 25770160,
+    },
+  },
+});
+
 // ===== Env-based Export ===== //
 interface ChainType {
   [key: number]: ReturnType<typeof defineChain>;
@@ -53,4 +78,6 @@ interface ChainType {
 const ENV = import.meta.env.VITE_ENV;
 
 export const chainConfig: ChainType =
-  ENV === "dev" ? { [local.id]: local } : { [ethereumMainnet.id]: ethereumMainnet };
+  ENV === "dev"
+    ? { [local.id]: local, [polygon.id]: polygon, [ethereumMainnet.id]: ethereumMainnet }
+    : { [ethereumMainnet.id]: ethereumMainnet, [polygon.id]: polygon };

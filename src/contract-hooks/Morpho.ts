@@ -2,7 +2,7 @@ import { Base } from "./Base";
 import { abi as MORPHO_ABI } from "../abi/IMorpho.sol/IMorpho.json";
 
 // Needs to change for multi-chain implementation
-const morphoAddress = "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb";
+const morphoAddress = "0x1bF0c2541F820E775182832f06c0B7Fc27A25f67";
 
 export default class Morpho extends Base {
   constructor() {

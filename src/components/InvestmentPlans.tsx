@@ -3,22 +3,26 @@ import { CollateralToken } from "../types";
 import BtnGreen from "./low-level/BtnGreen";
 import InvestmentPlanTab from "./InvestmentPlanTab";
 import { getNetYieldUsd } from "../utils/getNetYieldUsd";
+import { formatNumber } from "../utils/formatNumber";
 
 const InvestmentPlans = ({
   leverage,
   leverageApy,
-  amountInUsd,
+  amountCollateral,
   collateralToken,
   flashLeverage,
   desiredLtv,
 }: {
   leverage: string;
   leverageApy: string;
-  amountInUsd: number;
+  amountCollateral: number;
   collateralToken: CollateralToken;
   flashLeverage: FlashLeverage;
   desiredLtv: string;
 }) => {
+  const defaultamountCollateral = 100000;
+  const defaultDaysLeft = 365;
+
   return (
     <div className="flex flex-col gap-[18px]">
       {/* <div className="border-[1px] w-fit py-[8.5px] px-[10px] rounded-full">
@@ -27,7 +31,7 @@ const InvestmentPlans = ({
       <div className="flex items-center justify-normal gap-[0.5rem] lg:justify-normal  lg:gap-[20px] pb-[8px]">
         <div className="">
           <p className="text-[16px] lg:text-[24px] font-[500]">
-            ${Number(amountInUsd) || "10000"}
+            ${formatNumber(amountCollateral || defaultamountCollateral)}
           </p>
           <p className="text-[12px] text-[#8E8E8E]">Initial investment</p>
         </div>
@@ -39,10 +43,10 @@ const InvestmentPlans = ({
               <div className="flex items-center gap-[8px] text-[#68EA6A]">
                 <p className="text-[16px] lg:text-[24px] font-[500]">
                   +$
-                  {Math.max(Number(getNetYieldUsd(amountInUsd, leverageApy, leverage, collateralToken.maturityDaysLeft)), 0)}
+                  {Math.max(Number(getNetYieldUsd(amountCollateral || defaultamountCollateral, leverageApy, leverage, collateralToken.maturityDaysLeft || 365)), 0)}
                 </p>
                 <BtnGreen
-                  text={`in ${collateralToken.maturityDaysLeft} Days`}
+                  text={`in ${collateralToken.maturityDaysLeft || defaultDaysLeft} Days`}
                 />
               </div>
 
@@ -70,7 +74,7 @@ const InvestmentPlans = ({
       </div>
       <div className="p-[12px] bg-white border-[1px] border-white bg-opacity-[4%] border-opacity-[6%] rounded-[20px] rounded-b-none lg:rounded-b-[20px]">
         <InvestmentPlanTab
-          amountInUsd={amountInUsd}
+          amountCollateral={amountCollateral}
           desiredLtv={desiredLtv}
           collateralToken={collateralToken}
           selected
@@ -88,7 +92,7 @@ const InvestmentPlans = ({
           .slice(0, 4)
           .map((newcollateralToken, index) => (
             <InvestmentPlanTab
-              amountInUsd={amountInUsd}
+              amountCollateral={amountCollateral}
               key={index}
               desiredLtv={desiredLtv}
               collateralToken={newcollateralToken}

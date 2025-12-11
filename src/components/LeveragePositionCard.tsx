@@ -4,11 +4,11 @@ import BigNumber from "bignumber.js";
 import { useAccount, useChainId } from "wagmi";
 
 import FlashLeverage from "../contract-hooks/FlashLeverage";
-import { InternalReswapData, LeveragePosition } from "../types/index";
-import { calcLeverage } from "../utils";
+import { DeleverageSwapData, LeveragePosition } from "../types/index";
+import { calcLeverage, isMatured } from "../utils";
 import { displayTokenAmount } from "../utils/displayTokenAmounts";
 import { handleAsync } from "../utils/handleAsyncFunction";
-import { toastSuccess, toastError } from "../utils/toastWrapper";
+import { toastSuccess } from "../utils/toastWrapper";
 import ActionBtn from "./ActionBtn";
 import BtnFull from "./low-level/BtnFull";
 import Overlay from "./low-level/Overlay";
@@ -18,8 +18,8 @@ import LeverageBreakdown from "./LeverageBreakdown";
 import { HoverInfo } from "./low-level/HoverInfo";
 import MorphoLink from "./low-level/MorphoLink";
 import { formatUnits } from "../utils/formatUnits";
-import { getInternalReswapData } from "../api-services/swapAggregator";
-import { getNetYieldUsd } from "../utils/getNetYieldUsd";
+import { getDeLeverageSwapData } from "../api-services/swapAggregator";
+import { getProjectedYieldInLoanToken } from "../utils/getNetYieldUsd";
 import AutoDeleverage from "./low-level/AutoLeverage";
 
 const LeveragePositionCard = ({
@@ -34,33 +34,29 @@ const LeveragePositionCard = ({
   const [showCloseReview, setShowCloseReview] = useState(false);
   const [loading, setLoading] = useState(false);
   // Result of simulation
-  const [internalReswapData, setInternalReswapData] =
-    useState<InternalReswapData | null>(null);
+  const [deleverageSwapData, setDeleverageSwapData] =
+    useState<DeleverageSwapData | null>(null);
   const [amountReturnedSimulated, setAmountReturnedSimulated] =
     useState<BigNumber>(new BigNumber(0));
 
-  const { address } = useAccount();
   const chainId = useChainId();
   const appChainId = useChainId();
 
   const fetchAndSimulateClose = async () => {
     setLoading(true);
     try {
-      const _internalReswapData = await getInternalReswapData(
+      const _deleverageSwapData = await getDeLeverageSwapData(
         appChainId,
         flashLeverage,
         pos.collateralToken,
         pos.amountLeveragedCollateral
       );
 
-      const simulation = await flashLeverage.simulate("unleverage", [
-        address,
+      setDeleverageSwapData(_deleverageSwapData);
+
+      const simulation = await flashLeverage.simulate("deleverage", [
         pos.id,
-        _internalReswapData.pendleSwap,
-        _internalReswapData.tokenRedeemSy,
-        _internalReswapData.minTokenOut,
-        _internalReswapData.swapData,
-        _internalReswapData.limitOrderData,
+        _deleverageSwapData
       ]);
 
       const rawReturned = (simulation?.result ?? 0) as unknown as bigint;
@@ -69,30 +65,24 @@ const LeveragePositionCard = ({
         pos.collateralToken.loanToken.decimals
       );
 
-      setInternalReswapData(_internalReswapData);
       setAmountReturnedSimulated(normalized);
       setShowCloseReview(true);
 
       setLoading(false);
     } catch (err: any) {
-      console.log(err)
-      toastError("Simulation Error", err.shortMessage);
+      setShowCloseReview(true);
+      console.log(err);
       setLoading(false);
     }
   };
 
-  const handleCloseLeveragePosition = async () => {
-    if (!internalReswapData) return;
+  const handleDeleverage = async () => {
+    if (!deleverageSwapData) return;
     setLoading(true);
 
-    const amountReturned = await flashLeverage.unleverage(
-      address as string,
+    const amountReturned = await flashLeverage.deleverage(
       pos,
-      internalReswapData.pendleSwap,
-      internalReswapData.tokenRedeemSy,
-      internalReswapData.minTokenOut,
-      internalReswapData.swapData,
-      internalReswapData.limitOrderData
+      deleverageSwapData
     );
 
     if (chainId && Number(chainId) !== 31337) {
@@ -125,11 +115,11 @@ const LeveragePositionCard = ({
         onClick={fetchAndSimulateClose}
       />
     );
-  }, [pos, pos.isMatured, showCloseReview, loading, fetchAndSimulateClose]);
+  }, [pos, showCloseReview, loading, fetchAndSimulateClose]);
 
   return (
     <div>
-      {pos.isMatured && pos.open && (
+      {pos.collateralToken.isPt && isMatured(pos.collateralToken) && pos.open && (
         <div className="py-[5px] w-full text-center lg:text-start lg:w-fit px-[24px] bg-[#20374a] rounded-xl rounded-b-none">
           <p className="text-[#68EA6A] text-[14px]">Position Matured</p>
         </div>
@@ -138,7 +128,7 @@ const LeveragePositionCard = ({
       <div
         className="bg-white bg-opacity-[4%] rounded-xl w-full flex flex-col p-[24px] gap-[24px]"
         style={
-          pos.isMatured && pos.open
+          pos.collateralToken.isPt && isMatured(pos.collateralToken) && pos.open
             ? { borderTopLeftRadius: 0, borderTopRightRadius: 0 }
             : {}
         }
@@ -150,17 +140,16 @@ const LeveragePositionCard = ({
                 <div>
                   <img
                     className="w-[48px]"
-                    src={`/tokens/${pos.collateralToken.symbolExtended}.svg`}
-                    alt={`${pos.collateralToken.symbol} token`}
+                    src={`/tokens/${pos.collateralToken.symbolExtended || pos.collateralToken.symbol}.svg`}
                   />
                 </div>
 
                 <div>
-                  <div className="text-[24px] font-semibold">{`${pos.collateralToken.symbol.split("-")[1]
+                  <div className="text-[24px] font-semibold">{`${pos.collateralToken.symbol
                     }`}</div>
                 </div>
               </div>
-              {pos.open && (
+              {pos.open && pos.collateralToken.isPt && (
                 <div className="lg:hidden">
                   <AutoDeleverage />
                 </div>
@@ -168,7 +157,7 @@ const LeveragePositionCard = ({
             </div>
 
             <div className="text-[#68EA6A] flex items-center justify-normal gap-1">
-              <div
+              {/* <div
                 className="inline-flex"
                 style={pos.open ? { color: "#68EA6A" } : { color: "gray" }}
               >
@@ -179,13 +168,13 @@ const LeveragePositionCard = ({
                     <BtnGreen text={`Held for ${pos.heldFor} Days`} />
                   )
                 )}
-              </div>
+              </div> */}
 
               <div style={pos.open ? { color: "#68EA6A" } : { color: "gray" }}>
                 <BtnGreen
                   text={
-                    pos.open && !pos.isMatured
-                      ? `${pos.leverageApy}% APY (${pos.collateralToken.maturityDate} - ${pos.collateralToken.maturityDaysLeft} Days)`
+                    pos.open
+                      ? `${pos.leverageApy}% APY ${pos.collateralToken.isPt ? `(${pos.collateralToken.maturityDate} - ${pos.collateralToken.maturityDaysLeft} Days)` : ""}`
                       : `${pos.collateralToken.maturityDate}`
                   }
                 />
@@ -196,7 +185,7 @@ const LeveragePositionCard = ({
                   <HoverInfo
                     content={
                       <LeverageBreakdown
-                        collateralTokenApy={pos.collateralToken.impliedApy}
+                        collateralTokenApy={pos.collateralToken.apy}
                         borrowApy={pos.collateralToken.borrowApy}
                         leverage={pos.leverage}
                       />
@@ -219,7 +208,7 @@ const LeveragePositionCard = ({
         </div>
 
         <div className="flex flex-col gap-y-[12px] lg:grid grid-cols-[auto,auto] lg:gap-y-[14px] grid-rows-2 lg:grid-rows-1 lg:grid-cols-[1fr,1fr,1fr,1fr,1fr,1fr]">
-          {pos.open && !pos.isMatured ? (
+          {pos.open ? (
             <OpenPositionView
               pos={pos}
               yieldGenerated={pos.yieldGenerated || BigNumber(0)}
@@ -274,7 +263,7 @@ const LeveragePositionCard = ({
                 <ActionBtn
                   btnLoading={loading}
                   text="Close"
-                  onClick={handleAsync(handleCloseLeveragePosition, setLoading)}
+                  onClick={handleAsync(handleDeleverage, setLoading)}
                   expectedChainId={Number(chainId)}
                 />
               </div>
@@ -298,7 +287,7 @@ const LeveragePositionCard = ({
                         btnLoading={loading}
                         text="Close"
                         onClick={handleAsync(
-                          handleCloseLeveragePosition,
+                          handleDeleverage,
                           setLoading
                         )}
                         expectedChainId={Number(chainId)}
@@ -344,7 +333,7 @@ function OpenPositionView({
           {displayTokenAmount(pos.amountCollateral)}{" "}
           {pos.collateralToken.symbol}
           <div className="text-[14px] text-[#D7D7D7]">
-            ${displayTokenAmount(pos.amountDepositedInUsd)}
+            ${pos.collateralToken.isPt ? `` : pos.amountCollateral.multipliedBy(pos.collateralToken.valueInUsd).toFixed(2)}
           </div>
         </div>
       </div>
@@ -378,7 +367,7 @@ function OpenPositionView({
             {pos.collateralToken.loanToken.symbol}
           </div>
           <div className="text-[14px] text-[#D7D7D7]">
-            ${displayTokenAmount(pos.amountLoan)}
+            ${displayTokenAmount(pos.amountLoan.multipliedBy(pos.collateralToken.loanToken.valueInUsd))}
           </div>
         </div>
       </div>
@@ -396,11 +385,10 @@ function OpenPositionView({
                 <div className="flex flex-col lg:flex-row justify-between items-start gap-[12px] lg:gap-[6px]">
                   <p className="text-[14px] text-gray-400">Yield Generated</p>
                   <div className="flex flex-col lg:flex-row items-start gap-[6px] lg:gap-[4px] text-[14px] lg:text-[14px]">
-                    {displayTokenAmount(BigNumber.max(yieldGenerated, 0))}{" "}
-                    {pos.collateralToken.loanToken.symbol}
+                    {displayTokenAmount(BigNumber.max(yieldGenerated, 0), pos.collateralToken.loanToken, 5)}{" "}
                     <div className="text-[12px] text-[#D7D7D7]">
                       {" "}
-                      (${displayTokenAmount(BigNumber.max(yieldGenerated, 0))})
+                      (${displayTokenAmount(BigNumber.max(yieldGenerated.multipliedBy(pos.collateralToken.loanToken.valueInUsd), 0))})
                     </div>
                   </div>
                 </div>
@@ -409,44 +397,15 @@ function OpenPositionView({
           />
         </div>
         <div className="flex flex-col items-end lg:items-start lg:gap-[8px] text-[14px] lg:text-[16px]">
-          {Math.max(
-            Number(
-              displayTokenAmount(
-                BigNumber(
-                  getNetYieldUsd(
-                    Number(pos.amountDepositedInUsd),
-                    pos.leverageApy,
-                    pos.leverage,
-                    pos.collateralToken.maturityDaysLeft,
-                    false,
-                    false
-                  ).toString()
-                ).plus(BigNumber(pos.yieldGenerated))
-              )
-            ),
-            0
-          )}{" "}
+          {
+            displayTokenAmount(BigNumber(Math.max(Number(BigNumber(getProjectedYieldInLoanToken(pos)).plus(BigNumber(pos.yieldGenerated))), 0)), pos.collateralToken.loanToken, 5)
+          }{" "}
           {""}
-          {pos.collateralToken.loanToken.symbol}
+
           <div className="text-[14px] text-[#D7D7D7]">
-            $
-            {Math.max(
-              Number(
-                displayTokenAmount(
-                  BigNumber(
-                    getNetYieldUsd(
-                      Number(pos.amountDepositedInUsd),
-                      pos.leverageApy,
-                      pos.leverage,
-                      pos.collateralToken.maturityDaysLeft,
-                      false,
-                      false
-                    ).toString()
-                  ).plus(BigNumber(pos.yieldGenerated))
-                )
-              ),
-              0
-            )}
+            $ {
+              displayTokenAmount(BigNumber(getProjectedYieldInLoanToken(pos)).plus(BigNumber(pos.yieldGenerated)).multipliedBy(pos.collateralToken.loanToken.valueInUsd))
+            }
           </div>
         </div>
       </div>
@@ -465,15 +424,15 @@ function OpenPositionView({
         <p className="text-[14px] text-gray-400">Price</p>
         <div className="flex flex-col items-end lg:items-start lg:gap-[4px] gap-[4px] text-[14px] lg:text-[16px]">
           <BtnGreen
-            text={`Current: $${Number(pos.collateralToken.valueInUsd).toFixed(
+            text={`Current: ${Number(pos.collateralToken.valueInLoanToken).toFixed(
               3
-            )}`}
+            )} ${pos.collateralToken.loanToken.symbol}`}
           />
           <BtnGreen
-            text={`Liquidation: $${(
+            text={`Liquidation: ${(
               (Number(pos.ltv) / Number(pos.collateralToken.liqLtv)) *
-              Number(pos.collateralToken.valueInUsd)
-            ).toFixed(3)}`}
+              Number(pos.collateralToken.valueInLoanToken)
+            ).toFixed(3)} ${pos.collateralToken.loanToken.symbol}`}
           />
         </div>
       </div>
@@ -497,11 +456,11 @@ function ClosedOrMaturedView({
             {displayTokenAmount(pos.amountCollateral)}{" "}
             {pos.collateralToken.symbol}
           </div>
-          ${displayTokenAmount(pos.amountDepositedInUsd)}
+          $
         </div>
       </div>
 
-      {pos.open ? (
+      {/* {pos.open ? (
         <>
           <div className="col-span-1 flex justify-between items-start lg:flex-col gap-[4px] lg:gap-[8px]">
             <p className="text-[14px] text-gray-400">Yield Generated</p>
@@ -549,7 +508,7 @@ function ClosedOrMaturedView({
             </div>
           </div>
         </>
-      ) : null}
+      ) : null} */}
     </>
   );
 }

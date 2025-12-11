@@ -1,8 +1,10 @@
 import { CollateralToken } from "./../types/index";
 import BigNumber from "bignumber.js";
 
-export function calcLtv(amountStblUSD: BigNumber, amountCollateralInUsd: BigNumber) {
-  const ltv = amountStblUSD.div(amountCollateralInUsd).multipliedBy(100);
+export const zeroAddress = "0x0000000000000000000000000000000000000000";
+
+export function calcLtv(amountStblUSD: BigNumber, amountCollateralInLoanToken: BigNumber) {
+  const ltv = amountStblUSD.div(amountCollateralInLoanToken).multipliedBy(100);
   return ltv.isNaN() || !ltv.isFinite() ? "0.00" : ltv.toFixed(2);
 }
 
@@ -67,7 +69,7 @@ export function currentTimestamp() {
   return Math.floor(Date.now() / 1000);
 }
 
-export function daysAgo(timestamp:string) {
+export function daysAgo(timestamp: string) {
   const givenDate = new Date(timestamp);
   const now = new Date();
 

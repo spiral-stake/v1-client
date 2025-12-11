@@ -19,17 +19,22 @@ export const readCollateralTokens = async (chainId: number): Promise<CollateralT
   const tokenInfo = tokenInfoModule.default;
 
   return Object.keys(collateralTokens).map((tokenAddress) => {
-    const collateralToken = collateralTokens[tokenAddress];
-    const maturityDate = getMaturityDate(collateralToken.symbol);
+    const collateralToken = { ...collateralTokens[tokenAddress] };
 
-    return {
-      ...collateralToken,
-      symbolExtended: collateralToken.symbol,
-      symbol: `${collateralToken.symbol.split("-")[0]}-${collateralToken.symbol.split("-")[1]}`,
-      maturityDate,
-      maturityDaysLeft: getMaturityDaysLeft(maturityDate),
-      info: tokenInfo[tokenAddress],
-    };
+    collateralToken["info"] = tokenInfo[tokenAddress];
+
+    if (collateralToken.pendleMarket) {
+      collateralToken["isPt"] = true;
+      const maturityDate = getMaturityDate(collateralToken.symbol);
+      collateralToken["maturityDate"] = maturityDate;
+      collateralToken["maturityDaysLeft"] = getMaturityDaysLeft(maturityDate);
+      collateralToken["symbolExtended"] = collateralToken.symbol;
+      collateralToken["symbol"] = `${collateralToken.symbol.split("-")[0]}-${
+        collateralToken.symbol.split("-")[1]
+      }`;
+    }
+
+    return collateralToken;
   });
 };
 
@@ -66,14 +71,19 @@ export const readCollateralToken = async (
   const tokenInfo = tokenInfoModule.default;
 
   const collateralToken = collateralTokens[tokenAddress];
-  const maturityDate = getMaturityDate(collateralToken.symbol);
 
-  return {
-    ...collateralToken,
-    symbolExtended: collateralToken.symbol,
-    symbol: `${collateralToken.symbol.split("-")[0]}-${collateralToken.symbol.split("-")[1]}`,
-    maturityDate,
-    maturityDaysLeft: getMaturityDaysLeft(maturityDate),
-    info: tokenInfo[tokenAddress],
-  };
+  collateralToken["info"] = tokenInfo[tokenAddress];
+
+  if (collateralToken.pendleMarket) {
+    collateralToken["isPt"] = true;
+    const maturityDate = getMaturityDate(collateralToken.symbol);
+    collateralToken["maturityDate"] = maturityDate;
+    collateralToken["maturityDaysLeft"] = getMaturityDaysLeft(maturityDate);
+    collateralToken["symbolExtended"] = collateralToken.symbol;
+    collateralToken["symbol"] = `${collateralToken.symbol.split("-")[0]}-${
+      collateralToken.symbol.split("-")[1]
+    }`;
+  }
+
+  return collateralToken;
 };

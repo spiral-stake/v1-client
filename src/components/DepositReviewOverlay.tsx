@@ -42,12 +42,12 @@ const DepositReviewOverlay = ({
         <div className="flex flex-col gap-[8px]">
           <ReviewinfoTabs
             title="Deposit Amount"
-            info={`${amountCollateral} USDC`}
+            info={`${amountCollateral} ${token.symbol}`}
           />
-          <ReviewinfoTabs
+          {collateralToken.isPt && <ReviewinfoTabs
             title="Maturity Date"
             info={collateralToken.maturityDate}
-          />
+          />}
           <ReviewinfoTabs title="Leverage" info={`${leverage}x`} />
           <ReviewinfoTabs info={`${leverageApy}% APY`} title="Estimated Yield" />
           <ReviewinfoTabs title="Your LTV" info={`${desiredLtv}%`} />

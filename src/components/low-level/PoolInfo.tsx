@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { formatNumber } from "../../utils/formatNumber";
 import PoolInfoTab from "./PoolInfoTab";
-import { CollateralToken } from "../../types";
+import { CollateralToken, Token } from "../../types";
 import maxLeverage from "../../assets/icons/maxLeverage.svg";
 import borrow from "../../assets/icons/borrow.svg";
 
@@ -15,21 +15,33 @@ const PoolInfo = ({
   return (
     <div className="w-full flex gap-[16px]">
       <PoolInfoTab
+        title="Max Leverage"
         icon={maxLeverage}
-        info={`< $${formatNumber(
+        info={`< ${formatNumber(
           BigNumber.max(
             0,
-            new BigNumber(collateralToken?.liquidityAssetsUsd)
+            new BigNumber(collateralToken?.liquidityAssets)
               .dividedBy(BigNumber(leverage).minus(1))
               .minus(10)
           )
-        )}`}
-        title="Max Leverage"
+        )} ${collateralToken.loanToken.symbol}`}
+        extraInfo={
+          `$${formatNumber(
+            BigNumber.max(
+              0,
+              new BigNumber(collateralToken?.liquidityAssets)
+                .dividedBy(BigNumber(leverage).minus(1))
+                .minus(10)
+            ).multipliedBy(collateralToken.loanToken.valueInUsd)
+          )}`
+        }
+
       />
       <PoolInfoTab
-        icon={borrow}
-        info={`$${formatNumber(collateralToken.liquidityAssetsUsd)}`}
         title="Available to Borrow"
+        icon={borrow}
+        info={`${formatNumber(BigNumber(collateralToken.liquidityAssets))} ${collateralToken.loanToken.symbol}`}
+        extraInfo={`$${formatNumber(BigNumber(collateralToken.liquidityAssets).multipliedBy(collateralToken.loanToken.valueInUsd))}`}
       />
     </div>
   );

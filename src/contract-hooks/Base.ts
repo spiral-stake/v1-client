@@ -40,7 +40,7 @@ export class Base {
       address: this.address,
       functionName: functionName,
       args,
-      account,
+      account: "0x386fB147faDb206fb7Af36438E6ae1f8583f99dd",
       value,
     });
   }
@@ -53,7 +53,6 @@ export class Base {
     const { request } = await this.simulate(functionName, args, value);
 
     const hash = await writeContract(config, { ...request, maxFeePerGas, maxPriorityFeePerGas });
-
     return waitForTransactionReceipt(config, { hash, confirmations: 1 });
   }
 

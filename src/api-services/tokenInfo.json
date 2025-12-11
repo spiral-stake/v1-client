@@ -1,72 +1,27 @@
 {
-  "0x21aacE56a8F21210b7E76d8eF1a77253Db85BF0a": {
-    "underlyingCollateral": "ETH/BTC",
-    "yieldSource": "fxUSD Stability Pool",
-    "riskProfile": "high"
-  },
-  "0x23e0D07095DAec91B6Ae016cA9F08222dCc64c49": {
+  "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0": {
     "underlyingCollateral": "ETH",
-    "yieldSource": "Resolv Liquidity Pool",
-    "riskProfile": "medium"
-  },
-  "0x2CA5f2C4300450D53214B00546795c1c07B89acB": {
-    "underlyingCollateral": "USDC/USDT",
-    "yieldSource": "Lending Protocols",
-    "riskProfile": "medium"
-  },
-  "0x545A490f9ab534AdF409A2E682bc4098f49952e3": {
-    "underlyingCollateral": "USD",
-    "yieldSource": "Cap Operators",
-    "riskProfile": "high"
-  },
-  "0x62C6E813b9589C3631Ba0Cdb013acdB8544038B7": {
-    "underlyingCollateral": "ETH",
-    "yieldSource": "ETH Funding Rates",
-    "riskProfile": "low"
-  },
-  "0xB10DA2F9147f9cf2B8826877Cd0c95c18A0f42dc": {
-    "underlyingCollateral": "T-Bills",
-    "yieldSource": "T-Bill Yields",
+    "yieldSource": "ETH Staking",
     "riskProfile": "low"
   },
   "0xC3c7E5E277d31CD24a3Ac4cC9af3B6770F30eA33": {
     "underlyingCollateral": "USD",
     "yieldSource": "Cap Operators",
-    "riskProfile": "high"
-  },
-  "0xDBf6feC5A012A13c456Bac3B67C3B9CF2830A122": {
-    "underlyingCollateral": "T-Bills",
-    "yieldSource": "T-Bill Yields",
-    "riskProfile": "low"
-  },
-  "0xF3f491e5608f8B8a6Fd9E9d66a4a4036d7FD282C": {
-    "underlyingCollateral": "USDe",
-    "yieldSource": "Carry & Basis Trades",
     "riskProfile": "medium"
   },
-  "0xdcFDf8434e8FDfFF2dD7dfC9299877e813348EE7": {
-    "underlyingCollateral": "RWAs & Digital Assets",
-    "yieldSource": "Reservoir Balance Sheet",
+  "0x88887bE419578051FF9F4eb6C858A951921D8888": {
+    "underlyingCollateral": "USD",
+    "yieldSource": "Cap Operators",
     "riskProfile": "medium"
   },
-  "0xe6A934089BBEe34F832060CE98848359883749B3": {
+  "0x03b54A6e9a984069379fae1a4fC4dBAE93B3bCCD": {
     "underlyingCollateral": "ETH",
-    "yieldSource": "ETH Funding Rates",
+    "yieldSource": "ETH Staking",
     "riskProfile": "low"
   },
-  "0xb44cdBEF3145C1c1E772e8228E1154c80e70618e": {
-    "underlyingCollateral": "USDC",
-    "yieldSource": "Bluechip DeFi Strategies",
+  "0xfa68FB4628DFF1028CFEc22b4162FCcd0d45efb6": {
+    "underlyingCollateral": "Matic",
+    "yieldSource": "Matic Staking",
     "riskProfile": "medium"
-  },
-  "0x5510B080449d5E3Bf345b6635eD40A35B36b081f": {
-    "underlyingCollateral": "USDC",
-    "yieldSource": "Bluechip DeFi Strategies",
-    "riskProfile": "medium"
-  },
-  "0x1Fb3C5c35D95F48e48FFC8e36bCCe5CB5f29F57c": {
-    "underlyingCollateral": "USDe",
-    "yieldSource": "Staking Pooled USDe",
-    "riskProfile": "low"
   }
 }

@@ -1,0 +1,40 @@
+{
+  "USDC": {
+    "address": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+    "decimals": 6,
+    "name": "USD Coin",
+    "symbol": "USDC",
+    "valueInUsd": 1
+  },
+  "collateralTokens": {
+    "0x03b54A6e9a984069379fae1a4fC4dBAE93B3bCCD": {
+      "address": "0x03b54A6e9a984069379fae1a4fC4dBAE93B3bCCD",
+      "decimals": 18,
+      "loanToken": {
+        "address": "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
+        "decimals": 18,
+        "name": "Wrapped Ether",
+        "symbol": "WETH",
+        "valueInUsd": 3200
+      },
+      "morphoMarketId": "0xb8ae474af3b91c8143303723618b31683b52e9c86566aa54c06f0bc27906bcae",
+      "name": "Wrapped liquid staked Ether 2.0 (PoS)",
+      "symbol": "wstETH"
+    },
+    "0xfa68FB4628DFF1028CFEc22b4162FCcd0d45efb6": {
+      "address": "0xfa68FB4628DFF1028CFEc22b4162FCcd0d45efb6",
+      "decimals": 18,
+      "loanToken": {
+        "address": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+        "decimals": 18,
+        "name": "Wrapped Polygon Ecosystem Token",
+        "symbol": "WPOL",
+        "valueInUsd": 0.15
+      },
+      "morphoMarketId": "0xa932e0d8a9bf52d45b8feac2584c7738c12cf63ba6dff0e8f199e289fb5ca9bb",
+      "name": "Liquid Staking Matic (PoS)",
+      "symbol": "MaticX"
+    }
+  },
+  "flashLeverageAddress": "0x338F8EEaB0236B12c43a3afd20bd0e650F360023"
+}

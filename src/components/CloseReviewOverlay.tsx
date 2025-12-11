@@ -18,14 +18,13 @@ const CloseReviewOverlay = ({
   pos: LeveragePosition;
   amountReturnedSimulated: BigNumber;
 }) => {
-  console.log(pos.amountDepositedInUsd.toString(), amountReturnedSimulated.toString());
 
   return (
     <div className="flex flex-col p-[24px] lg:backdrop-blur-2xl lg:bg-white lg:bg-opacity-[8%] rounded-[16px] rounded-b-none lg:rounded-b-[16px] gap-[20px] w-full lg:w-[500px] border-[1px] border-b-0 lg:border-b-[1px] border-white border-opacity-[4%]">
       <div className="flex justify-between items-center text-[20px]">
         <div className="flex gap-[8px] items-center">
           <img
-            src={`/tokens/${pos.collateralToken.symbolExtended}.svg`}
+            src={`/tokens/${pos.collateralToken.symbolExtended || pos.collateralToken.symbol}.svg`}
             alt=""
             className="w-[32px]"
           />
@@ -44,11 +43,14 @@ const CloseReviewOverlay = ({
             <div className="flex items-start gap-2 rounded-xl">
               <img src={warning} alt="Warning" className="w-10" />
               <p className="text-sm leading-relaxed text-amber-500">
-                <span className="font-medium"> Yields spike at maturity. </span>
-                PTs reach full value only then, so positions
-                should only be unleveraged at maturity. Leverage or Deleveraging face{" "}
-                <span className="font-medium">~0.1% slippage atleast</span>. <br />
-                <br />
+                {pos.collateralToken.isPt && <>
+                  <span className="font-medium"> Yields spike at maturity. </span>
+                  PTs reach full value only then, so positions
+                  should only be unleveraged at maturity. Leverage or Deleveraging face{" "}
+                  <span className="font-medium">~0.1% slippage atleast.</span>
+                  <br />
+                  <br />
+                </>}
                 If APY drops, it usually rebounds as borrow rates ease and utilization falls. Frequent
                 rebalancing erodes returns —{" "}
                 <span className="font-medium">holding often pays off.</span>
@@ -66,17 +68,17 @@ const CloseReviewOverlay = ({
         <div className="flex flex-col gap-[8px]">
           <ReviewinfoTabs
             title="Amount Deposited"
-            info={`${amountCollateral.toFixed(2)} ${pos.collateralToken.symbol}`}
-            extraInfo={`$${displayTokenAmount(pos.amountDepositedInUsd)}`}
+            info={`${amountCollateral.toFixed(4)} ${pos.collateralToken.symbol}`}
+            extraInfo={`$${displayTokenAmount(pos.amountDepositedInLoanToken)}`}
           />
 
-          <ReviewinfoTabs
+          {pos.collateralToken.isPt && <ReviewinfoTabs
             title="Maturity Date"
             info={pos.collateralToken.maturityDate}
             extraInfo={`(${pos.collateralToken.maturityDaysLeft} Days left)`}
-          />
+          />}
 
-          <ReviewinfoTabs
+          {amountReturnedSimulated.isGreaterThan(0) && <ReviewinfoTabs
             title="Amount Returned"
             info={`${displayTokenAmount(
               BigNumber.max(
@@ -85,25 +87,24 @@ const CloseReviewOverlay = ({
               )
             )} ${pos.collateralToken.loanToken.symbol}`}
             extraInfo={`$${displayTokenAmount(amountReturnedSimulated)}`}
-          />
+          />}
 
-          <ReviewinfoTabs
+          {amountReturnedSimulated.minus(pos.amountDepositedInLoanToken).isGreaterThan(0) && <ReviewinfoTabs
             title="Effective Yield"
             hoverInfo="After 0.1% Slippage & 10% Performance Fee on Yield Generated"
             info={`${displayTokenAmount(
               BigNumber.max(
-                amountReturnedSimulated.minus(pos.amountDepositedInUsd),
+                amountReturnedSimulated.minus(pos.amountDepositedInLoanToken),
                 0
               )
             )} ${pos.collateralToken.loanToken.symbol}`}
             extraInfo={`$${displayTokenAmount(
               BigNumber.max(
                 0,
-                amountReturnedSimulated.minus(pos.amountDepositedInUsd)
+                amountReturnedSimulated.minus(pos.amountDepositedInLoanToken)
               )
             )}`}
-          />
-
+          />}
         </div>
       </div>
     </div>
