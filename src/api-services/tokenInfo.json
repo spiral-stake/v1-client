@@ -4,6 +4,11 @@
     "yieldSource": "fxUSD Stability Pool",
     "riskProfile": "medium"
   },
+  "0x54Bf2659B5CdFd86b75920e93C0844c0364F5166": {
+    "underlyingCollateral": "USD",
+    "yieldSource": "Basis Trades",
+    "riskProfile": "medium"
+  },
   "0x23e0D07095DAec91B6Ae016cA9F08222dCc64c49": {
     "underlyingCollateral": "ETH",
     "yieldSource": "Resolv Liquidity Pool",
@@ -59,6 +64,12 @@
     "yieldSource": "Bluechip DeFi Strategies",
     "riskProfile": "medium"
   },
+  "0xEC4402d1389E749C14A7caEef3e4c1f861e09Bc8": {
+    "underlyingCollateral": "USDC",
+    "yieldSource": "Bluechip DeFi Strategies",
+    "riskProfile": "medium"
+  },
+
   "0x5510B080449d5E3Bf345b6635eD40A35B36b081f": {
     "underlyingCollateral": "USDC",
     "yieldSource": "Bluechip DeFi Strategies",

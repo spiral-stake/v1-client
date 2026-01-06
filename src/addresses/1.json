@@ -253,6 +253,38 @@
       "name": "PT Wrapped Savings rUSD 26FEB2026",
       "pendleMarket": "0x41b5236DF40C4718A76d4342e83153556373C072",
       "symbol": "PT-wsrUSD-26FEB2026"
+    },
+    "0x54Bf2659B5CdFd86b75920e93C0844c0364F5166": {
+      "YT": "0x08903411e7a3eB500e30aaC3bdD44775055b8C00",
+      "address": "0x54Bf2659B5CdFd86b75920e93C0844c0364F5166",
+      "decimals": 18,
+      "loanToken": {
+        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "decimals": 6,
+        "name": "USD Coin",
+        "symbol": "USDC"
+      },
+      "maturityTimestamp": 1772668800,
+      "morphoMarketId": "0x2a9a5c436719badcfadbad3ad8e8179a160ded758603eaa03a883f922a1790d3",
+      "name": "PT Staked NUSD 5MAR2026",
+      "pendleMarket": "0x6D8C4DE7071D5AeE27fc3a810764E62a4a00Ceb9",
+      "symbol": "PT-sNUSD-5MAR2026"
+    },
+    "0xEC4402d1389E749C14A7caEef3e4c1f861e09Bc8": {
+      "YT": "0x60FD558d1DfF7A4aDFcD1F8BE09Fd73861d50e6a",
+      "address": "0xEC4402d1389E749C14A7caEef3e4c1f861e09Bc8",
+      "decimals": 18,
+      "loanToken": {
+        "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "decimals": 6,
+        "name": "USD Coin",
+        "symbol": "USDC"
+      },
+      "maturityTimestamp": 1771459200,
+      "morphoMarketId": "0xb4b257c2b8001847d361a55fcd30a7bd630750bf492b85b37c4646e42e8e0d8c",
+      "name": "PT infiniFi USD 19FEB2026",
+      "pendleMarket": "0x3D39E4d42B3F6B493EE52AD5a0D8cB222F03f152",
+      "symbol": "PT-iUSD-19FEB2026"
     }
   },
   "flashLeverageAddress": "0xcAcCfC3168402668DBDCc054947Dea0101812cca",
