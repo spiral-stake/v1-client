@@ -243,7 +243,7 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
       }
     };
 
-    fetchSwapData();
+    // fetchSwapData();
   }, [showSummary]);
 
   useEffect(() => {
@@ -318,6 +318,8 @@ const ProductPage = ({ flashLeverage }: { flashLeverage: FlashLeverage }) => {
   }
 
   async function handleLeverage() {
+
+
     if (
       !flashLeverage ||
       !fromToken ||
