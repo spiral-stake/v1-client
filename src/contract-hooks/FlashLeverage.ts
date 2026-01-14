@@ -265,7 +265,7 @@ export default class FlashLeverage extends Base {
           userProxy: userProxy,
           collateralToken,
           amountCollateral: formatUnits(pos.amountCollateral, collateralToken?.decimals),
-          amountLeveragedCollateral,
+          amountLeveragedCollateral: formatUnits(morphoCollateral, collateralToken?.decimals),
           amountLoan,
           sharesBorrowed: pos.sharesBorrowed,
           ltv,
