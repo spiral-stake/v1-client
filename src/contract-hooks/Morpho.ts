@@ -33,16 +33,8 @@ export default class Morpho extends Base {
     ]);
   }
 
-  withdrawCollateralEncodedData(pos: LeveragePosition, amountWithdraw: string) {
-    if (
-      pos.amountLoan
-        .dividedBy(
-          pos.amountLeveragedCollateral
-            .multipliedBy(pos.collateralToken.valueInUsd)
-            .minus(BigNumber(amountWithdraw).multipliedBy(pos.collateralToken.valueInUsd))
-        )
-        .isGreaterThan(0.75)
-    ) {
+  withdrawCollateralEncodedData(pos: LeveragePosition, amountWithdraw: string, ltv: BigNumber) {
+    if (ltv.isGreaterThan(0.75)) {
       throw { shortMessage: "LTV exceeds 75%" };
     }
 

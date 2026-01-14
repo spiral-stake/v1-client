@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FlashLeverage from "../contract-hooks/FlashLeverage";
 import Input from "./low-level/Input";
 import ActionBtn from "./ActionBtn";
@@ -16,8 +16,36 @@ const Info = ({ flashLeverage, pos }: { flashLeverage: FlashLeverage, pos: Lever
     const [amountCollateral, setAmountCollateral] = useState("");
     const [repayLoading, setRepayLoading] = useState(false);
     const [withdrawLoading, setWithdrawLoading] = useState(false);
+    const [newLtv, setNewLtv] = useState(BigNumber(0));
 
     const chainId = useChainId();
+
+    useEffect(() => {
+        if (amountCollateral) {
+            setNewLtv(
+                pos.amountLoan
+                    .dividedBy(
+                        pos.amountLeveragedCollateral
+                            .multipliedBy(pos.collateralToken.valueInUsd)
+                            .minus(BigNumber(amountCollateral).multipliedBy(pos.collateralToken.valueInUsd))
+                    )
+
+            )
+        } else if (amountRepay) {
+            setNewLtv(
+                pos.amountLoan.minus(amountRepay)
+                    .dividedBy(
+                        pos.amountLeveragedCollateral
+                            .multipliedBy(pos.collateralToken.valueInUsd)
+
+                    )
+
+            )
+        } else {
+            setNewLtv(BigNumber(0));
+        }
+
+    }, [amountCollateral, amountRepay])
 
     const handleRepay = async () => {
         const morpho = new Morpho();
@@ -27,7 +55,7 @@ const Info = ({ flashLeverage, pos }: { flashLeverage: FlashLeverage, pos: Lever
     }
 
     const handleWithdraw = async () => {
-        await new UserProxy(pos.userProxy).execute(new Morpho().withdrawCollateralEncodedData(pos, amountCollateral))
+        await new UserProxy(pos.userProxy).execute(new Morpho().withdrawCollateralEncodedData(pos, amountCollateral, newLtv))
     }
 
     return (
@@ -43,7 +71,10 @@ const Info = ({ flashLeverage, pos }: { flashLeverage: FlashLeverage, pos: Lever
                                 type="number"
                                 name="amountRepay"
                                 placeholder="0"
-                                onChange={(e: any) => setAmountRepay(e.target.value)}
+                                onChange={(e: any) => {
+                                    setAmountCollateral("");
+                                    setAmountRepay(e.target.value)
+                                }}
                                 value={amountRepay}
                             />
                             <div className="relative transition-all duration-300" >
@@ -75,6 +106,8 @@ const Info = ({ flashLeverage, pos }: { flashLeverage: FlashLeverage, pos: Lever
                     />
                 </section>
             </div>
+            <div className="flex items-center">New LTV ~{newLtv.toFixed(2)}%</div>
+
             <div>
 
                 <section
@@ -87,7 +120,10 @@ const Info = ({ flashLeverage, pos }: { flashLeverage: FlashLeverage, pos: Lever
                                 type="number"
                                 name="amountCollateral"
                                 placeholder="0"
-                                onChange={(e: any) => setAmountCollateral(e.target.value)}
+                                onChange={(e: any) => {
+                                    setAmountRepay("")
+                                    setAmountCollateral(e.target.value)
+                                }}
                                 value={amountCollateral}
                             />
                             <div className="relative transition-all duration-300" >
