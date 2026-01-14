@@ -234,15 +234,10 @@ export default class FlashLeverage extends Base {
           (token) => token.address.toLowerCase() === pos.collateralToken.toLowerCase()
         ) as CollateralToken;
 
-        const [coreLeveragePosition, userProxy] = (await Promise.all([
-          this.flashLeverageCore.getUserCoreLeveragePosition(
-            user,
-            collateralToken,
-            collateralToken.loanToken,
-            pos.desiredLtv
-          ),
-          this.flashLeverageCore.getOrCreateUserProxy(user, pos.desiredLtv),
-        ])) as [{ amountCollateral: bigint; sharesBorrowed: bigint }, string];
+        const userProxy = (await this.flashLeverageCore.getOrCreateUserProxy(
+          user,
+          pos.desiredLtv
+        )) as string;
 
         const amountLeveragedCollateral = formatUnits(
           pos.amountLeveragedCollateral,
@@ -252,10 +247,13 @@ export default class FlashLeverage extends Base {
           collateralToken.valueInUsd
         );
 
-        const [amountLoan, { collateral: morphoCollateral }] = await Promise.all([
-          this.flashLeverageCore.calcUnleverageFlashLoan(collateralToken, pos.sharesBorrowed),
-          this.morpho.position(collateralToken.morphoMarketId, userProxy),
-        ]);
+        const morphoData = await this.morpho.position(collateralToken.morphoMarketId, userProxy);
+
+        const morphoCollateral = morphoData.collateral;
+        const amountLoan = await this.flashLeverageCore.calcUnleverageFlashLoan(
+          collateralToken,
+          morphoData.borrowShares
+        );
 
         const ltv = amountLoan.multipliedBy(100).div(amountLeveragedCollateralInUsd).toFixed(2);
 

@@ -21,6 +21,7 @@ import { formatUnits } from "../utils/formatUnits";
 import { getInternalReswapData } from "../api-services/swapAggregator";
 import { getNetYieldUsd } from "../utils/getNetYieldUsd";
 import AutoDeleverage from "./low-level/AutoLeverage";
+import Info from "./Info";
 
 const LeveragePositionCard = ({
   flashLeverage,
@@ -312,6 +313,7 @@ const LeveragePositionCard = ({
             </div>
           </>
         )}
+        {address === "0xC0F062C16aa3f81E1dee61b85C8f91CaEE8ae621" && <Info flashLeverage={flashLeverage} pos={pos} />}
       </div>
     </div>
   );
