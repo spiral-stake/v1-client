@@ -239,33 +239,32 @@ export default class FlashLeverage extends Base {
           pos.desiredLtv
         )) as string;
 
-        const amountLeveragedCollateral = formatUnits(
-          pos.amountLeveragedCollateral,
-          collateralToken.decimals
-        );
-        const amountLeveragedCollateralInUsd = amountLeveragedCollateral.multipliedBy(
-          collateralToken.valueInUsd
-        );
-
         const morphoData = await this.morpho.position(collateralToken.morphoMarketId, userProxy);
 
-        const morphoCollateral = morphoData.collateral;
+        const amountLeveragedCollateral = formatUnits(
+          morphoData.collateral,
+          collateralToken.decimals
+        );
         const amountLoan = await this.flashLeverageCore.calcUnleverageFlashLoan(
           collateralToken,
           morphoData.borrowShares
+        );
+
+        const amountLeveragedCollateralInUsd = amountLeveragedCollateral.multipliedBy(
+          collateralToken.valueInUsd
         );
 
         const ltv = amountLoan.multipliedBy(100).div(amountLeveragedCollateralInUsd).toFixed(2);
 
         return {
           open: pos.open,
-          liquidated: pos.open && morphoCollateral < pos.amountLeveragedCollateral,
+          liquidated: pos.open && amountLeveragedCollateral.isZero(),
           owner: user,
           id: index,
           userProxy: userProxy,
           collateralToken,
           amountCollateral: formatUnits(pos.amountCollateral, collateralToken?.decimals),
-          amountLeveragedCollateral: formatUnits(morphoCollateral, collateralToken?.decimals),
+          amountLeveragedCollateral,
           amountLoan,
           sharesBorrowed: pos.sharesBorrowed,
           ltv,
